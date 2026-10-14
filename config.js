@@ -1,1 +1,1 @@
-window.CFG={URL:'ISI_PROJECT_URL_DI_SINI',KEY:'ISI_ANON_KEY_DI_SINI'};
+window.CFG={URL:'https://fmzwtbclzhjppibtyilq.supabase.co/',KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtend0YmNsemhqcHBpYnR5aWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5ODcwMzYsImV4cCI6MjEwNzU2MzAzNn0.PT4pMuCJRL7pijqk80HGZcKSf68RJfPPD-J2Voh1Pto'};
