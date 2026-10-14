@@ -1,0 +1,80 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Titip Gacoan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f3f6f9;--tx:#10192b;--mu:#667085;--ln:#e3e8ef;--te:#0a8fb0;--pk:#e6007e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 'Plus Jakarta Sans',system-ui,sans-serif}
+header{background:var(--te);color:#fff;padding:22px 18px 30px;border-radius:0 0 28px 28px}
+.lg{font:800 46px/0.9 'Barlow Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase}.lg b{display:inline-block;background:var(--pk);padding:2px 12px 4px;border-radius:18px 18px 18px 4px;margin-left:8px;transform:rotate(-2deg)}
+#st{margin-top:10px;opacity:.9;font-size:13px}main{max-width:560px;margin:-14px auto 0;padding:0 14px 40px}
+.card{background:#fff;border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 2px 10px #0a8fb015}
+h2{font:800 17px 'Barlow Condensed',sans-serif;letter-spacing:.14em;color:var(--te);margin:0 0 10px;text-transform:uppercase}
+input,select{width:100%;padding:11px;margin:4px 0 8px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);font:inherit;color:var(--tx)}
+button,.btn{display:inline-block;padding:11px 16px;border:0;border-radius:999px;background:var(--te);color:#fff;font:800 14px 'Plus Jakarta Sans',sans-serif;text-decoration:none;margin:4px 6px 4px 0}
+.pk{background:var(--pk)}.gh{background:#fff;color:var(--te);border:1.5px solid var(--te)}.x{background:none;color:var(--mu);padding:0 4px;margin:0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln)}.row:last-child{border:0}.r{text-align:right}
+.mu{color:var(--mu);font-size:13px}.num{font-weight:800;white-space:nowrap}.tot{font:800 54px/1 'Barlow Condensed',sans-serif;color:var(--pk)}
+.ok{color:#0a9d63;font-style:normal;font-weight:800;font-size:13px}.no{color:var(--pk);font-style:normal;font-weight:800;font-size:13px}
+#msg{color:var(--pk);font-weight:800;text-align:center;min-height:20px;margin-top:10px}a{color:var(--te)}
+</style></head><body>
+<header><div class="lg">Titip<b>Gacoan</b></div><div id="st"></div></header><main><div id="msg"></div><div id="app"></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script><script src="config.js"></script>
+<script>
+const sb=supabase.createClient(CFG.URL,CFG.KEY),$=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rp=n=>(n<0?'–':'')+'Rp'+Math.abs(Math.round(n)).toLocaleString('id-ID'),key=s=>s.trim().toLowerCase(),label=o=>o.item+(o.level?' · Level '+o.level:'');
+const toast=t=>{$('#msg').textContent=t;setTimeout(()=>$('#msg').textContent='',4000)},wa=(n,t)=>'https://wa.me/'+(n||'')+'?text='+encodeURIComponent(t);
+let S=null,P=[],me=null,prof=null,tm,built='';
+const pj=()=>+S.pajak,price=o=>Math.round((S.prices?.[o.item]||0)*(1+pj()/100)/100)*100;
+function calc(){const g={};P.forEach(o=>{const k=key(o.nama);(g[k]=g[k]||{nama:o.nama.trim(),os:[]}).os.push(o)});const G=Object.values(g);let sub=0,tot=0;
+G.forEach(x=>{x.sum=x.os.reduce((s,o)=>s+price(o),0)+S.fee;x.paid=x.os.every(o=>o.paid);sub+=x.os.reduce((s,o)=>s+(S.prices?.[o.item]||0),0);tot+=x.sum});
+const pb1=Math.round(sub*pj()/100),fee=S.fee*G.length;return{G,sub,pb1,fee,tot,rnd:tot-sub-pb1-fee}}
+const link=()=>location.origin+location.pathname+'#/s/'+S.kode;
+function rekapText(){const c=calc();return '*Daftar Titipan Mie Gacoan*\n'+c.G.map((g,i)=>(i+1)+'. '+g.nama+' – '+g.os.map(label).join(' + ')+' = '+rp(g.sum)).join('\n')+'\n\nTotal: '+rp(c.tot)+'\nTransfer: '+(S.rek||'-')+'\nCentang bayar & kirim bukti: '+link()}
+function head(){$('#st').textContent=S?(S.judul||'')+' · '+(S.status==='open'?'Daftar dibuka':S.status==='closed'?'Daftar ditutup, menunggu belanja':'Rekap terbit')+(S.nama?' · Jastip: '+S.nama:''):''}
+function listHTML(adm){const c=calc();return '<div class="card"><h2>Daftar titipan</h2>'+(c.G.length?c.G.map((g,i)=>'<div class="row"><div><b>'+esc(g.nama)+'</b><div class="mu">'+g.os.map(o=>esc(label(o))+(adm&&S.status==='open'?' <button class="x" onclick="delO(\''+o.id+'\')">✕</button>':'')).join(' + ')+'</div></div>'+(S.status==='settled'?'<div class="r"><div class="num">'+rp(g.sum)+'</div>'+(adm?'<button class="x" onclick="tog('+i+')">':'<span>')+(g.paid?'<i class="ok">✓ Lunas</i>':'<i class="no">Belum</i>')+(adm?'</button>':'</span>')+(g.os.find(o=>o.bukti)?' <a target="_blank" href="'+esc(g.os.find(o=>o.bukti).bukti)+'">bukti</a>':'')+'</div>':'')+'</div>').join(''):'<div class="mu">Belum ada titipan.</div>')+'</div>'}
+function rekapHTML(){const c=calc(),L=(a,b)=>'<div class="row"><span class="mu">'+a+'</span><span class="num">'+b+'</span></div>';
+return '<div class="card"><h2>Rekap pembayaran</h2>'+L('Subtotal sebelum pajak',rp(c.sub))+L('PB1 · '+pj()+'%',rp(c.pb1))+(c.fee?L('Fee jastip',rp(c.fee)):'')+L('Pembulatan',rp(c.rnd))+'<div class="mu" style="margin-top:12px">TOTAL DIBAYAR</div><div class="tot">'+rp(c.tot)+'</div><div class="mu">Transfer: <b>'+esc(S.rek||'')+'</b></div><button class="gh" onclick="saveImg()">Simpan rekap sebagai gambar</button></div>'}
+function saveImg(){const c=calc(),W=900,H=540+c.G.length*76,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),B="'Barlow Condensed',sans-serif",J="'Plus Jakarta Sans',sans-serif";
+x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#0a8fb0';x.fillRect(0,0,W,210);x.fillStyle='#fff';x.font='800 96px '+B;x.fillText('TITIP GACOAN',48,110);x.font='600 22px '+J;x.fillText((S.tgl||'')+' · '+c.G.length+' orang · '+(S.nama||''),48,160);let y=290;
+c.G.forEach((g,i)=>{x.fillStyle='#10192b';x.font='800 28px '+J;x.textAlign='left';x.fillText(String(i+1).padStart(2,'0')+'  '+g.nama,48,y);x.textAlign='right';x.fillText(rp(g.sum),W-48,y);x.textAlign='left';x.fillStyle='#667085';x.font='400 20px '+J;x.fillText(g.os.map(label).join(' + '),96,y+30);y+=76});
+y+=10;[['Subtotal sebelum pajak',c.sub],['PB1 · '+pj()+'%',c.pb1]].concat(c.fee?[['Fee jastip',c.fee]]:[],[['Pembulatan',c.rnd]]).forEach(r=>{x.fillStyle='#667085';x.font='400 22px '+J;x.textAlign='left';x.fillText(r[0],48,y);x.textAlign='right';x.fillText(rp(r[1]),W-48,y);y+=40});
+x.textAlign='left';x.fillStyle='#667085';x.font='800 20px '+B;x.fillText('TOTAL DIBAYAR',48,y+30);x.fillStyle='#e6007e';x.font='800 96px '+B;x.fillText(rp(c.tot),48,y+110);x.fillStyle='#10192b';x.font='600 22px '+J;x.fillText('Transfer: '+(S.rek||''),48,y+160);
+cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='rekap-titipan.png';a.click()})}
+/* ===== PENITIP ===== */
+async function loadP(k){const[a,b]=await Promise.all([sb.rpc('get_sesi',{k}),sb.rpc('list_pesanan',{k})]);S=a.data;if(S)S.kode=k;P=b.data||[]}
+async function penitip(k){app.innerHTML='<div class="mu">Memuat…</div>';await loadP(k);if(!S){app.innerHTML='<div class="card">Link tidak ditemukan.</div>';return}built='';drawP();tm=setInterval(async()=>{await loadP(k);drawP()},12000)}
+function drawP(){head();if(built!==S.status){built=S.status;app.innerHTML='<div id="f"></div><div id="l"></div><div id="k"></div><div id="p"></div>';
+if(S.status==='open')$('#f').innerHTML='<div class="card"><h2>Titip sekarang</h2><label class="mu">Nama</label><input id="n" value="'+esc(localStorage.nm||'')+'"><label class="mu">Pesanan</label><input id="i" list="dl" oninput="lv()" placeholder="Mie Gacoan, Udang Keju…"><datalist id="dl"><option>Mie Gacoan<option>Udang Keju<option>Thai Tea Iced</datalist><div id="lw" style="display:none"><label class="mu">Level</label><select id="lvl"><option value="">–</option>'+[1,2,3,4,5,6,7,8].map(n=>'<option>'+n+'</option>').join('')+'</select></div><button onclick="kirim()">Titip</button></div>';
+if(S.status==='settled'){const G=calc().G;$('#p').innerHTML='<div class="card"><h2>Sudah bayar?</h2><select id="who">'+G.map(g=>'<option value="'+esc(key(g.nama))+'">'+esc(g.nama)+'</option>').join('')+'</select><div class="mu">Bukti transfer (foto)</div><input id="bk" type="file" accept="image/*"><button class="pk" onclick="bayar()">Centang lunas & kirim</button></div>'}}
+$('#l').innerHTML=listHTML(false);if(S.status==='settled')$('#k').innerHTML=rekapHTML()}
+function lv(){$('#lw').style.display=/mie/i.test($('#i').value)?'block':'none'}
+async function kirim(){const n=$('#n').value.trim(),i=$('#i').value.trim(),l=/mie/i.test(i)?$('#lvl').value:'';if(!n||!i)return toast('Isi nama dan pesanan dulu');localStorage.nm=n;
+const r=await sb.rpc('tambah_pesanan',{k:S.kode,n,i,l});if(r.error)return toast('Gagal, coba lagi');$('#i').value='';lv();toast('Masuk ke daftar ✓');await loadP(S.kode);drawP()}
+async function bayar(){const g=calc().G.find(x=>key(x.nama)===$('#who').value),f=$('#bk').files[0];let b=null;if(!g)return;
+if(f){const p=S.kode+'/'+Date.now()+'-'+f.name.replace(/[^\w.]/g,'_'),u=await sb.storage.from('bukti').upload(p,f);if(u.error)toast('Upload bukti gagal, kirim lewat WA ya');else b=sb.storage.from('bukti').getPublicUrl(p).data.publicUrl}
+await sb.rpc('tandai_bayar',{k:S.kode,n:g.nama,b});toast('Tercatat lunas ✓');await loadP(S.kode);drawP();
+if(S.wa)window.open(wa(S.wa,'Halo, saya '+g.nama+' sudah transfer '+rp(g.sum)+' untuk titipan Gacoan.'),'_blank')}
+/* ===== ADMIN ===== */
+async function admin(){const m=location.hash.match(/^#\/a\/(\w+)/);const{data:{session}}=await sb.auth.getSession();me=session?.user;
+if(!me){S=null;head();app.innerHTML='<div class="card"><h2>Masuk jastip</h2><input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password (min 6)"><button onclick="auth(0)">Masuk</button><button class="gh" onclick="auth(1)">Daftar</button></div>';return}
+prof=(await sb.from('profiles').select('*').eq('id',me.id).maybeSingle()).data;if(m)return detail(m[1]);dash()}
+async function auth(up){const e=$('#em').value,p=$('#pw').value,r=up?await sb.auth.signUp({email:e,password:p}):await sb.auth.signInWithPassword({email:e,password:p});if(r.error)return toast(r.error.message);admin()}
+async function dash(){S=null;head();const{data}=await sb.from('sesi').select('*').order('created_at',{ascending:false});
+app.innerHTML='<div class="card"><h2>Profil jastip</h2><input id="pn" placeholder="Nama" value="'+esc(prof?.nama||'')+'"><input id="pr" placeholder="Info transfer, mis. DANA 0812… a.n. Nama" value="'+esc(prof?.rek||'')+'"><input id="pw2" placeholder="Nomor WA (62…)" value="'+esc(prof?.wa||'')+'"><button onclick="saveProf()">Simpan profil</button><button class="gh" onclick="sb.auth.signOut().then(admin)">Keluar</button></div><div class="card"><h2>Sesi baru</h2><input id="jd" placeholder="Judul, mis. Gacoan Jumat malam"><button class="pk" onclick="newS()">Buat sesi</button></div><div class="card"><h2>Sesi saya</h2>'+((data||[]).map(s=>'<div class="row"><a href="#/a/'+s.kode+'"><b>'+esc(s.judul||s.kode)+'</b></a><span class="mu">'+s.status+'</span></div>').join('')||'<div class="mu">Belum ada sesi.</div>')+'</div>'}
+async function saveProf(){const r=await sb.from('profiles').upsert({id:me.id,nama:$('#pn').value,rek:$('#pr').value,wa:$('#pw2').value.replace(/\D/g,'')});toast(r.error?r.error.message:'Profil tersimpan ✓');prof=(await sb.from('profiles').select('*').eq('id',me.id).maybeSingle()).data}
+async function newS(){const r=await sb.from('sesi').insert({kode:Math.random().toString(36).slice(2,8),owner:me.id,judul:$('#jd').value||'Titipan Gacoan'}).select().single();if(r.error)return toast(r.error.message);location.hash='#/a/'+r.data.kode}
+async function detail(k){const r=await sb.from('sesi').select('*').eq('kode',k).maybeSingle();if(!r.data){app.innerHTML='<div class="card">Sesi tidak ditemukan. <a href="#/">Kembali</a></div>';return}
+S={...r.data,nama:prof?.nama,rek:prof?.rek,wa:prof?.wa};P=(await sb.from('pesanan').select('*').eq('sesi_id',S.id).order('created_at')).data||[];drawA()}
+function drawA(){head();const s=S.status;let h='<div class="card"><h2>Kontrol</h2><a href="#/">← Semua sesi</a><div class="mu" style="margin:8px 0">Link penitip: '+esc(link())+'</div>';
+if(s==='open')h+='<a class="btn" target="_blank" href="'+esc(wa('','Titip Gacoan yuk! Isi nama, pesanan & level di sini: '+link()))+'">Bagikan ke WA</a><button class="pk" onclick="setS(\'closed\')">Simpan & tutup daftar</button><button class="gh" onclick="reload()">Segarkan</button>';
+else if(s==='closed')h+='<div class="mu">Harga per porsi <b>sebelum pajak</b> (dari struk)</div>'+[...new Set(P.map(o=>o.item))].map(i=>'<label class="mu">'+esc(i)+'</label><input type="number" data-p="'+esc(i)+'" value="'+(S.prices?.[i]||'')+'">').join('')+'<label class="mu">Pajak gerai (PB1 %)</label><input id="pj" type="number" value="'+pj()+'"><label class="mu">Fee jastip per orang (Rp)</label><input id="fe" type="number" value="'+S.fee+'"><button class="pk" onclick="settle()">Hitung & terbitkan rekap</button><button class="gh" onclick="setS(\'open\')">Buka lagi</button>';
+else h+='<a class="btn" target="_blank" href="'+esc(wa('',rekapText()))+'">Kirim rekap ke WA</a><button class="gh" onclick="setS(\'closed\')">Ubah harga</button><button class="gh" onclick="reload()">Segarkan</button>';
+app.innerHTML=h+'</div>'+listHTML(true)+(s==='settled'?rekapHTML():'')}
+const reload=()=>detail(S.kode);
+async function setS(status){await sb.from('sesi').update({status}).eq('id',S.id);reload()}
+async function settle(){const prices={};document.querySelectorAll('[data-p]').forEach(e=>prices[e.dataset.p]=+e.value||0);await sb.from('sesi').update({status:'settled',prices,pajak:+$('#pj').value||0,fee:+$('#fe').value||0}).eq('id',S.id);reload()}
+async function delO(id){await sb.from('pesanan').delete().eq('id',id);reload()}
+async function tog(i){const g=calc().G[i];await sb.from('pesanan').update({paid:!g.paid}).in('id',g.os.map(o=>o.id));reload()}
+function route(){clearInterval(tm);const m=location.hash.match(/^#\/s\/(\w+)/);m?penitip(m[1]):admin()}
+addEventListener('hashchange',route);route();
+</script></body></html>
