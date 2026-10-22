@@ -40,6 +40,7 @@ async function loadCustomerData(k) {
  */
 export async function showCustomer(k) {
   const my = ++state.rid;
+  document.body.classList.remove('auth-mode');
   state.role = 'penitip';
   state.sesi = null; state.pesanan = []; state.built = ''; state.sig = '';
   renderHeader();

@@ -14,7 +14,7 @@ import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible } from '../views/customer.js';
-import { authenticate, logout } from '../views/admin-auth.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword } from '../views/admin-auth.js';
 import { saveProfile, createSession } from '../views/admin-dashboard.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -26,7 +26,10 @@ const ACT = {
   reload: reloadSession,
   img: saveRecapImage,
   copy: copyLink,
-  signup: () => authenticate(true),
+    'to-signup': () => showAuth('signup'),
+  'to-login': () => showAuth('login'),
+  pw: togglePassword,
+  forgot: forgotPassword,
   out: logout,
   sets: (b) => setStatus(b.dataset.s),
   del: deleteOrder,
@@ -38,6 +41,7 @@ const FORM = {
   kirim: submitOrder,
   bayar: submitPayment,
   login: () => authenticate(false),
+  signup: () => authenticate(true),
   prof: saveProfile,
   news: createSession,
   settle: publishRecap,

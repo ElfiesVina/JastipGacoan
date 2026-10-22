@@ -11,12 +11,7 @@ import { hargaDasar, linkSesi, pajak, teksRekap } from '../services/calc.js';
 import { orderListHTML } from './order-list.js';
 import { recapCardHTML } from './recap-card.js';
 
-/** Form masuk / daftar jastip. */
-export const loginHTML = () =>
-  '<form class="card" data-form="login"><h2>Masuk jastip</h2>' +
-  '<label class="lb" for="em">Email</label><input id="em" type="email" autocomplete="email" inputmode="email" required placeholder="nama@email.com">' +
-  '<label class="lb" for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" minlength="6" required placeholder="Minimal 6 karakter">' +
-  '<div class="acts"><button type="submit">Masuk</button><button type="button" class="gh" data-act="signup">Daftar</button></div></form>';
+
 
 /** Kartu profil jastip. */
 const profileCard = () =>

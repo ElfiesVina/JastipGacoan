@@ -13,8 +13,12 @@ export async function getSession() {
 /** Masuk dengan email & password. @returns {Promise<{data,error}>} */
 export const signIn = (email, password) => sb.auth.signInWithPassword({ email, password });
 
-/** Daftar akun baru. @returns {Promise<{data,error}>} */
-export const signUp = (email, password) => sb.auth.signUp({ email, password });
+/**
+ * Daftar akun baru. Nama disimpan sebagai metadata akun (user_metadata.nama).
+ * @returns {Promise<{data,error}>}
+ */
+export const signUp = (email, password, nama) =>
+  sb.auth.signUp({ email, password, options: { data: { nama } } });
 
 /** Keluar dari akun. */
 export const signOut = () => sb.auth.signOut();

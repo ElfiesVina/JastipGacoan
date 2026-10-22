@@ -43,6 +43,8 @@ export function renderChangelogBadge() {
   const b = $('#bdg');
   b.hidden = !u.length;
   b.textContent = u.length > 9 ? '9+' : u.length;
+    const dot = $('#auth-dot'); // titik di lonceng layar masuk/daftar
+  if (dot) dot.hidden = !u.length;
   $('#cl').innerHTML = u.length
     ? '<button type="button" class="tz" data-act="cl"><span class="tzd"></span><span class="tzt"><b>' +
       u.length + ' pembaruan baru</b><span>' + esc(u[0].judul) + '</span></span><span class="tzg">Lihat</span></button>'

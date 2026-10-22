@@ -16,7 +16,9 @@
   --pk:#e6007e;      /* pink aksen */
   --pkt:#fff0f8;     /* latar pink muda */
   --ok:#0a8a58;      /* hijau sukses */
-
+      /* --- layar masuk/daftar --- */
+  --au:#1db3d5;      /* cyan pita atas, tautan, fokus */
+  --ab:#0c7a94;      /* tombol utama masuk/daftar */
   /* --- font --- */
   --f-body:"Plus Jakarta Sans",system-ui,sans-serif;
   --f-head:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif-condensed,sans-serif;

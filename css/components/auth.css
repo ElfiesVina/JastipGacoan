@@ -1,0 +1,85 @@
+/* =====================================================================
+   components/auth.css
+   Layar Masuk & Daftar (desain baru). Hanya aktif saat <body class="auth-mode">.
+   Susunan: pita cyan di atas + logo Sakan (lingkaran putih) -> logo Me Gacoan
+   + lonceng -> form -> tautan ganti mode. Gelombang tipis di pojok kanan bawah.
+   ===================================================================== */
+
+/* --- mode auth: sembunyikan header aplikasi, konten jadi selebar layar --- */
+body.auth-mode{background:#fff}
+body.auth-mode header,
+body.auth-mode #cl{display:none}
+body.auth-mode main{max-width:none;margin:0;padding:0}
+
+/* gelombang dekoratif di pojok kanan bawah (tidak menangkap sentuhan) */
+body.auth-mode::after{
+  content:"";position:fixed;right:0;bottom:0;z-index:-1;pointer-events:none;
+  width:min(60vw,440px);aspect-ratio:400/220;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 220' preserveAspectRatio='none'%3E%3Cpath d='M0 220C120 208 210 172 270 112C320 62 365 32 400 24V220Z' fill='%23ebf8f9'/%3E%3C/svg%3E") no-repeat right bottom/100% 100%;
+}
+
+.auth{min-height:100vh;min-height:100dvh;padding-bottom:var(--safe-b)}
+
+/* --- pita atas --- */
+.auth-head{height:calc(64px + var(--safe-t));background:var(--au);border-radius:0 0 24px 24px}
+.auth-in{position:relative;width:min(calc(100% - 80px),400px);margin:0 auto}
+.auth-head .auth-in{height:100%}
+
+/* logo Sakan: lingkaran putih menimpa pita */
+.auth-sakan{
+  position:absolute;left:-4px;top:calc(22px + var(--safe-t));
+  width:82px;height:82px;border-radius:50%;background:#fff;
+  display:grid;place-items:center;
+}
+.auth-sakan img{width:66px;height:auto;display:block}
+
+/* --- logo Me Gacoan + lonceng --- */
+.auth-brand{position:relative;width:max-content;margin:76px auto 30px}
+.auth-brand img{display:block;width:120px;height:auto}
+.auth-bell{
+  position:absolute;left:100%;top:-8px;margin:0 0 0 2px;padding:0;
+  width:44px;height:44px;min-height:44px;border-radius:50%;
+  background:none;color:#266c7d;
+}
+.auth-bell:active{background:#266c7d14}
+.auth-bell svg{display:block;margin:auto}
+.auth-dot{position:absolute;top:8px;right:8px;width:11px;height:11px;border-radius:50%;background:var(--au);border:2px solid #fff}
+
+/* --- form --- */
+.auth-form{margin:0}
+.auth-field{position:relative;margin:0 0 14px}
+.auth-field .ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#4d5d73;display:flex;pointer-events:none}
+.auth-field input:not(.vh){
+  height:46px;margin:0;padding:0 46px 0 48px;
+  border:1.5px solid #dfe9ef;border-radius:16px;background:#f8f9fb;
+}
+.auth-field input:not(.vh):focus{border-color:var(--au);background:#fff;box-shadow:0 0 0 4px #1db3d524}
+
+/* tombol mata (lihat / sembunyikan password) */
+.auth-eye{
+  position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  margin:0;padding:0;width:42px;height:42px;min-height:42px;
+  border-radius:50%;background:none;color:#4d5d73;
+}
+.auth-eye:active{transform:translateY(-50%) scale(.94)}
+.auth-eye .on{display:none}
+.auth-eye[aria-pressed="true"] .on{display:block}
+.auth-eye[aria-pressed="true"] .off{display:none}
+
+/* tombol utama */
+.auth-btn{width:100%;min-height:50px;margin:22px 0 0;background:var(--ab);font-size:16px}
+
+/* tautan ganti mode / lupa password */
+.auth-links{display:flex;margin-top:12px;font-size:13px;color:#46566c}
+.auth-links.end{justify-content:flex-end}
+.auth-links button{
+  display:inline;min-height:32px;margin:0 0 0 6px;padding:0 2px;
+  background:none;color:var(--au);font:800 14px var(--f-body);border-radius:6px;
+}
+.auth-forgot{justify-content:flex-end;margin:-4px 0 0}
+.auth-forgot button{margin:0}
+
+/* layar lebih lebar: logo sedikit lebih besar */
+@media (min-width:768px){
+  .auth-brand img{width:140px}
+}
