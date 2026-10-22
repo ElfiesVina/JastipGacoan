@@ -1,302 +1,71 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<!-- viewport-fit=cover: konten boleh sampai tepi layar; jarak aman notch diatur di CSS lewat env(safe-area-inset-*) -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07758f">
 <title>Titip Gacoan</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
-<style>
-:root{--bg:#f2f6f9;--sf:#fff;--tx:#10192b;--mu:#5d6a80;--ln:#dfe6ee;--te:#07758f;--te2:#0a8fb0;--tint:#e4f3f7;--pk:#e6007e;--pkt:#fff0f8;--ok:#0a8a58}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-[hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 'Plus Jakarta Sans',system-ui,sans-serif;touch-action:manipulation}
-html:has(dialog[open]){overflow:hidden}
 
-/* ---- header ---- */
-header{background:var(--te);color:#fff;padding:20px 18px 38px;border-radius:0 0 28px 28px;overflow:hidden}
-.lg{font:800 clamp(36px,12.5vw,52px)/.9 'Barlow Condensed','Roboto Condensed','Arial Narrow',sans-serif-condensed,sans-serif;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap}
-.lg b{display:inline-block;background:var(--pk);padding:2px 12px 4px;border-radius:18px 18px 18px 4px;margin-left:8px;transform:rotate(-2deg)}
-.hd{display:flex;align-items:flex-start;gap:12px;margin-top:12px;max-width:560px}
-#st{flex:1;min-height:44px;padding-top:2px;font-size:14px;opacity:.95}
-.bell{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:50%;background:#ffffff2b;color:#fff;display:grid;place-items:center;cursor:pointer;transition:background-color .15s}
-.bell:active{background:#ffffff48}
-#bdg{position:absolute;top:-3px;right:-3px;min-width:21px;height:21px;padding:0 5px;border-radius:11px;background:var(--pk);border:2px solid var(--te);color:#fff;font:800 11px/17px 'Plus Jakarta Sans',sans-serif;text-align:center}
-main{max-width:560px;margin:-16px auto 0;padding:0 14px 96px}
+<!-- CSS: urutan penting (variabel -> dasar -> layout -> komponen -> utilitas -> responsif terakhir) -->
+<link rel="stylesheet" href="css/base/variables.css">
+<link rel="stylesheet" href="css/base/reset.css">
+<link rel="stylesheet" href="css/base/typography.css">
+<link rel="stylesheet" href="css/layout/header.css">
+<link rel="stylesheet" href="css/layout/main.css">
+<link rel="stylesheet" href="css/components/card.css">
+<link rel="stylesheet" href="css/components/form.css">
+<link rel="stylesheet" href="css/components/button.css">
+<link rel="stylesheet" href="css/components/choice.css">
+<link rel="stylesheet" href="css/components/upload.css">
+<link rel="stylesheet" href="css/components/list.css">
+<link rel="stylesheet" href="css/components/toast.css">
+<link rel="stylesheet" href="css/components/skeleton.css">
+<link rel="stylesheet" href="css/components/changelog.css">
+<link rel="stylesheet" href="css/components/dialog.css">
+<link rel="stylesheet" href="css/utilities.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
 
-/* ---- kartu & tipografi ---- */
-.card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px 16px;margin:14px 0;box-shadow:0 10px 24px -16px #07758f66}
-h2{font:800 18px 'Barlow Condensed',sans-serif;letter-spacing:.12em;color:var(--te);margin:0 0 12px;text-transform:uppercase}
-.ch{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.cnt{font-size:13px;font-weight:600;color:var(--mu)}
-.lb{display:block;font-size:13px;font-weight:600;color:var(--mu);margin:12px 0 4px}
-h2+.lb{margin-top:0}
-.mu{color:var(--mu);font-size:14px}
-a{color:var(--te)}p{margin:0 0 8px}
-.num{font-weight:800;white-space:nowrap}
-.tot{font:800 56px/1 'Barlow Condensed',sans-serif;color:var(--pk)}
-.empty{padding:6px 0}
-
-/* ---- input ---- */
-input:not(.vh){width:100%;height:50px;padding:0 14px;margin:0 0 4px;border:1.5px solid var(--ln);border-radius:14px;background:var(--bg);font:inherit;font-size:16px;color:var(--tx);transition:border-color .15s,box-shadow .15s}
-input::placeholder{color:#97a2b4}
-input:not(.vh):focus{outline:0;border-color:var(--te2);background:#fff;box-shadow:0 0 0 4px #0a8fb024}
-.lk{padding:10px 12px;margin:0 0 8px;border-radius:12px;background:var(--bg);font-size:13px;word-break:break-all;color:var(--mu)}
-
-/* ---- tombol ---- */
-button,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;margin:4px 8px 4px 0;border:0;border-radius:999px;background:var(--te);color:#fff;font:800 15px 'Plus Jakarta Sans',sans-serif;text-decoration:none;cursor:pointer;transition:transform .1s,background-color .15s,opacity .15s}
-button:active,.btn:active{transform:scale(.97)}
-button:disabled{opacity:.55;cursor:default}
-.pk{background:var(--pk)}.gh{background:#fff;color:var(--te);box-shadow:inset 0 0 0 1.5px var(--te)}
-.b{width:100%;margin:14px 0 0}
-.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.acts>*{margin:0;flex:1 1 auto}
-button:focus-visible,.btn:focus-visible,a:focus-visible,.bell:focus-visible{outline:3px solid var(--te2);outline-offset:2px}
-.x{min-height:32px;min-width:32px;padding:0 6px;margin:0 -4px 0 2px;background:none;color:var(--mu);font-size:14px;border-radius:8px}
-.x.arm{background:var(--pkt);color:var(--pk);padding:0 10px}
-
-/* ---- pilihan (radio kartu) ---- */
-.vh{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
-.opts{display:grid;gap:8px;margin:4px 0 6px}
-.opt{display:block;position:relative;cursor:pointer}
-.box{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:16px;background:var(--sf);transition:border-color .15s,background-color .15s,box-shadow .15s}
-.tx{flex:1;min-width:0}.ot{display:block;font-weight:800;font-size:16px}.sub{display:block;font-size:13px;font-weight:600;color:var(--mu)}
-.ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #b5c0cf;transition:border-color .15s,background-color .15s}
-.vh:checked+.box{border-color:var(--pk);background:var(--pkt);box-shadow:0 0 0 3px #e6007e1c}
-.vh:checked+.box .ck{border-color:var(--pk);background:var(--pk) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/15px no-repeat}
-.vh:focus-visible+.box,.lv .vh:focus-visible+span{outline:3px solid var(--te2);outline-offset:2px}
-.opts.cmp .box{min-height:52px}
-
-/* level pedas: muncul hanya untuk Mie, makin pekat makin pedas */
-.lvw{display:grid;grid-template-rows:0fr;transition:grid-template-rows .24s ease}
-.lvw.on{grid-template-rows:1fr}
-.lvi{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .24s}
-.lvw.on .lvi{visibility:visible;transition-delay:0s}
-.lvs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 6px}
-.lv{display:block;cursor:pointer}
-.lv span{display:grid;place-items:center;height:52px;border-radius:14px;border:1.5px solid var(--ln);background:#fff;background:color-mix(in srgb,var(--pk) calc(var(--h)*5%),#fff);font:800 24px 'Barlow Condensed',sans-serif;transition:background-color .15s,border-color .15s,color .15s}
-.lv .vh:checked+span{background:var(--pk);border-color:var(--pk);color:#fff}
-.hint{font-size:12.5px;margin:2px 0 4px}
-
-/* ---- unggah bukti ---- */
-.file{display:flex;align-items:center;gap:10px;min-height:50px;padding:0 14px;border:1.5px dashed #9fb0c2;border-radius:14px;background:var(--bg);cursor:pointer;font-weight:600;color:var(--te);overflow:hidden}
-.file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file.has{border-style:solid;border-color:var(--te2);background:var(--tint)}
-.file:focus-within{outline:3px solid var(--te2);outline-offset:2px}
-
-/* ---- daftar ---- */
-.row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--ln)}.row:last-child{border:0;padding-bottom:0}
-.av{flex:none;width:38px;height:38px;border-radius:50%;background:var(--tint);color:var(--te);display:grid;place-items:center;font:800 18px 'Barlow Condensed',sans-serif}
-.rb{flex:1;min-width:0}.rb b{word-break:break-word}
-.its{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
-.it{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--bg);font-size:13px;font-weight:600;color:#33415a}
-.r{text-align:right;flex:none;margin-left:auto}
-.pill{display:inline-flex;min-height:0;padding:3px 10px;margin:4px 0 0;border-radius:999px;font:800 12.5px 'Plus Jakarta Sans',sans-serif}
-.pill.ok{background:#e3f6ee;color:var(--ok)}.pill.no{background:var(--pkt);color:var(--pk)}
-button.pill{min-height:32px;padding:0 12px;cursor:pointer}
-.bk{display:block;font-size:13px;font-weight:600;margin-top:2px}
-.s-open,.s-closed,.s-settled{font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap}
-.s-open{background:#e3f6ee;color:var(--ok)}.s-closed{background:#fff4dc;color:#8a5a00}.s-settled{background:var(--tint);color:var(--te)}
-.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border-bottom:1px solid var(--ln);text-decoration:none;color:inherit}.srow:last-child{border:0;padding-bottom:0}
-.srow b{color:var(--te)}
-.note{background:var(--tint);border-color:#bfe2ec;box-shadow:none}
-.done{border-color:#bfe8d6;background:#f2fbf7}
-
-/* ---- teaser changelog ---- */
-.tz{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;margin:12px 0 0;padding:8px 14px;border-radius:16px;background:#fff;color:var(--tx);box-shadow:0 8px 20px -14px #07758f88,inset 0 0 0 1.5px var(--pk);text-align:left;font-weight:400}
-.tzd{flex:none;width:10px;height:10px;border-radius:50%;background:var(--pk);animation:pulse 1.6s ease-out 2}
-.tzt{flex:1;min-width:0;display:block}.tzt b{display:block;font-size:14px}.tzt span{display:block;font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tzg{flex:none;font-weight:800;font-size:14px;color:var(--pk)}
-@keyframes pulse{0%{box-shadow:0 0 0 0 #e6007e66}100%{box-shadow:0 0 0 10px #e6007e00}}
-
-/* ---- sheet changelog ---- */
-dialog{border:0;padding:0;margin:auto auto 0;width:min(100%,560px);max-width:100%;max-height:86vh;max-height:86dvh;border-radius:26px 26px 0 0;background:var(--sf);color:var(--tx);overflow:hidden}
-dialog[open]{display:flex;flex-direction:column;animation:up .28s cubic-bezier(.2,.8,.2,1)}
-dialog::backdrop{background:#10192b80}
-@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
-.shh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 10px;border-bottom:1px solid var(--ln)}
-.shh h3{margin:0;font:800 26px 'Barlow Condensed',sans-serif;letter-spacing:.02em}
-.shh button{margin:0;min-height:40px;padding:0 16px;background:var(--bg);color:var(--tx)}
-.shb{overflow:auto;overscroll-behavior:contain;padding:6px 18px 28px}
-.en{padding:16px 0 16px 14px;border-left:4px solid var(--ln);margin-top:14px}
-.en.nw{border-left-color:var(--pk)}
-.eh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12.5px;color:var(--mu);font-weight:600}
-.tg{padding:2px 10px;border-radius:999px;background:var(--tint);color:var(--te);font-weight:800}
-.nb{padding:2px 10px;border-radius:999px;background:var(--pk);color:#fff;font-weight:800}
-.en h4{font:800 17px/1.3 'Plus Jakarta Sans',sans-serif;margin:8px 0 6px}
-.en ul{margin:0;padding-left:18px;color:#33415a;font-size:14.5px}.en li{margin:3px 0}
-
-/* ---- toast (fixed, tidak menggeser layout) ---- */
-#toast{position:fixed;z-index:20;left:50%;top:12px;max-width:min(92vw,420px);padding:12px 18px;border-radius:14px;background:var(--tx);color:#fff;font-weight:700;font-size:14px;text-align:center;opacity:0;transform:translate(-50%,-14px);pointer-events:none;transition:opacity .2s,transform .2s}
-#toast.show{opacity:1;transform:translate(-50%,0)}
-#toast.bad{background:var(--pk)}
-
-/* ---- skeleton ---- */
-.sk i{display:block;height:16px;border-radius:8px;margin:12px 0;background:linear-gradient(90deg,#e9eef4 25%,#f5f8fb 50%,#e9eef4 75%);background-size:200% 100%;animation:sh 1.3s linear infinite}
-.sk i:first-child{width:40%}.sk i:last-child{width:70%}
-@keyframes sh{to{background-position:-200% 0}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-</style></head><body>
+<!-- Header: logo, status sesi, lonceng changelog -->
 <header>
-<div class="lg">Titip<b>Gacoan</b></div>
-<div class="hd"><div id="st"></div>
-<button id="bell" class="bell" type="button" data-act="cl" aria-label="Lihat yang baru"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span id="bdg" hidden></span></button></div>
+  <div class="wrap">
+    <div class="lg">Titip<b>Gacoan</b></div>
+    <div class="hd">
+      <div id="st"></div>
+      <button id="bell" class="bell" type="button" data-act="cl" aria-label="Lihat yang baru">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+        <span id="bdg" hidden></span>
+      </button>
+    </div>
+  </div>
 </header>
-<main><div id="cl"></div><div id="app"></div><noscript><div class="card">Halaman ini butuh JavaScript.</div></noscript></main>
+
+<!-- Konten utama: #cl = teaser changelog, #app = halaman aktif (digambar oleh JS) -->
+<main>
+  <div id="cl"></div>
+  <div id="app"></div>
+  <noscript><div class="card">Halaman ini butuh JavaScript.</div></noscript>
+</main>
+
+<!-- Toast: pesan singkat -->
 <div id="toast" role="status" aria-live="polite"></div>
-<dialog id="dlg" aria-labelledby="dlt"><div class="shh"><h3 id="dlt">Yang baru</h3><button type="button" data-act="x">Tutup</button></div><div class="shb" id="dl"></div></dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script><script src="config.js"></script><script src="changelog.js"></script>
-<script>
-'use strict';
-const sb=supabase.createClient(CFG.URL,CFG.KEY),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],app=$('#app'),dlg=$('#dlg');
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const rp=n=>(n<0?'–':'')+'Rp'+Math.abs(Math.round(n)).toLocaleString('id-ID'),key=s=>s.trim().toLowerCase(),label=o=>o.item+(o.level?' · Level '+o.level:'');
-const wa=(n,t)=>'https://wa.me/'+(n||'')+'?text='+encodeURIComponent(t),isMie=v=>/mie/i.test(v||'');
-const safeUrl=u=>{try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return''}};
-const store={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
-const MENU=CFG.MENU||['Mie Gacoan','Udang Keju','Thai Tea Iced'];
-let S=null,P=[],me=null,prof=null,tm=0,rid=0,built='',sig='',busy=false,polling=false,ROLE='penitip';
-const draft={n:store.get('nm')||'',i:'',l:'',who:'',f:null};
+<!-- Sheet changelog -->
+<dialog id="dlg" aria-labelledby="dlt">
+  <div class="shh"><h3 id="dlt">Yang baru</h3><button type="button" data-act="x">Tutup</button></div>
+  <div class="shb" id="dl"></div>
+</dialog>
 
-/* ===== util UI ===== */
-let tt;function toast(t,bad){const el=$('#toast');el.textContent=t;el.className='show'+(bad?' bad':'');clearTimeout(tt);tt=setTimeout(()=>el.className='',3800)}
-function setBusy(sel,t){const b=$(sel);if(!b)return;if(t){b.dataset.t=b.textContent;b.textContent=t;b.disabled=true}else{b.textContent=b.dataset.t||b.textContent;b.disabled=false}}
-async function lock(fn){if(busy)return;busy=true;try{return await fn()}finally{busy=false}}
-const skeleton='<div class="card sk"><i></i><i></i><i></i></div>';
-
-/* ===== hitung ===== */
-const pj=()=>+S.pajak||0,base=item=>Object.prototype.hasOwnProperty.call(S.prices||{},item)?+S.prices[item]||0:0,price=o=>Math.round(base(o.item)*(1+pj()/100)/100)*100;
-function calc(){const g={};P.forEach(o=>{const k=key(o.nama);(g[k]=g[k]||{nama:o.nama.trim(),os:[]}).os.push(o)});const G=Object.values(g);let sub=0,tot=0;
-G.forEach(x=>{x.sum=x.os.reduce((s,o)=>s+price(o),0)+S.fee;x.paid=x.os.every(o=>o.paid);sub+=x.os.reduce((s,o)=>s+base(o.item),0);tot+=x.sum});
-const pb1=Math.round(sub*pj()/100),fee=S.fee*G.length;return{G,sub,pb1,fee,tot,rnd:tot-sub-pb1-fee}}
-const link=()=>location.origin+location.pathname+'#/s/'+S.kode;
-function rekapText(){const c=calc();return '*Daftar Titipan Gacoan*\n'+c.G.map((g,i)=>(i+1)+'. '+g.nama+' – '+g.os.map(label).join(' + ')+' = '+rp(g.sum)).join('\n')+'\n\nTotal: '+rp(c.tot)+'\nTransfer: '+(S.rek||'-')+'\nCentang bayar & kirim bukti: '+link()}
-function head(){$('#st').textContent=S?(S.judul||'')+' · '+(S.status==='open'?'Daftar dibuka':S.status==='closed'?'Daftar ditutup, menunggu belanja':'Rekap terbit')+(S.nama?' · Jastip: '+S.nama:''):'Titip pesanan, rekap otomatis'}
-
-/* ===== tampilan daftar & rekap ===== */
-function listHTML(adm){const c=calc(),st=S.status;
-const rows=c.G.map(g=>{const k=esc(key(g.nama)),bk=g.os.find(o=>safeUrl(o.bukti));
-const items=g.os.map(o=>'<span class="it">'+esc(label(o))+(adm&&st==='open'?'<button type="button" class="x" data-act="del" data-id="'+esc(o.id)+'" aria-label="Hapus '+esc(label(o))+'">✕</button>':'')+'</span>').join('');
-const pill=adm?'<button type="button" class="pill '+(g.paid?'ok':'no')+'" data-act="tog" data-k="'+k+'">'+(g.paid?'✓ Lunas':'Belum')+'</button>':'<span class="pill '+(g.paid?'ok':'no')+'">'+(g.paid?'✓ Lunas':'Belum')+'</span>';
-const right=st==='settled'?'<div class="r"><div class="num">'+rp(g.sum)+'</div>'+pill+(bk?'<a class="bk" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(bk.bukti))+'">Lihat bukti</a>':'')+'</div>':'';
-return '<div class="row"><span class="av" aria-hidden="true">'+esc(([...g.nama][0]||'?').toUpperCase())+'</span><div class="rb"><b>'+esc(g.nama)+'</b><div class="its">'+items+'</div></div>'+right+'</div>'}).join('');
-return '<div class="card"><div class="ch"><h2>Daftar titipan</h2><span class="cnt">'+c.G.length+' orang</span></div>'+(rows||'<p class="mu empty">Belum ada titipan.'+(adm?' Bagikan link ke WA supaya teman bisa mengisi.':' Jadi yang pertama titip.')+'</p>')+'</div>'}
-function rekapHTML(){const c=calc(),L=(a,b)=>'<div class="row"><span class="mu">'+a+'</span><span class="num r">'+b+'</span></div>';
-return '<div class="card"><h2>Rekap pembayaran</h2>'+L('Subtotal sebelum pajak',rp(c.sub))+L('PB1 · '+pj()+'%',rp(c.pb1))+(c.fee?L('Fee jastip',rp(c.fee)):'')+L('Pembulatan',rp(c.rnd))+'<div class="mu" style="margin-top:14px">Total dibayar</div><div class="tot">'+rp(c.tot)+'</div><div class="mu">Transfer: <b>'+esc(S.rek||'-')+'</b></div><button type="button" class="gh b" data-act="img">Simpan rekap sebagai gambar</button></div>'}
-async function saveImg(){try{await Promise.all(['800 40px "Barlow Condensed"','600 20px "Plus Jakarta Sans"','800 20px "Plus Jakarta Sans"'].map(f=>document.fonts.load(f)))}catch{}
-const c=calc(),rows=c.fee?4:3,W=900,H=290+c.G.length*76+10+rows*40+210,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),B="'Barlow Condensed',sans-serif",J="'Plus Jakarta Sans',sans-serif";
-x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#07758f';x.fillRect(0,0,W,210);x.fillStyle='#fff';x.font='800 96px '+B;x.fillText('TITIP GACOAN',48,110);x.font='600 22px '+J;x.fillText((S.tgl||'')+' · '+c.G.length+' orang · '+(S.nama||''),48,160,W-96);let y=290;
-c.G.forEach((g,i)=>{x.fillStyle='#10192b';x.font='800 28px '+J;x.textAlign='left';x.fillText(String(i+1).padStart(2,'0')+'  '+g.nama,48,y,560);x.textAlign='right';x.fillText(rp(g.sum),W-48,y);x.textAlign='left';x.fillStyle='#5d6a80';x.font='400 20px '+J;x.fillText(g.os.map(label).join(' + '),96,y+30,W-144);y+=76});
-y+=10;[['Subtotal sebelum pajak',c.sub],['PB1 · '+pj()+'%',c.pb1]].concat(c.fee?[['Fee jastip',c.fee]]:[],[['Pembulatan',c.rnd]]).forEach(r=>{x.fillStyle='#5d6a80';x.font='400 22px '+J;x.textAlign='left';x.fillText(r[0],48,y);x.textAlign='right';x.fillText(rp(r[1]),W-48,y);y+=40});
-x.textAlign='left';x.fillStyle='#5d6a80';x.font='800 20px '+B;x.fillText('TOTAL DIBAYAR',48,y+30);x.fillStyle='#e6007e';x.font='800 96px '+B;x.fillText(rp(c.tot),48,y+110);x.fillStyle='#10192b';x.font='600 22px '+J;x.fillText('Transfer: '+(S.rek||''),48,y+160,W-96);
-cv.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='rekap-titipan.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)})}
-
-/* ===== changelog ===== */
-const CL=(window.CHANGELOG||[]).slice().sort((a,b)=>b.id-a.id);
-const clFor=()=>CL.filter(c=>!c.untuk||c.untuk==='semua'||c.untuk===ROLE),seenKey=()=>'cl_'+ROLE;
-function seenId(){const v=store.get(seenKey());if(v!==null)return+v||0;const cut=Date.now()-14*864e5;return Math.max(0,...clFor().filter(c=>new Date(c.tgl+'T00:00')<cut).map(c=>c.id))}
-const unread=()=>{const s=seenId();return clFor().filter(c=>c.id>s)};
-function renderCL(){const u=unread(),b=$('#bdg');b.hidden=!u.length;b.textContent=u.length>9?'9+':u.length;
-$('#cl').innerHTML=u.length?'<button type="button" class="tz" data-act="cl"><span class="tzd"></span><span class="tzt"><b>'+u.length+' pembaruan baru</b><span>'+esc(u[0].judul)+'</span></span><span class="tzg">Lihat</span></button>':''}
-function entryHTML(c,nw){const d=new Date(c.tgl+'T00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
-return '<article class="en'+(nw?' nw':'')+'"><div class="eh">'+(nw?'<span class="nb">Baru</span>':'')+'<span class="tg">'+esc(c.jenis||'Info')+'</span><time datetime="'+esc(c.tgl)+'">'+esc(d)+'</time>'+(c.v?'<span>v'+esc(c.v)+'</span>':'')+'</div><h4>'+esc(c.judul)+'</h4><ul>'+(c.poin||[]).map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul></article>'}
-function openCL(){const list=clFor(),sn=seenId();$('#dl').innerHTML=list.length?list.map(c=>entryHTML(c,c.id>sn)).join(''):'<p class="mu" style="padding-top:16px">Belum ada catatan perubahan.</p>';$('#dl').scrollTop=0;
-if(list.length)store.set(seenKey(),list[0].id);dlg.showModal?dlg.showModal():dlg.setAttribute('open','');renderCL()}
-dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
-
-/* ===== PENITIP ===== */
-async function loadP(k){const[a,b]=await Promise.all([sb.rpc('get_sesi',{k}),sb.rpc('list_pesanan',{k})]);if(a.error||b.error)return'err';if(!a.data)return'none';S={...a.data,kode:k};P=b.data||[];return'ok'}
-async function penitip(k){const my=++rid;ROLE='penitip';S=null;P=[];built='';sig='';head();renderCL();app.innerHTML=skeleton;
-const r=await loadP(k);if(my!==rid)return;
-if(r==='err'){app.innerHTML='<div class="card"><h2>Gagal memuat</h2><p class="mu">Periksa koneksi internet, lalu coba lagi.</p><button type="button" data-act="retry">Coba lagi</button></div>';return}
-if(r==='none'){app.innerHTML='<div class="card"><h2>Link tidak ditemukan</h2><p class="mu">Minta jastip mengirim ulang linknya.</p></div>';return}
-drawP();tm=setInterval(()=>poll(k,my),12000)}
-async function poll(k,my){if(document.hidden||busy||polling||my!==rid)return;polling=true;try{if(await loadP(k)==='ok'&&my===rid)drawP()}finally{polling=false}}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ROLE==='penitip'&&S)poll(S.kode,rid)});
-function formHTML(){return '<form class="card" data-form="kirim" novalidate><h2>Titip sekarang</h2>'+
-'<label class="lb" for="n">Nama</label><input id="n" autocomplete="name" autocapitalize="words" enterkeyhint="done" maxlength="60" placeholder="Nama kamu" value="'+esc(draft.n)+'">'+
-'<div class="lb" id="lm">Pesanan</div><div class="opts" role="radiogroup" aria-labelledby="lm">'+MENU.map(m=>'<label class="opt"><input class="vh" type="radio" name="item" value="'+esc(m)+'"><span class="box"><span class="tx"><span class="ot">'+esc(m)+'</span>'+(isMie(m)?'<span class="sub">Bisa pilih level pedas</span>':'')+'</span><span class="ck"></span></span></label>').join('')+'</div>'+
-'<div class="lvw" id="lw"><div class="lvi"><div class="lb" id="ll">Level pedas</div><div class="lvs" role="radiogroup" aria-labelledby="ll">'+[1,2,3,4,5,6,7,8].map(n=>'<label class="lv"><input class="vh" type="radio" name="level" value="'+n+'"><span style="--h:'+n+'">'+n+'</span></label>').join('')+'</div><div class="mu hint">1 paling ringan, 8 paling pedas. Ketuk lagi untuk batal.</div></div></div>'+
-'<button class="b" id="go" type="submit">Titip</button></form>'}
-function syncChoice(){$$('input[name=item]').forEach(r=>r.checked=r.value===draft.i);const m=isMie(draft.i);if(!m)draft.l='';$$('input[name=level]').forEach(r=>r.checked=r.value===draft.l);const w=$('#lw');if(w)w.classList.toggle('on',m)}
-function payHTML(){const G=calc().G;return '<form class="card" data-form="bayar" novalidate><h2>Sudah bayar?</h2><div class="lb" id="lwho">Pilih namamu</div><div class="opts cmp" role="radiogroup" aria-labelledby="lwho">'+G.map(g=>'<label class="opt"><input class="vh" type="radio" name="who" value="'+esc(key(g.nama))+'"><span class="box"><span class="tx"><span class="ot">'+esc(g.nama)+'</span><span class="sub">'+rp(g.sum)+'</span></span><span class="ck"></span></span></label>').join('')+'</div>'+
-'<div class="lb">Bukti transfer (foto)</div><label class="file" id="fl"><input class="vh" type="file" id="bk" accept="image/*"><span id="fn">Pilih foto bukti</span></label><button class="b pk" id="pay" type="submit">Centang lunas & kirim</button></form>'}
-function drawP(){head();const st=S.status;
-if(built!==st){built=st;sig='';app.innerHTML='<div id="f"></div><div id="l"></div><div id="k"></div><div id="p"></div>';
-if(st==='open'){$('#f').innerHTML=formHTML();syncChoice()}
-else if(st==='closed')$('#f').innerHTML='<div class="card note"><h2>Daftar ditutup</h2><p class="mu" style="margin:0">Jastip sedang belanja. Rekap dan info transfer muncul di sini setelah harga masuk.</p></div>';
-else{$('#p').innerHTML=payHTML();$$('input[name=who]').forEach(r=>r.checked=r.value===draft.who)}}
-const sg=JSON.stringify([S,P]);if(sg===sig)return;sig=sg;$('#l').innerHTML=listHTML(false);$('#k').innerHTML=st==='settled'?rekapHTML():''}
-async function kirim(){return lock(async()=>{const n=draft.n.trim(),i=draft.i;
-if(!n){toast('Isi nama dulu',1);$('#n').focus();return}if(!i){toast('Pilih pesanan dulu',1);return}
-setBusy('#go','Mengirim…');const l=isMie(i)?draft.l:'';store.set('nm',n);
-const r=await sb.rpc('tambah_pesanan',{k:S.kode,n,i,l});
-if(r.error){setBusy('#go');toast('Gagal mengirim. Coba lagi.',1);return}
-const ok=await loadP(S.kode)==='ok';setBusy('#go');
-if(ok&&S.status!=='open'){drawP();toast('Daftar sudah ditutup jastip',1);return}
-if(r.data===false){toast('Tidak bisa menambah: daftar penuh atau isian tidak valid',1);return}
-draft.i='';draft.l='';syncChoice();toast('Masuk ke daftar ✓');if(ok)drawP()})}
-async function shrink(f){try{const bm=await createImageBitmap(f),s=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));if(blob)return{blob,ext:'jpg'}}catch{}
-return{blob:f,ext:(f.type.split('/')[1]||'jpg').replace(/\W/g,'')}}
-async function bayar(){return lock(async()=>{const g=calc().G.find(x=>key(x.nama)===draft.who);if(!g){toast('Pilih namamu dulu',1);return}
-setBusy('#pay','Mengirim…');let b=null,warn=false;
-if(draft.f){try{const{blob,ext}=await shrink(draft.f),p=S.kode+'/'+crypto.randomUUID()+'.'+ext,u=await sb.storage.from('bukti').upload(p,blob,{contentType:blob.type});if(u.error)throw u.error;b=sb.storage.from('bukti').getPublicUrl(p).data.publicUrl}catch{warn=true}}
-const r=await sb.rpc('tandai_bayar',{k:S.kode,n:g.nama,b});
-if(r.error){setBusy('#pay');toast('Gagal mencatat. Coba lagi.',1);return}
-draft.f=null;await loadP(S.kode);if(S)drawP();
-$('#p').innerHTML='<div class="card done"><h2>Tercatat lunas ✓</h2><p class="mu">Terima kasih, '+esc(g.nama)+'.'+(warn?' Foto bukti gagal terunggah, kirim lewat WA ya.':'')+'</p>'+(S.wa?'<a class="btn" target="_blank" rel="noopener" href="'+esc(wa(S.wa,'Halo, saya '+g.nama+' sudah transfer '+rp(g.sum)+' untuk titipan Gacoan.'))+'">Kabari jastip lewat WA</a>':'')+'</div>'})}
-
-/* ===== ADMIN ===== */
-const loginHTML=()=>'<form class="card" data-form="login"><h2>Masuk jastip</h2><label class="lb" for="em">Email</label><input id="em" type="email" autocomplete="email" inputmode="email" required placeholder="nama@email.com"><label class="lb" for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" minlength="6" required placeholder="Minimal 6 karakter"><div class="acts"><button type="submit">Masuk</button><button type="button" class="gh" data-act="signup">Daftar</button></div></form>';
-async function admin(){const my=++rid;ROLE='admin';clearInterval(tm);S=null;head();renderCL();const m=location.hash.match(/^#\/a\/(\w+)/);
-const{data:{session}}=await sb.auth.getSession();if(my!==rid)return;me=session?.user||null;
-if(!me){app.innerHTML=loginHTML();return}
-prof=(await sb.from('profiles').select('*').eq('id',me.id).maybeSingle()).data;if(my!==rid)return;
-m?detail(m[1],my):dash(my)}
-async function auth(up){return lock(async()=>{const e=$('#em').value.trim(),p=$('#pw').value;if(!e||p.length<6){toast('Isi email dan password (min 6 karakter)',1);return}
-const r=up?await sb.auth.signUp({email:e,password:p}):await sb.auth.signInWithPassword({email:e,password:p});
-if(r.error){toast(up&&/database error/i.test(r.error.message)?'Email ini belum diizinkan jadi jastip. Hubungi admin.':r.error.message,1);return}if(up&&!r.data.session){toast('Cek email untuk konfirmasi, lalu masuk');return}admin()})}
-const STL={open:'Dibuka',closed:'Ditutup',settled:'Rekap terbit'};
-async function dash(my){S=null;head();const{data,error}=await sb.from('sesi').select('kode,judul,status,tgl').order('created_at',{ascending:false});if(my!==rid)return;
-app.innerHTML='<form class="card" data-form="prof"><h2>Profil jastip</h2><label class="lb" for="pn">Nama</label><input id="pn" autocomplete="name" placeholder="Nama" value="'+esc(prof?.nama||'')+'"><label class="lb" for="pr">Info transfer</label><input id="pr" placeholder="DANA 0812… a.n. Nama" value="'+esc(prof?.rek||'')+'"><label class="lb" for="pwa">Nomor WA</label><input id="pwa" inputmode="tel" placeholder="62812…" value="'+esc(prof?.wa||'')+'"><div class="acts"><button type="submit">Simpan profil</button><button type="button" class="gh" data-act="out">Keluar</button></div></form>'+
-'<form class="card" data-form="news"><h2>Sesi baru</h2><label class="lb" for="jd">Judul</label><input id="jd" placeholder="mis. Gacoan Jumat malam"><button class="pk b" type="submit">Buat sesi</button></form>'+
-'<div class="card"><h2>Sesi saya</h2>'+(error?'<p class="mu">Gagal memuat sesi.</p>':(data||[]).map(s=>'<a class="srow" href="#/a/'+esc(s.kode)+'"><span><b>'+esc(s.judul||s.kode)+'</b><span class="mu" style="display:block">'+esc(s.tgl||'')+'</span></span><span class="s-'+esc(s.status)+'">'+esc(STL[s.status]||s.status)+'</span></a>').join('')||'<p class="mu" style="margin:0">Belum ada sesi. Buat satu di atas.</p>')+'</div>'}
-async function saveProf(){return lock(async()=>{const wn=$('#pwa').value.replace(/\D/g,'').replace(/^0/,'62');const r=await sb.from('profiles').upsert({id:me.id,nama:$('#pn').value.trim(),rek:$('#pr').value.trim(),wa:wn});
-if(r.error){toast(r.error.message,1);return}$('#pwa').value=wn;toast('Profil tersimpan ✓');prof=(await sb.from('profiles').select('*').eq('id',me.id).maybeSingle()).data})}
-const newCode=()=>{const a=new Uint8Array(8);crypto.getRandomValues(a);return[...a].map(x=>'abcdefghjkmnpqrstuvwxyz23456789'[x%31]).join('')};
-async function newS(){return lock(async()=>{let r;for(let t=0;t<3;t++){r=await sb.from('sesi').insert({kode:newCode(),owner:me.id,judul:$('#jd').value.trim()||'Titipan Gacoan'}).select().single();if(!r.error||r.error.code!=='23505')break}
-if(r.error){toast(r.error.message,1);return}location.hash='#/a/'+r.data.kode})}
-async function fetchP(){return(await sb.from('pesanan').select('*').eq('sesi_id',S.id).order('created_at')).data}
-async function detail(k,my=rid){const r=await sb.from('sesi').select('*').eq('kode',k).maybeSingle();if(my!==rid)return;
-if(!r.data){app.innerHTML='<div class="card">Sesi tidak ditemukan. <a href="#/">Kembali</a></div>';return}
-S={...r.data,nama:prof?.nama,rek:prof?.rek,wa:prof?.wa};P=(await fetchP())||[];if(my!==rid)return;drawA()}
-function drawA(){clearInterval(tm);head();const s=S.status;
-const ctl='<div class="card"><h2>Kontrol</h2><a href="#/">← Semua sesi</a><div class="lb">Link untuk penitip</div><div class="lk">'+esc(link())+'</div><div class="acts"><button type="button" class="gh" data-act="copy">Salin link</button>',
-sets=(t,v,c)=>'<button type="button" class="'+c+'" data-act="sets" data-s="'+v+'">'+t+'</button>',
-rl='<button type="button" class="gh" data-act="reload">Segarkan</button>';let h;
-if(s==='open')h=ctl+'<a class="btn" target="_blank" rel="noopener" href="'+esc(wa('','Titip Gacoan yuk! Isi nama, pesanan & level di sini: '+link()))+'">Bagikan ke WA</a></div><div class="acts">'+sets('Simpan & tutup daftar','closed','pk')+rl+'</div></div>';
-else if(s==='closed')h=ctl+'</div></div><form class="card" data-form="settle"><h2>Harga & biaya</h2><div class="mu">Harga per porsi <b>sebelum pajak</b> (lihat struk)</div>'+[...new Set(P.map(o=>o.item))].map(i=>'<label class="lb">'+esc(i)+'<input type="number" inputmode="numeric" min="0" data-p="'+esc(i)+'" value="'+(base(i)||'')+'"></label>').join('')+'<label class="lb" for="pj">Pajak gerai (PB1 %)</label><input id="pj" type="number" inputmode="decimal" min="0" max="100" value="'+pj()+'"><label class="lb" for="fe">Fee jastip per orang (Rp)</label><input id="fe" type="number" inputmode="numeric" min="0" value="'+S.fee+'"><div class="acts"><button type="submit" class="pk">Hitung & terbitkan rekap</button>'+sets('Buka lagi','open','gh')+'</div></form>';
-else h=ctl+'<a class="btn" target="_blank" rel="noopener" href="'+esc(wa('',rekapText()))+'">Kirim rekap ke WA</a></div><div class="acts">'+sets('Ubah harga','closed','gh')+rl+'</div></div>';
-app.innerHTML=h+'<div id="l">'+listHTML(true)+'</div>'+(s==='settled'?rekapHTML():'');
-sig=JSON.stringify(P);if(s==='open')tm=setInterval(pollA,12000)}
-async function pollA(){if(document.hidden||busy)return;const d=await fetchP();if(!d||!S||S.status!=='open')return;const sg=JSON.stringify(d);if(sg===sig)return;sig=sg;P=d;const l=$('#l');if(l)l.innerHTML=listHTML(true)}
-const reload=()=>detail(S.kode);
-async function setS(status){return lock(async()=>{const r=await sb.from('sesi').update({status}).eq('id',S.id);if(r.error){toast(r.error.message,1);return}await reload()})}
-async function settle(){return lock(async()=>{const prices={};let bad=false;$$('[data-p]').forEach(e=>{const v=+e.value;if(!(v>0))bad=true;prices[e.dataset.p]=v});
-if(bad){toast('Isi harga semua menu dulu',1);return}const pjk=+$('#pj').value,fee=+$('#fe').value||0;if(!(pjk>=0&&pjk<=100)){toast('Pajak harus 0 sampai 100',1);return}if(fee<0){toast('Fee tidak boleh minus',1);return}
-const r=await sb.from('sesi').update({status:'settled',prices,pajak:pjk,fee:Math.round(fee)}).eq('id',S.id);if(r.error){toast(r.error.message,1);return}await reload()})}
-async function delO(b){if(!b.dataset.arm){b.dataset.arm='1';b.dataset.t=b.textContent;b.classList.add('arm');b.textContent='Hapus?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.classList.remove('arm');b.textContent=b.dataset.t}},3000);return}
-return lock(async()=>{const r=await sb.from('pesanan').delete().eq('id',b.dataset.id);if(r.error){toast(r.error.message,1);return}P=P.filter(o=>o.id!==b.dataset.id);sig=JSON.stringify(P);$('#l').innerHTML=listHTML(true);toast('Dihapus')})}
-async function tog(k){return lock(async()=>{const g=calc().G.find(x=>key(x.nama)===k);if(!g)return;const ids=g.os.map(o=>o.id),v=!g.paid;const r=await sb.from('pesanan').update({paid:v}).in('id',ids);if(r.error){toast(r.error.message,1);return}P.forEach(o=>{if(ids.includes(o.id))o.paid=v});$('#l').innerHTML=listHTML(true)})}
-async function copyLink(){try{await navigator.clipboard.writeText(link());toast('Link disalin ✓')}catch{toast('Salin manual dari kotak di atas',1)}}
-
-/* ===== event ===== */
-const ACT={cl:openCL,x:()=>dlg.close(),retry:()=>route(),reload,img:saveImg,copy:copyLink,signup:()=>auth(1),out:async()=>{await sb.auth.signOut();admin()},sets:b=>setS(b.dataset.s),del:delO,tog:b=>tog(b.dataset.k)};
-const FORM={kirim,bayar,login:()=>auth(0),prof:saveProf,news:newS,settle};
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b&&ACT[b.dataset.act])ACT[b.dataset.act](b,e);
-const t=e.target;if(t.matches&&t.matches('input[name=level]')){if(draft.l===t.value){draft.l='';t.checked=false}else draft.l=t.value}});
-document.addEventListener('submit',e=>{const f=e.target.closest('[data-form]');if(!f)return;e.preventDefault();FORM[f.dataset.form]?.(f)});
-document.addEventListener('input',e=>{if(e.target.id==='n')draft.n=e.target.value});
-document.addEventListener('change',e=>{const t=e.target;if(t.name==='item'){draft.i=t.value;syncChoice()}else if(t.name==='who')draft.who=t.value;else if(t.id==='bk'){draft.f=t.files[0]||null;$('#fn').textContent=draft.f?draft.f.name:'Pilih foto bukti';$('#fl').classList.toggle('has',!!draft.f)}});
-function route(){clearInterval(tm);const m=location.hash.match(/^#\/s\/(\w+)/);m?penitip(m[1]):admin()}
-addEventListener('hashchange',route);route();
-</script></body></html>
+<!-- Library Supabase (versi dikunci). Harus dimuat SEBELUM main.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- Aplikasi (ES module) -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,1 +1,10 @@
-
+/* =====================================================================
+   components/card.css
+   Kartu putih, header kartu, kartu catatan & kartu selesai.
+   ===================================================================== */
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px 16px;margin:14px 0;box-shadow:0 10px 24px -16px #07758f66}
+.ch{display:flex;align-items:baseline;justify-content:space-between;gap:10px}  /* judul + jumlah */
+.cnt{font-size:13px;font-weight:600;color:var(--mu)}
+.note{background:var(--tint);border-color:#bfe2ec;box-shadow:none}
+.done{border-color:#bfe8d6;background:#f2fbf7}
+.lk{padding:10px 12px;margin:0 0 8px;border-radius:12px;background:var(--bg);font-size:13px;word-break:break-all;color:var(--mu)}
