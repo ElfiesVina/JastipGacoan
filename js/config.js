@@ -8,10 +8,10 @@
  */
 export const CFG = {
   /** Alamat proyek Supabase. */
-  URL: 'https://fmzwtbclzhjppibtyilq.supabase.co/',
+  URL: 'https://bmhjbutnunmymrcldhmo.supabase.co',
 
   /** Anon (public) key Supabase. */
-  KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtend0YmNsemhqcHBpYnR5aWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5ODcwMzYsImV4cCI6MjEwNzU2MzAzNn0.PT4pMuCJRL7pijqk80HGZcKSf68RJfPPD-J2Voh1Pto',
+  KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtaGpidXRudW5teW1yY2xkaG1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2Njk0MDgsImV4cCI6MjEwODI0NTQwOH0.jw2cdtuxN6eM9IIyQ9RsM_vJsrf9Rq5TAEpLYGmTj9s',
 
   /** Daftar menu yang bisa dipilih penitip. Menu yang mengandung kata "mie" otomatis punya level pedas. */
   MENU: ['Mie Gacoan', 'Udang Keju', 'Thai Tea Iced'],
