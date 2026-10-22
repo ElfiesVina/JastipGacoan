@@ -1,0 +1,15 @@
+/* =====================================================================
+   base/typography.css
+   Judul kartu dan kelas teks kecil yang dipakai di banyak tempat.
+   ===================================================================== */
+h2{font:800 18px var(--f-head);letter-spacing:.12em;color:var(--te);margin:0 0 12px;text-transform:uppercase}
+
+.mu{color:var(--mu);font-size:14px}                 /* teks redup */
+.num{font-weight:800;white-space:nowrap}            /* angka rupiah */
+.tot{font:800 56px/1 var(--f-head);color:var(--pk)} /* total besar di rekap */
+.empty{padding:6px 0}
+.hint{font-size:12.5px;margin:2px 0 4px}
+
+/* label di atas input */
+.lb{display:block;font-size:13px;font-weight:600;color:var(--mu);margin:12px 0 4px}
+h2+.lb{margin-top:0}

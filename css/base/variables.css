@@ -1,0 +1,32 @@
+/* =====================================================================
+   base/variables.css
+   Semua "token" desain ada di sini (warna, font, lebar, jarak aman layar).
+   Mau ganti warna/lebar aplikasi? Cukup ubah di file ini saja.
+   ===================================================================== */
+:root{
+  /* --- warna --- */
+  --bg:#f2f6f9;      /* latar halaman */
+  --sf:#fff;         /* permukaan kartu */
+  --tx:#10192b;      /* teks utama */
+  --mu:#5d6a80;      /* teks redup */
+  --ln:#dfe6ee;      /* garis / border */
+  --te:#07758f;      /* teal utama (kontras 5,3 dengan teks putih) */
+  --te2:#0a8fb0;     /* teal terang (fokus, aksen) */
+  --tint:#e4f3f7;    /* latar teal muda */
+  --pk:#e6007e;      /* pink aksen */
+  --pkt:#fff0f8;     /* latar pink muda */
+  --ok:#0a8a58;      /* hijau sukses */
+
+  /* --- font --- */
+  --f-body:"Plus Jakarta Sans",system-ui,sans-serif;
+  --f-head:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif-condensed,sans-serif;
+
+  /* --- lebar konten: mobile dulu, membesar lewat responsive.css --- */
+  --wrap:560px;
+
+  /* --- area aman layar (notch / bar gestur). 0px di perangkat tanpa notch --- */
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}

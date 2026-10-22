@@ -1,0 +1,38 @@
+/* =====================================================================
+   components/choice.css
+   Pilihan berbentuk kartu (radio asli yang disembunyikan secara visual)
+   dan chip level pedas 1-8. Radio asli tetap ada agar bisa dipakai
+   keyboard & pembaca layar.
+   ===================================================================== */
+.vh{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}  /* visually hidden */
+
+.opts{display:grid;gap:8px;margin:4px 0 6px}
+.opt{display:block;position:relative;cursor:pointer}
+.box{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1.5px solid var(--ln);border-radius:16px;background:var(--sf);transition:border-color .15s,background-color .15s,box-shadow .15s}
+.opts.cmp .box{min-height:52px}
+.tx{flex:1;min-width:0}
+.ot{display:block;font-weight:800;font-size:16px;word-break:break-word}
+.sub{display:block;font-size:13px;font-weight:600;color:var(--mu)}
+
+/* lingkaran centang */
+.ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #b5c0cf;transition:border-color .15s,background-color .15s}
+.vh:checked+.box{border-color:var(--pk);background:var(--pkt);box-shadow:0 0 0 3px #e6007e1c}
+.vh:checked+.box .ck{border-color:var(--pk);background:var(--pk) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/15px no-repeat}
+.vh:focus-visible+.box,.lv .vh:focus-visible+span{outline:3px solid var(--te2);outline-offset:2px}
+
+/* --- level pedas: muncul hanya untuk Mie, makin pekat makin pedas --- */
+.lvw{display:grid;grid-template-rows:0fr;transition:grid-template-rows .24s ease}   /* animasi buka-tutup tanpa tinggi tetap */
+.lvw.on{grid-template-rows:1fr}
+.lvi{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .24s}
+.lvw.on .lvi{visibility:visible;transition-delay:0s}
+.lvs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 6px}
+.lv{display:block;cursor:pointer}
+.lv span{
+  display:grid;place-items:center;height:52px;border-radius:14px;
+  border:1.5px solid var(--ln);
+  background:#fff;                                                         /* cadangan jika color-mix tak didukung */
+  background:color-mix(in srgb,var(--pk) calc(var(--h)*5%),#fff);          /* --h diisi 1..8 dari HTML */
+  font:800 24px var(--f-head);
+  transition:background-color .15s,border-color .15s,color .15s;
+}
+.lv .vh:checked+span{background:var(--pk);border-color:var(--pk);color:#fff}

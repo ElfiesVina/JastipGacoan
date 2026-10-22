@@ -1,0 +1,8 @@
+/* =====================================================================
+   components/upload.css
+   Kotak pilih foto bukti transfer.
+   ===================================================================== */
+.file{display:flex;align-items:center;gap:10px;min-height:50px;padding:0 14px;border:1.5px dashed #9fb0c2;border-radius:14px;background:var(--bg);cursor:pointer;font-weight:600;color:var(--te);overflow:hidden}
+.file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}   /* nama file panjang dipotong "…" */
+.file.has{border-style:solid;border-color:var(--te2);background:var(--tint)}
+.file:focus-within{outline:3px solid var(--te2);outline-offset:2px}

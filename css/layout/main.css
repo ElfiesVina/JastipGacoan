@@ -1,0 +1,11 @@
+/* =====================================================================
+   layout/main.css
+   Wadah konten utama. Ditarik sedikit ke atas supaya menimpa lengkung header.
+   padding-bottom besar = ruang napas di bawah (tetap, bukan vh, supaya
+   halaman tidak "melompat" ketika keyboard HP muncul).
+   ===================================================================== */
+main{
+  max-width:var(--wrap);
+  margin:-16px auto 0;
+  padding:0 calc(14px + var(--safe-r)) calc(96px + var(--safe-b)) calc(14px + var(--safe-l));
+}

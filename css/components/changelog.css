@@ -1,0 +1,22 @@
+/* =====================================================================
+   components/changelog.css
+   Teaser "pembaruan baru" di atas halaman + isi sheet changelog.
+   ===================================================================== */
+/* --- teaser --- */
+.tz{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;margin:12px 0 0;padding:8px 14px;border-radius:16px;background:#fff;color:var(--tx);box-shadow:0 8px 20px -14px #07758f88,inset 0 0 0 1.5px var(--pk);text-align:left;font-weight:400}
+.tzd{flex:none;width:10px;height:10px;border-radius:50%;background:var(--pk);animation:pulse 1.6s ease-out 2}
+.tzt{flex:1;min-width:0;display:block}
+.tzt b{display:block;font-size:14px}
+.tzt span{display:block;font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tzg{flex:none;font-weight:800;font-size:14px;color:var(--pk)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #e6007e66}100%{box-shadow:0 0 0 10px #e6007e00}}
+
+/* --- satu entri catatan --- */
+.en{padding:16px 0 16px 14px;border-left:4px solid var(--ln);margin-top:14px}
+.en.nw{border-left-color:var(--pk)}
+.eh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12.5px;color:var(--mu);font-weight:600}
+.tg{padding:2px 10px;border-radius:999px;background:var(--tint);color:var(--te);font-weight:800}
+.nb{padding:2px 10px;border-radius:999px;background:var(--pk);color:#fff;font-weight:800}
+.en h4{font:800 17px/1.3 var(--f-body);margin:8px 0 6px}
+.en ul{margin:0;padding-left:18px;color:#33415a;font-size:14.5px}
+.en li{margin:3px 0}
