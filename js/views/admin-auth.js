@@ -6,7 +6,8 @@
 import { app, $ } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { toast, lock } from '../core/ui.js';
-import { getSession, signIn, signUp, signOut } from '../api/auth.api.js';
+import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword } from '../api/auth.api.js';
+import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
 import { renderHeader } from '../components/header.js';
 import { authScreenHTML } from '../components/auth-forms.js';
@@ -14,9 +15,13 @@ import { renderChangelogBadge } from '../services/changelog.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
 
+/** true setelah password baru berhasil disimpan (supaya layar "password baru" tidak muncul lagi). */
+let recoveryHandled = false;
+
 /**
- * Tampilkan layar Masuk atau Daftar (header aplikasi disembunyikan lewat body.auth-mode).
- * @param {'login'|'signup'} mode
+ * Tampilkan layar Masuk / Daftar / Lupa password / Password baru
+ * (header aplikasi disembunyikan lewat body.auth-mode).
+ * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export function showAuth(mode) {
   document.body.classList.add('auth-mode');
@@ -39,7 +44,12 @@ export async function showAdmin() {
   const session = await getSession();
   if (my !== state.rid) return;
   state.user = session?.user || null;
-  if (!state.user) { showAuth('login'); return; }
+  if (state.user && OPENED_FROM_RECOVERY_LINK && !recoveryHandled) { showAuth('newpass'); return; } // dari link reset
+  if (!state.user) {
+    if (RESET_LINK_EXPIRED) toast('Link reset sudah tidak berlaku. Minta link baru.', 1);
+    showAuth('login');
+    return;
+  }
 
   state.profil = (await getProfile(state.user.id)).data;
   if (my !== state.rid) return;
@@ -93,5 +103,30 @@ export function togglePassword(b) {
   b.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
 }
 
-/** "Forgot password?" — belum tersedia (butuh layar atur-password-baru + backend). */
-export const forgotPassword = () => toast('Fitur lupa password belum tersedia', 1);
+/** Tombol "Forgot password?": buka layar lupa password. */
+export const forgotPassword = () => showAuth('forgot');
+
+/** Kirim email link reset ke alamat yang diisi, lalu kembali ke layar Masuk. */
+export function sendReset() {
+  return lock(async () => {
+    const e = $('#em').value.trim();
+    if (!e) { toast('Isi email dulu', 1); $('#em').focus(); return; }
+    const r = await sendResetEmail(e, location.origin + location.pathname);
+    if (r.error) { toast(r.error.message, 1); return; }
+    toast('Link dikirim. Cek email (termasuk folder Spam).');
+    showAuth('login');
+  });
+}
+
+/** Simpan password baru (setelah membuka link reset), lalu masuk ke dashboard. */
+export function saveNewPassword() {
+  return lock(async () => {
+    const p = $('#pw').value;
+    if (p.length < 6) { toast('Password minimal 6 karakter', 1); return; }
+    const r = await updatePassword(p);
+    if (r.error) { toast(r.error.message, 1); return; }
+    recoveryHandled = true;
+    toast('Password diubah ✓');
+    showAdmin();
+  });
+}

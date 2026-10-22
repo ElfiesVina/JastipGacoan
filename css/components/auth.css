@@ -79,6 +79,9 @@ body.auth-mode::after{
 .auth-forgot{justify-content:flex-end;margin:-4px 0 0}
 .auth-forgot button{margin:0}
 
+/* kalimat penjelas di atas form (lupa / password baru) */
+.auth-hint{margin:0 0 16px;font-size:13px;line-height:1.5;color:#46566c;text-align:center}
+
 /* layar lebih lebar: logo sedikit lebih besar */
 @media (min-width:768px){
   .auth-brand img{width:140px}

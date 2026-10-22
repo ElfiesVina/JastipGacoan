@@ -46,9 +46,28 @@ const signupBody = () =>
   '<button class="auth-btn" type="submit">Daftar</button>' +
   '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div></form>';
 
+/** Isi form LUPA PASSWORD: email, tombol kirim, tautan kembali ke Masuk. */
+const forgotBody = () =>
+  '<form class="auth-form" data-form="reset" novalidate>' +
+  '<p class="auth-hint">Masukkan email akunmu. Kami kirim link untuk membuat password baru.</p>' +
+  field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
+  '<button class="auth-btn" type="submit">Kirim link reset</button>' +
+  '<div class="auth-links">Ingat password?<button type="button" data-act="to-login">Masuk</button></div></form>';
+
+/** Isi form PASSWORD BARU (muncul setelah link di email diketuk). */
+const newPasswordBody = () =>
+  '<form class="auth-form" data-form="newpass" novalidate>' +
+  '<p class="auth-hint">Buat password baru untuk akunmu.</p>' +
+  field('lock', 'id="pw" type="password" autocomplete="new-password" minlength="6" placeholder="New password"', true) +
+  '<button class="auth-btn" type="submit">Simpan password</button></form>';
+
+/** Pilih isi form sesuai mode. */
+const bodyFor = (mode) =>
+  ({ signup: signupBody, forgot: forgotBody, newpass: newPasswordBody }[mode] || loginBody)();
+
 /**
  * Layar lengkap.
- * @param {'login'|'signup'} mode
+ * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export const authScreenHTML = (mode) =>
   '<section class="auth">' +
@@ -56,5 +75,5 @@ export const authScreenHTML = (mode) =>
   '<div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
-  (mode === 'signup' ? signupBody() : loginBody()) +
+  bodyFor(mode) +
   '</div></section>';
