@@ -6,19 +6,26 @@
    ===================================================================== */
 
 /* --- mode auth: sembunyikan header aplikasi, konten jadi selebar layar --- */
-body.auth-mode{background:#fff}
+body.auth-mode{background:#fff;min-height:100svh} /* svh stabil saat keyboard muncul (tidak ikut loncat) */
 body.auth-mode header,
 body.auth-mode #cl{display:none}
 body.auth-mode main{max-width:none;margin:0;padding:0}
 
-/* gelombang dekoratif di pojok kanan bawah (tidak menangkap sentuhan) */
-body.auth-mode::after{
-  content:"";position:fixed;right:0;bottom:0;z-index:-1;pointer-events:none;
+/* gelombang dekoratif: absolute di dalam .auth (bukan fixed) supaya tidak tumpang tindih saat keyboard */
+.auth{
+  position:relative;
+  min-height:100vh;           /* fallback browser lama */
+  min-height:100svh;          /* stabil saat keyboard; tidak pakai dvh agar tidak loncat */
+  padding-bottom:var(--safe-b);
+  overflow:hidden;            /* gelombang tidak keluar dari area auth */
+}
+.auth::after{
+  content:"";position:absolute;right:0;bottom:0;z-index:0;pointer-events:none;
   width:min(60vw,440px);aspect-ratio:400/220;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 220' preserveAspectRatio='none'%3E%3Cpath d='M0 220C120 208 210 172 270 112C320 62 365 32 400 24V220Z' fill='%23ebf8f9'/%3E%3C/svg%3E") no-repeat right bottom/100% 100%;
 }
-
-.auth{min-height:100vh;min-height:100dvh;padding-bottom:var(--safe-b)}
+/* form & logo di atas gelombang */
+.auth > *{position:relative;z-index:1}
 
 /* --- pita atas --- */
 .auth-head{height:calc(64px + var(--safe-t));background:var(--au);border-radius:0 0 24px 24px}
