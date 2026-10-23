@@ -82,6 +82,9 @@ body.auth-mode::after{
 /* kalimat penjelas di atas form (lupa / password baru) */
 .auth-hint{margin:0 0 16px;font-size:13px;line-height:1.5;color:#46566c;text-align:center}
 
+/* kolom kode: angka tebal dengan jarak antar-digit (placeholder tetap normal) */
+#cd:not(:placeholder-shown){letter-spacing:.3em;font-weight:800}
+
 /* layar lebih lebar: logo sedikit lebih besar */
 @media (min-width:768px){
   .auth-brand img{width:140px}

@@ -14,7 +14,7 @@ import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible } from '../views/customer.js';
-import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, saveNewPassword } from '../views/admin-auth.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, resendCode, verifyCode, saveNewPassword } from '../views/admin-auth.js';
 import { saveProfile, createSession } from '../views/admin-dashboard.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -30,6 +30,7 @@ const ACT = {
   'to-login': () => showAuth('login'),
   pw: togglePassword,
   forgot: forgotPassword,
+  resend: resendCode,
   out: logout,
   sets: (b) => setStatus(b.dataset.s),
   del: deleteOrder,
@@ -43,6 +44,7 @@ const FORM = {
   login: () => authenticate(false),
   signup: () => authenticate(true),
   reset: sendReset,
+  code: verifyCode,
   newpass: saveNewPassword,
   prof: saveProfile,
   news: createSession,

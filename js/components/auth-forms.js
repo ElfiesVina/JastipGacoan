@@ -5,6 +5,8 @@
  * beda isi form.
  */
 
+import { esc } from '../core/dom.js';
+
 /* Ikon-ikon inline (ikut warna teks lewat currentColor). */
 const svg = (body, size = 20) =>
   '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + '</svg>';
@@ -14,6 +16,7 @@ const ICON = {
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r=".8" fill="currentColor"/>'),
   eyeOff: svg('<path d="M3 3l18 18"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M10.6 6.1A9.6 9.6 0 0 1 12 6c5 0 8.5 4 9.5 6-.4.8-1.2 2-2.5 3.2M6.6 7.6C4.6 9 3.3 10.9 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/>'),
   eye: svg('<path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/>'),
+  key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>'),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
 
@@ -46,34 +49,45 @@ const signupBody = () =>
   '<button class="auth-btn" type="submit">Daftar</button>' +
   '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div></form>';
 
-/** Isi form LUPA PASSWORD: email, tombol kirim, tautan kembali ke Masuk. */
+/** Isi form LUPA PASSWORD (langkah 1): email -> kirim kode. */
 const forgotBody = () =>
   '<form class="auth-form" data-form="reset" novalidate>' +
-  '<p class="auth-hint">Masukkan email akunmu. Kami kirim link untuk membuat password baru.</p>' +
+  '<p class="auth-hint">Masukkan email akunmu. Kami kirim kode untuk membuat password baru.</p>' +
   field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
-  '<button class="auth-btn" type="submit">Kirim link reset</button>' +
+  '<button class="auth-btn" type="submit">Kirim kode</button>' +
   '<div class="auth-links">Ingat password?<button type="button" data-act="to-login">Masuk</button></div></form>';
 
-/** Isi form PASSWORD BARU (muncul setelah link di email diketuk). */
+/** Isi form KODE (langkah 2): masukkan kode dari email. @param {string} email alamat tujuan kode */
+const codeBody = (email) =>
+  '<form class="auth-form" data-form="code" novalidate>' +
+  '<p class="auth-hint">Kode dikirim ke <b>' + esc(email) + '</b>. Cek juga folder Spam.</p>' +
+  field('key', 'id="cd" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Kode dari email"') +
+  '<button class="auth-btn" type="submit">Verifikasi</button>' +
+  '<div class="auth-links">Tidak menerima kode?<button type="button" data-act="resend">Kirim ulang</button></div>' +
+  '<div class="auth-links">Salah email?<button type="button" data-act="forgot">Ubah</button></div></form>';
+
+/** Isi form PASSWORD BARU (langkah 3): password + konfirmasi. */
 const newPasswordBody = () =>
   '<form class="auth-form" data-form="newpass" novalidate>' +
   '<p class="auth-hint">Buat password baru untuk akunmu.</p>' +
   field('lock', 'id="pw" type="password" autocomplete="new-password" minlength="6" placeholder="New password"', true) +
+  field('lock', 'id="pw2" type="password" autocomplete="new-password" minlength="6" placeholder="Confirm password"', true) +
   '<button class="auth-btn" type="submit">Simpan password</button></form>';
 
-/** Pilih isi form sesuai mode. */
-const bodyFor = (mode) =>
-  ({ signup: signupBody, forgot: forgotBody, newpass: newPasswordBody }[mode] || loginBody)();
+/** Pilih isi form sesuai mode. @param {string} mode @param {{email?:string}} ctx data tambahan */
+const bodyFor = (mode, ctx) =>
+  ({ signup: signupBody, forgot: forgotBody, code: () => codeBody(ctx.email || ''), newpass: newPasswordBody }[mode] || loginBody)();
 
 /**
  * Layar lengkap.
- * @param {'login'|'signup'|'forgot'|'newpass'} mode
+ * @param {'login'|'signup'|'forgot'|'code'|'newpass'} mode
+ * @param {{email?:string}} [ctx] data tambahan (mis. email untuk layar kode)
  */
-export const authScreenHTML = (mode) =>
+export const authScreenHTML = (mode, ctx = {}) =>
   '<section class="auth">' +
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
   '<div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
-  bodyFor(mode) +
+  bodyFor(mode, ctx) +
   '</div></section>';
