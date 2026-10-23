@@ -5,7 +5,7 @@
  */
 import { app, $ } from '../core/dom.js';
 import { state } from '../core/state.js';
-import { toast, lock } from '../core/ui.js';
+import { toast, lock, skeleton } from '../core/ui.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
@@ -54,6 +54,7 @@ export async function showAdmin() {
   renderHeader();
   renderChangelogBadge();
 
+  // Masih di auth-mode saat muat profil → form login tetap tampil, tidak flash header
   state.profil = (await getProfile(state.user.id)).data;
   if (my !== state.rid) return;
 
@@ -63,7 +64,15 @@ export async function showAdmin() {
     const s = await saveProfile({ id: state.user.id, nama });
     if (!s.error) state.profil = { id: state.user.id, nama, rek: '', wa: '' };
   }
+  if (my !== state.rid) return;
+
+  // Baru ganti ke beranda: kosongkan form auth dulu, baru tampilkan header (hindari tumpang tindih)
+  app.innerHTML = skeleton;
+  document.body.classList.remove('auth-mode');
+  renderHeader();
+  renderChangelogBadge();
   m ? showSessionDetail(m[1], my) : showDashboard(my);
+}
 }
 
 /**
