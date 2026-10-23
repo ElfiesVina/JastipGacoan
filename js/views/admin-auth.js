@@ -33,12 +33,10 @@ export function showAuth(mode) {
 /** Titik masuk admin: pastikan sudah login, muat profil, lalu pilih halaman. */
 export async function showAdmin() {
   const my = ++state.rid;
-  document.body.classList.remove('auth-mode');
+  // Jangan tampilkan header beranda dulu — tunggu hasil cek sesi (cegah flash)
   state.role = 'admin';
   clearInterval(state.timer);
   state.sesi = null;
-  renderHeader();
-  renderChangelogBadge();
 
   const m = location.hash.match(/^#\/a\/(\w+)/); // #/a/<kode> = detail sesi
   const session = await getSession();
@@ -50,6 +48,11 @@ export async function showAdmin() {
     showAuth('login');
     return;
   }
+
+  // Baru di sini: user sudah login → tampilkan header aplikasi
+  document.body.classList.remove('auth-mode');
+  renderHeader();
+  renderChangelogBadge();
 
   state.profil = (await getProfile(state.user.id)).data;
   if (my !== state.rid) return;
