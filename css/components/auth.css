@@ -74,12 +74,14 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 }
 
 /* --- tombol panah mengambang --- */
+/* tombol panah mengambang – tanpa bulat & shadow, animasi bob tetap */
 .auth-nav{
   position:absolute;left:0;right:0;z-index:3;margin:0 auto;padding:0;
-  width:48px;height:48px;min-height:48px;border-radius:50%;
-  background:#fff;color:var(--ab);
+  width:48px;height:48px;min-height:48px;
+  background:transparent;          /* hilangkan putih */
+  color:var(--ab);
   display:grid;place-items:center;
-  box-shadow:0 10px 24px -10px #07758f99,inset 0 0 0 1.5px #cfe6ed;
+  /* hilangkan: border-radius, box-shadow */
   transition:opacity .3s ease,visibility 0s;
 }
 .auth-nav svg{display:block}
