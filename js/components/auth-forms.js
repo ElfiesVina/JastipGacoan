@@ -5,6 +5,11 @@
  * beda isi form.
  */
 
+import { CHANGELOG } from '../data/changelog-data.js';
+
+/** Nomor versi terbaru dari catatan perubahan (untuk footer). */
+const VERSI = (CHANGELOG.slice().sort((a, b) => b.id - a.id)[0] || {}).v || '';
+
 /* Ikon-ikon inline (ikut warna teks lewat currentColor). */
 const svg = (body, size = 20) =>
   '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + '</svg>';
@@ -66,15 +71,49 @@ const newPasswordBody = () =>
 const bodyFor = (mode) =>
   ({ signup: signupBody, forgot: forgotBody, newpass: newPasswordBody }[mode] || loginBody)();
 
+/** Langkah singkat cara pakai: [judul, penjelasan]. */
+const STEPS = [
+  ['Buat sesi', 'Jastip masuk, lalu membuat sesi titipan baru.'],
+  ['Bagikan link', 'Kirim link sesi ke teman lewat WhatsApp.'],
+  ['Teman mengisi', 'Nama, menu, dan level pedas. Tanpa perlu akun.'],
+  ['Rekap otomatis', 'Harga, pajak, dan fee terhitung. Teman bayar dan kirim bukti.'],
+];
+
+/** Kartu "Cara kerjanya". Di HP tampil di bawah form; di laptop jadi bagian panel kiri. */
+const infoHTML = () =>
+  '<section class="auth-info" aria-labelledby="auth-info-t"><h2 id="auth-info-t">Cara kerjanya</h2><ol class="auth-steps">' +
+  STEPS.map((s, i) =>
+    '<li><span class="auth-n" aria-hidden="true">' + (i + 1) + '</span><span class="auth-st"><b>' + s[0] + '</b>' + s[1] + '</span></li>').join('') +
+  '</ol><p class="auth-note">Halaman masuk ini khusus jastip. Kalau kamu penitip, cukup buka link dari jastip, tidak perlu daftar.</p></section>';
+
+/** Teks sambutan besar. Hanya tampil di layar lebar (laptop). */
+const heroHTML = () =>
+  '<div class="auth-hero"><h1>Titip pesanan, rekap otomatis.</h1>' +
+  '<p>Kumpulkan titipan teman lewat satu link, hitung total beserta pajaknya, lalu terima bukti transfer di satu tempat.</p></div>';
+
+/** Footer: hak cipta, versi, tautan "Yang baru", dan catatan bahwa ini bukan aplikasi resmi. */
+const footerHTML = () =>
+  '<footer class="auth-foot"><div class="auth-foot-in">' +
+  '<span class="auth-copy">&copy; ' + new Date().getFullYear() + ' Titip Gacoan' + (VERSI ? ' &middot; v' + VERSI : '') +
+  '<button type="button" class="auth-foot-link" data-act="cl">Yang baru</button></span>' +
+  '<span class="auth-disc">Bukan aplikasi resmi Mie Gacoan. Logo dan merek milik pemiliknya masing-masing.</span>' +
+  '</div></footer>';
+
 /**
- * Layar lengkap.
+ * Layar lengkap. Susunan: panel samping (pita + sambutan + info) | form | footer.
+ * Di HP semuanya berurutan ke bawah; di laptop jadi dua kolom (lihat auth.css).
  * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export const authScreenHTML = (mode) =>
   '<section class="auth">' +
+  '<aside class="auth-side">' +
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
-  '<div class="auth-in">' +
+  heroHTML() + infoHTML() +
+  '</aside>' +
+  '<div class="auth-main"><div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
   bodyFor(mode) +
-  '</div></section>';
+  '</div></div>' +
+  footerHTML() +
+  '</section>';

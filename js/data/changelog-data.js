@@ -12,6 +12,13 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 5, tgl: '2026-10-24', v: '1.2', jenis: 'Tampilan', untuk: 'admin',
+    judul: 'Halaman masuk lebih lengkap dan rapi',
+    poin: [
+      'Di laptop, halaman masuk tampil dua kolom: info di kiri, form di kanan.',
+      'Ada penjelasan singkat cara kerja dan footer di bagian bawah.',
+      'Tombol masuk menampilkan tanda proses, dan pesan galat kini berbahasa Indonesia.',
+      'Email yang sudah diketik tidak hilang saat pindah antara Masuk dan Daftar.'] },
   { id: 4, tgl: '2026-10-15', v: '1.1', jenis: 'Perbaikan', untuk: 'admin',
     judul: 'Lebih aman saat menerbitkan rekap',
     poin: [
