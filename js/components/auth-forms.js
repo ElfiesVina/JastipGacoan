@@ -32,10 +32,10 @@ const field = (icon, attrs, eye) =>
 const loginBody = () =>
   '<form class="auth-form" data-form="login" novalidate>' +
   field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
-  field('lock', 'id="pw" type="password" autocomplete="current-password" placeholder="Password"', true) +
+  field('lock', 'id="pw" type="password" autocomplete="current-password" enterkeyhint="go" placeholder="Password"', true) +
   '<div class="auth-links auth-forgot"><button type="button" data-act="forgot">Forgot password?</button></div>' +
   '<button class="auth-btn" type="submit">Masuk</button>' +
-  '<div class="auth-links">I haven’t an account<button type="button" data-act="to-signup">Daftar</button></div></form>';
+  '<div class="auth-links">I don’t have an account<button type="button" data-act="to-signup">Daftar</button></div></form>';
 
 /** Isi form DAFTAR: nama, email, password baru, tombol Daftar, tautan ke Masuk. */
 const signupBody = () =>

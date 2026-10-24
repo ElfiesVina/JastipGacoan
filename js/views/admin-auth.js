@@ -5,7 +5,7 @@
  */
 import { app, $ } from '../core/dom.js';
 import { state } from '../core/state.js';
-import { toast, lock, skeleton } from '../core/ui.js';
+import { toast, lock, skeleton, setBusy } from '../core/ui.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
@@ -24,8 +24,10 @@ let recoveryHandled = false;
  * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export function showAuth(mode) {
+  const email = $('#em')?.value || ''; // jangan hilangkan email yang sudah diketik saat pindah layar
   document.body.classList.add('auth-mode');
   app.innerHTML = authScreenHTML(mode);
+  if (email && $('#em')) $('#em').value = email;
   renderChangelogBadge(); // isi titik di lonceng
   window.scrollTo(0, 0);
 }
@@ -42,17 +44,15 @@ export async function showAdmin() {
   const session = await getSession();
   if (my !== state.rid) return;
   state.user = session?.user || null;
-  if (state.user && OPENED_FROM_RECOVERY_LINK && !recoveryHandled) { showAuth('newpass'); return; } // dari link reset
+  if (state.user && OPENED_FROM_RECOVERY_LINK && !recoveryHandled) {
+    if (!$('[data-form=newpass]')) showAuth('newpass'); // sudah tampil? jangan hapus yang sedang diketik
+    return;
+  } // dari link reset
   if (!state.user) {
     if (RESET_LINK_EXPIRED) toast('Link reset sudah tidak berlaku. Minta link baru.', 1);
     showAuth('login');
     return;
   }
-
-  // Baru di sini: user sudah login → tampilkan header aplikasi
-  document.body.classList.remove('auth-mode');
-  renderHeader();
-  renderChangelogBadge();
 
   // Masih di auth-mode saat muat profil → form login tetap tampil, tidak flash header
   state.profil = (await getProfile(state.user.id)).data;
@@ -73,6 +73,19 @@ export async function showAdmin() {
   renderChangelogBadge();
   m ? showSessionDetail(m[1], my) : showDashboard(my);
 }
+
+/** Terjemahkan pesan galat Supabase yang umum ke bahasa Indonesia. */
+function authError(err, isSignUp) {
+  const m = err?.message || '';
+  if (isSignUp && /database error/i.test(m)) return 'Email ini belum diizinkan jadi jastip. Hubungi admin.';
+  if (/invalid login credentials/i.test(m)) return 'Email atau password salah.';
+  if (/email not confirmed/i.test(m)) return 'Email belum dikonfirmasi. Cek kotak masuk (dan Spam), ketuk link konfirmasinya.';
+  if (/already registered|already been registered/i.test(m)) return 'Email ini sudah terdaftar. Silakan masuk.';
+  if (/rate limit|too many|security purposes/i.test(m)) return 'Terlalu sering mencoba. Tunggu sebentar lalu coba lagi.';
+  if (/password should be at least|weak password/i.test(m)) return 'Password terlalu pendek atau lemah (min 6 karakter).';
+  if (/invalid email|unable to validate email/i.test(m)) return 'Format email tidak valid.';
+  if (/failed to fetch|network|load failed/i.test(m)) return 'Tidak ada koneksi internet. Coba lagi.';
+  return m || 'Terjadi kesalahan. Coba lagi.';
 }
 
 /**
@@ -87,9 +100,16 @@ export function authenticate(isSignUp) {
     if (isSignUp && !nama) { toast('Isi nama dulu', 1); $('#nm').focus(); return; }
     if (!e || p.length < 6) { toast('Isi email dan password (min 6 karakter)', 1); return; }
 
-    const r = isSignUp ? await signUp(e, p, nama) : await signIn(e, p);
+    setBusy('.auth-btn', isSignUp ? 'Mendaftar…' : 'Masuk…'); // beri tanda sedang diproses
+    let r;
+    try {
+      r = isSignUp ? await signUp(e, p, nama) : await signIn(e, p);
+    } catch (err) {
+      r = { error: err }; // jaringan putus: tampilkan pesan, jangan diam
+    }
     if (r.error) {
-      toast(isSignUp && /database error/i.test(r.error.message) ? 'Email ini belum diizinkan jadi jastip. Hubungi admin.' : r.error.message, 1);
+      setBusy('.auth-btn');
+      toast(authError(r.error, isSignUp), 1);
       return;
     }
     if (isSignUp && !r.data.session) { toast('Cek email untuk konfirmasi, lalu masuk'); showAuth('login'); return; }
@@ -123,8 +143,10 @@ export function sendReset() {
   return lock(async () => {
     const e = $('#em').value.trim();
     if (!e) { toast('Isi email dulu', 1); $('#em').focus(); return; }
-    const r = await sendResetEmail(e, location.origin + location.pathname);
-    if (r.error) { toast(r.error.message, 1); return; }
+    setBusy('.auth-btn', 'Mengirim…');
+    let r;
+    try { r = await sendResetEmail(e, location.origin + location.pathname); } catch (err) { r = { error: err }; }
+    if (r.error) { setBusy('.auth-btn'); toast(authError(r.error), 1); return; }
     toast('Link dikirim. Cek email (termasuk Spam), lalu ketuk linknya.');
     showAuth('login');
   });
@@ -136,8 +158,10 @@ export function saveNewPassword() {
     const p = $('#pw').value;
     if (p.length < 6) { toast('Password minimal 6 karakter', 1); return; }
     if (p !== $('#pw2').value) { toast('Konfirmasi password tidak sama', 1); return; }
-    const r = await updatePassword(p);
-    if (r.error) { toast(r.error.message, 1); return; }
+    setBusy('.auth-btn', 'Menyimpan…');
+    let r;
+    try { r = await updatePassword(p); } catch (err) { r = { error: err }; }
+    if (r.error) { setBusy('.auth-btn'); toast(authError(r.error), 1); return; }
     recoveryHandled = true;
     toast('Password diubah ✓');
     showAdmin();

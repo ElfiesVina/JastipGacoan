@@ -17,8 +17,10 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
   min-height:100vh;           /* fallback browser lama */
   min-height:100svh;          /* stabil saat keyboard; tidak pakai dvh agar tidak loncat */
   padding-bottom:var(--safe-b);
-  overflow:hidden;            /* gelombang tidak keluar dari area auth */
+  overflow:hidden;            /* fallback: gelombang tidak keluar dari area auth */
 }
+/* overflow:clip tidak bisa digeser oleh fokus input (hidden bisa, dan halaman jadi nyangkut bergeser saat keyboard muncul) */
+@supports (overflow:clip){ .auth{overflow:clip} }
 .auth::after{
   content:"";position:absolute;right:0;bottom:0;z-index:0;pointer-events:none;
   width:min(60vw,440px);aspect-ratio:400/220;
