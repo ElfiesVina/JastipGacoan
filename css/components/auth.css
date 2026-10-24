@@ -162,6 +162,15 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 .auth-field input.auth-otp{font-size:20px;font-weight:800;letter-spacing:.3em;text-align:center}
 .auth-field input.auth-otp::placeholder{font-size:15px;font-weight:600;letter-spacing:normal}
 
+.auth-role-title{
+  margin:0 0 8px;
+  font:800 22px/1.2 var(--f-head);
+  color:var(--ab);
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+}
+
 /* kalimat penjelas di atas form (lupa / kode / password baru) */
 .auth-hint{margin:0 0 16px;font-size:13px;line-height:1.5;color:#46566c;text-align:center}
 

@@ -333,3 +333,10 @@ export function saveNewPassword() {
     showAdmin();
   });
 }
+
+if (form.dataset.form === 'go-sesi') {
+  const kode = ($('#kode')?.value || '').trim().toUpperCase();
+  if (!kode) { toast('Isi kode sesi dulu'); return; }
+  location.hash = '#/s/' + encodeURIComponent(kode);
+  return;
+}
