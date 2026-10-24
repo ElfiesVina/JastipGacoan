@@ -5,6 +5,7 @@
  * beda isi form.
  */
 
+import { esc } from '../core/dom.js';
 import { CHANGELOG } from '../data/changelog-data.js';
 
 /** Nomor versi terbaru dari catatan perubahan (untuk footer). */
@@ -16,6 +17,7 @@ const svg = (body, size = 20) =>
 const ICON = {
   user: svg('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/>'),
   mail: svg('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7.5l8 5.5 8-5.5"/>'),
+  key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l3 3"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r=".8" fill="currentColor"/>'),
   eyeOff: svg('<path d="M3 3l18 18"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M10.6 6.1A9.6 9.6 0 0 1 12 6c5 0 8.5 4 9.5 6-.4.8-1.2 2-2.5 3.2M6.6 7.6C4.6 9 3.3 10.9 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/>'),
   eye: svg('<path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/>'),
@@ -56,10 +58,19 @@ const signupBody = () =>
 /** Isi form LUPA PASSWORD: email -> kirim link reset. */
 const forgotBody = () =>
   '<form class="auth-form" data-form="reset" novalidate>' +
-  '<p class="auth-hint">Masukkan email akunmu. Kami kirim link ke email itu untuk membuat password baru.</p>' +
+  '<p class="auth-hint">Masukkan email akunmu. Kami kirim kode verifikasi ke email itu untuk membuat password baru.</p>' +
   field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
-  '<button class="auth-btn" type="submit">Kirim link</button>' +
+  '<button class="auth-btn" type="submit">Kirim kode</button>' +
   '<div class="auth-links">Ingat password?<button type="button" data-act="to-login">Masuk</button></div></form>';
+
+/** Isi form KODE (OTP): angka dari email -> verifikasi. @param {{email?:string}} ctx */
+const otpBody = (ctx) =>
+  '<form class="auth-form" data-form="otp" novalidate>' +
+  '<p class="auth-hint">Kode verifikasi dikirim ke <b>' + esc(ctx.email || 'emailmu') + '</b>. Masukkan kodenya di bawah. Cek folder Spam kalau belum masuk.</p>' +
+  field('key', 'id="otp" class="auth-otp" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" enterkeyhint="go" maxlength="10" placeholder="Kode"') +
+  '<button class="auth-btn" type="submit">Verifikasi</button>' +
+  '<div class="auth-links">Belum menerima kode?<button type="button" data-act="resend">Kirim ulang</button></div>' +
+  '<div class="auth-links">Salah email?<button type="button" data-act="forgot">Ganti</button></div></form>';
 
 /** Isi form PASSWORD BARU (setelah link di email diketuk): password + konfirmasi. */
 const newPasswordBody = () =>
@@ -70,8 +81,8 @@ const newPasswordBody = () =>
   '<button class="auth-btn" type="submit">Simpan password</button></form>';
 
 /** Pilih isi form sesuai mode. @param {string} mode */
-const bodyFor = (mode) =>
-  ({ signup: signupBody, forgot: forgotBody, newpass: newPasswordBody }[mode] || loginBody)();
+const bodyFor = (mode, ctx) =>
+  ({ signup: signupBody, forgot: forgotBody, otp: otpBody, newpass: newPasswordBody }[mode] || loginBody)(ctx);
 
 /** Langkah singkat cara pakai: [judul, penjelasan]. */
 const STEPS = [
@@ -106,17 +117,19 @@ const footerHTML = () =>
  *   p1 = pita + logo + form      p2 = sambutan + cara kerja + footer
  * HP: layar bisa digulir biasa (snap). Awalnya hanya p1 yang terlihat; panah mengambang menggulir ke p2.
  * Laptop: kedua halaman dilebur jadi dua kolom (lihat auth.css).
- * @param {'login'|'signup'|'forgot'|'newpass'} mode
+ * @param {'login'|'signup'|'forgot'|'otp'|'newpass'} mode
+ * @param {{email?:string}} [ctx] data tambahan (mis. email tujuan kode)
  */
-export const authScreenHTML = (mode) =>
+export const authScreenHTML = (mode, ctx = {}) =>
   '<section class="auth" data-page="1">' +
+  '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
   '<div class="auth-scroll">' +
   '<div class="auth-pg auth-p1">' +
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
   '<div class="auth-main"><div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
-  bodyFor(mode) +
+  bodyFor(mode, ctx) +
   '</div></div>' +
   '</div>' +
   '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + infoHTML() + '</div>' + footerHTML() + '</div>' +

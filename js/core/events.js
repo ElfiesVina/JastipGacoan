@@ -14,7 +14,7 @@ import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible } from '../views/customer.js';
-import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, saveNewPassword, setAuthPage } from '../views/admin-auth.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage } from '../views/admin-auth.js';
 import { saveProfile, createSession } from '../views/admin-dashboard.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -30,6 +30,7 @@ const ACT = {
   'to-login': () => showAuth('login'),
   pw: togglePassword,
   forgot: forgotPassword,
+  resend: resendCode,
   down: () => setAuthPage(2), // layar masuk: ke halaman cara kerja
   up: () => setAuthPage(1),   // layar masuk: kembali ke form
   out: logout,
@@ -45,6 +46,7 @@ const FORM = {
   login: () => authenticate(false),
   signup: () => authenticate(true),
   reset: sendReset,
+  otp: verifyCode,
   newpass: saveNewPassword,
   prof: saveProfile,
   news: createSession,
@@ -76,6 +78,7 @@ export function bindEvents() {
   // ketik nama: simpan ke draft agar tidak hilang saat tampilan digambar ulang
   document.addEventListener('input', (e) => {
     if (e.target.id === 'n') draft.n = e.target.value;
+    if (e.target.id === 'otp') e.target.value = e.target.value.replace(/\D/g, ''); // kode: hanya angka (juga saat ditempel)
   });
 
   // pilihan radio & file bukti

@@ -6,7 +6,7 @@
 import { app, $ } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { toast, lock, skeleton, setBusy } from '../core/ui.js';
-import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword } from '../api/auth.api.js';
+import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword, verifyResetCode } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
 import { renderHeader } from '../components/header.js';
@@ -18,17 +18,37 @@ import { showSessionDetail } from './admin-session.js';
 /** true setelah password baru berhasil disimpan (supaya layar "password baru" tidak muncul lagi). */
 let recoveryHandled = false;
 
+/** Email tujuan kode reset + waktu kirim terakhir (untuk jeda kirim ulang). */
+let resetEmail = '';
+let lastSent = 0;
+const RESEND_MS = 60000;
+
+/**
+ * Warna bilah status/alamat browser HP. Di layar masuk dibuat sama dengan biru header,
+ * sehingga biru menyatu sampai ke tepi atas layar. Di halaman lain kembali ke warna aplikasi.
+ */
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+const THEME_APP = themeMeta?.content || '#07758f';
+const THEME_AUTH = '#1db3d5';
+if (themeMeta) {
+  new MutationObserver(() => {
+    themeMeta.content = document.body.classList.contains('auth-mode') ? THEME_AUTH : THEME_APP;
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
 /**
  * Tampilkan layar Masuk / Daftar / Lupa password / Password baru
  * (header aplikasi disembunyikan lewat body.auth-mode).
- * @param {'login'|'signup'|'forgot'|'newpass'} mode
+ * @param {'login'|'signup'|'forgot'|'otp'|'newpass'} mode
+ * @param {{email?:string}} [ctx] data tambahan (mis. email tujuan kode)
  */
-export function showAuth(mode) {
-  const email = $('#em')?.value || ''; // jangan hilangkan email yang sudah diketik saat pindah layar
+export function showAuth(mode, ctx = {}) {
+  const email = ctx.email || $('#em')?.value || ''; // jangan hilangkan email yang sudah diketik saat pindah layar
   document.body.classList.add('auth-mode');
-  app.innerHTML = authScreenHTML(mode);
+  app.innerHTML = authScreenHTML(mode, ctx);
   if (email && $('#em')) $('#em').value = email;
   initAuthScroll();
+  initPullRefresh();
   renderChangelogBadge(); // isi titik di lonceng
   window.scrollTo(0, 0);
 }
@@ -84,6 +104,65 @@ function initAuthScroll() {
   update();
 }
 
+/**
+ * Tarik layar masuk ke bawah (saat sudah di paling atas) untuk memuat ulang halaman.
+ * Biru header "memanjang" mengikuti jari, muncul indikator putar; lepas setelah cukup jauh = refresh.
+ * Hanya jalan di layar sentuh; dilewati saat keyboard terbuka supaya isian tidak hilang tidak sengaja.
+ */
+function initPullRefresh() {
+  const a = $('.auth');
+  const sc = $('.auth-scroll');
+  if (!a || !sc) return;
+  const THRESH = 72;  // jarak tarik minimal (px) agar refresh
+  const MAX = 130;    // jarak tarik maksimal
+  const HOLD = 64;    // tinggi indikator saat memuat
+  let y0 = null;
+  let pull = 0;
+  let loading = false;
+
+  const set = (v) => {
+    pull = v;
+    a.style.setProperty('--pull', v + 'px');
+    a.style.setProperty('--ptr', String(Math.min(1, v / THRESH)));
+  };
+  const typing = () => /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || '');
+
+  sc.addEventListener('touchstart', (e) => {
+    if (loading || typing() || sc.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; }
+    y0 = e.touches[0].clientY;
+    a.classList.add('pulling');
+  }, { passive: true });
+
+  sc.addEventListener('touchmove', (e) => {
+    if (y0 === null) return;
+    const dy = e.touches[0].clientY - y0;
+    if (dy > 0 && sc.scrollTop === 0) {
+      if (e.cancelable) e.preventDefault();           // jangan biarkan browser ikut menarik
+      set(Math.min(MAX, dy * 0.5));                   // 0.5 = terasa "berat" ditarik
+    } else {
+      set(0);
+      y0 = null;
+      a.classList.remove('pulling');
+    }
+  }, { passive: false });
+
+  const end = () => {
+    if (y0 === null) return;
+    y0 = null;
+    a.classList.remove('pulling');
+    if (pull >= THRESH) {
+      loading = true;
+      a.classList.add('refreshing');
+      set(HOLD);
+      setTimeout(() => location.reload(), 650);
+    } else {
+      set(0);
+    }
+  };
+  sc.addEventListener('touchend', end);
+  sc.addEventListener('touchcancel', end);
+}
+
 /** Titik masuk admin: pastikan sudah login, muat profil, lalu pilih halaman. */
 export async function showAdmin() {
   const my = ++state.rid;
@@ -133,6 +212,7 @@ function authError(err, isSignUp) {
   if (/invalid login credentials/i.test(m)) return 'Email atau password salah.';
   if (/email not confirmed/i.test(m)) return 'Email belum dikonfirmasi. Cek kotak masuk (dan Spam), ketuk link konfirmasinya.';
   if (/already registered|already been registered/i.test(m)) return 'Email ini sudah terdaftar. Silakan masuk.';
+  if (/otp.*(expired|invalid)|token.*(expired|invalid)|expired.*token|invalid.*token/i.test(m)) return 'Kode salah atau sudah kedaluwarsa. Minta kode baru.';
   if (/rate limit|too many|security purposes/i.test(m)) return 'Terlalu sering mencoba. Tunggu sebentar lalu coba lagi.';
   if (/password should be at least|weak password/i.test(m)) return 'Password terlalu pendek atau lemah (min 6 karakter).';
   if (/invalid email|unable to validate email/i.test(m)) return 'Format email tidak valid.';
@@ -187,20 +267,54 @@ export function togglePassword(b) {
   b.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
 }
 
-/** Tombol "Forgot password?": buka layar lupa password. */
-export const forgotPassword = () => showAuth('forgot');
+/** Tombol "Forgot password?" / "Ganti" email: buka layar lupa password. */
+export const forgotPassword = () => showAuth('forgot', { email: $('#em') ? '' : resetEmail });
 
-/** Kirim email berisi link reset ke alamat yang diisi, lalu kembali ke layar Masuk. */
+/** Minta kode ke email. Dipakai oleh form lupa password dan tombol "Kirim ulang". */
+async function requestCode(email) {
+  setBusy('.auth-btn', 'Mengirim…');
+  let r;
+  try { r = await sendResetEmail(email, location.origin + location.pathname); } catch (err) { r = { error: err }; }
+  if (r.error) { setBusy('.auth-btn'); toast(authError(r.error), 1); return false; }
+  resetEmail = email;
+  lastSent = Date.now();
+  return true;
+}
+
+/** Kirim kode ke email yang diisi, lalu pindah ke layar isi kode. */
 export function sendReset() {
   return lock(async () => {
     const e = $('#em').value.trim();
     if (!e) { toast('Isi email dulu', 1); $('#em').focus(); return; }
-    setBusy('.auth-btn', 'Mengirim…');
+    if (!(await requestCode(e))) return;
+    toast('Kode dikirim. Cek email (termasuk Spam).');
+    showAuth('otp', { email: e });
+  });
+}
+
+/** Kirim ulang kode (jeda 60 detik supaya tidak kena batas Supabase). */
+export function resendCode() {
+  return lock(async () => {
+    if (!resetEmail) { showAuth('forgot'); return; }
+    const sisa = Math.ceil((RESEND_MS - (Date.now() - lastSent)) / 1000);
+    if (sisa > 0) { toast('Tunggu ' + sisa + ' detik lagi untuk kirim ulang', 1); return; }
+    if (!(await requestCode(resetEmail))) return;
+    setBusy('.auth-btn');
+    toast('Kode baru dikirim');
+  });
+}
+
+/** Periksa kode dari email. Kalau benar, lanjut ke layar password baru. */
+export function verifyCode() {
+  return lock(async () => {
+    const kode = $('#otp').value.replace(/\D/g, '');
+    if (kode.length < 6) { toast('Isi kode dari email (min 6 angka)', 1); $('#otp').focus(); return; }
+    setBusy('.auth-btn', 'Memeriksa…');
     let r;
-    try { r = await sendResetEmail(e, location.origin + location.pathname); } catch (err) { r = { error: err }; }
+    try { r = await verifyResetCode(resetEmail, kode); } catch (err) { r = { error: err }; }
     if (r.error) { setBusy('.auth-btn'); toast(authError(r.error), 1); return; }
-    toast('Link dikirim. Cek email (termasuk Spam), lalu ketuk linknya.');
-    showAuth('login');
+    toast('Kode benar. Buat password baru.');
+    showAuth('newpass');
   });
 }
 

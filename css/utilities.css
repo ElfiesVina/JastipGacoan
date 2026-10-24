@@ -2,6 +2,10 @@
    utilities.css
    Aturan lintas-komponen: hormati pengguna yang mematikan animasi.
    ===================================================================== */
+/* sembunyikan indikator scrollbar di semua halaman dan bagian (tetap bisa digulir) */
+*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important}
 }

@@ -12,6 +12,12 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 7, tgl: '2026-10-24', v: '1.4', jenis: 'Fitur', untuk: 'admin',
+    judul: 'Lupa password lewat kode email',
+    poin: [
+      'Isi email, kirim kode, masukkan kode dari email, lalu buat password baru.',
+      'Di halaman masuk, tarik layar ke bawah untuk memuat ulang.',
+      'Warna biru di atas layar kini menyatu dengan bilah browser.'] },
   { id: 6, tgl: '2026-10-24', v: '1.3', jenis: 'Tampilan', untuk: 'admin',
     judul: 'Halaman masuk jadi dua halaman di HP',
     poin: [

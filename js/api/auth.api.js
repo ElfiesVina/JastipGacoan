@@ -30,5 +30,13 @@ export const signOut = () => sb.auth.signOut();
  */
 export const sendResetEmail = (email, redirectTo) => sb.auth.resetPasswordForEmail(email, { redirectTo });
 
+/**
+ * Cek kode (OTP) yang dikirim ke email untuk reset password. Kalau benar, Supabase membuat sesi
+ * sehingga password baru bisa disimpan lewat updatePassword().
+ * Butuh template email "Reset Password" di Supabase berisi {{ .Token }}.
+ * @param {string} email @param {string} token kode angka dari email
+ */
+export const verifyResetCode = (email, token) => sb.auth.verifyOtp({ email, token, type: 'recovery' });
+
 /** Ganti password akun yang sedang login (dipakai setelah membuka link reset). */
 export const updatePassword = (password) => sb.auth.updateUser({ password });
