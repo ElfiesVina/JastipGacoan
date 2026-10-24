@@ -32,6 +32,22 @@ export function showAuth(mode) {
   window.scrollTo(0, 0);
 }
 
+/**
+ * Pindah halaman di layar masuk (khusus HP): 1 = form, 2 = cara kerja + footer.
+ * Animasi dikerjakan CSS lewat atribut data-page. Di laptop atribut ini tidak berpengaruh.
+ * @param {1|2} n halaman tujuan
+ */
+export function setAuthPage(n) {
+  const a = $('.auth');
+  if (!a) return;
+  document.activeElement?.blur?.(); // tutup keyboard kalau sedang terbuka
+  a.dataset.page = String(n);
+  const pg = $(n === 2 ? '.auth-p2' : '.auth-p1');
+  if (pg) pg.scrollTop = 0;
+  // fokus ke tombol yang kini terlihat (untuk pengguna keyboard / pembaca layar)
+  setTimeout(() => $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true }), 350);
+}
+
 /** Titik masuk admin: pastikan sudah login, muat profil, lalu pilih halaman. */
 export async function showAdmin() {
   const my = ++state.rid;

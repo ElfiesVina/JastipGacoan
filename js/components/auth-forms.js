@@ -19,6 +19,8 @@ const ICON = {
   lock: svg('<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r=".8" fill="currentColor"/>'),
   eyeOff: svg('<path d="M3 3l18 18"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M10.6 6.1A9.6 9.6 0 0 1 12 6c5 0 8.5 4 9.5 6-.4.8-1.2 2-2.5 3.2M6.6 7.6C4.6 9 3.3 10.9 2.5 12c1 2 4.5 6 9.5 6 1.3 0 2.5-.3 3.6-.7"/>'),
   eye: svg('<path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/>'),
+  down: svg('<path d="M6 9l6 6 6-6"/>', 26),
+  up: svg('<path d="M6 15l6-6 6 6"/>', 26),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
 
@@ -86,34 +88,37 @@ const infoHTML = () =>
     '<li><span class="auth-n" aria-hidden="true">' + (i + 1) + '</span><span class="auth-st"><b>' + s[0] + '</b>' + s[1] + '</span></li>').join('') +
   '</ol><p class="auth-note">Halaman masuk ini khusus jastip. Kalau kamu penitip, cukup buka link dari jastip, tidak perlu daftar.</p></section>';
 
-/** Teks sambutan besar. Hanya tampil di layar lebar (laptop). */
+/** Sambutan: judul (HP: di halaman kedua) + logo dan paragraf (hanya laptop). */
 const heroHTML = () =>
-  '<div class="auth-hero"><h1>Titip pesanan, rekap otomatis.</h1>' +
+  '<div class="auth-hero"><div class="auth-hero-logo"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div>' +
+  '<h1>Titip pesanan, rekap otomatis.</h1>' +
   '<p>Kumpulkan titipan teman lewat satu link, hitung total beserta pajaknya, lalu terima bukti transfer di satu tempat.</p></div>';
 
-/** Footer: hak cipta, versi, tautan "Yang baru", dan catatan bahwa ini bukan aplikasi resmi. */
+/** Footer: hak cipta, versi, dan catatan bahwa ini bukan aplikasi resmi. */
 const footerHTML = () =>
   '<footer class="auth-foot"><div class="auth-foot-in">' +
-  '<span class="auth-copy">&copy; ' + new Date().getFullYear() + ' Titip Gacoan' + (VERSI ? ' &middot; v' + VERSI : '') +
-  '<button type="button" class="auth-foot-link" data-act="cl">Yang baru</button></span>' +
+  '<span class="auth-copy">&copy; ' + new Date().getFullYear() + ' Titip Gacoan' + (VERSI ? ' &middot; v' + VERSI : '') + '</span>' +
   '<span class="auth-disc">Bukan aplikasi resmi Mie Gacoan. Logo dan merek milik pemiliknya masing-masing.</span>' +
   '</div></footer>';
 
 /**
- * Layar lengkap. Susunan: panel samping (pita + sambutan + info) | form | footer.
- * Di HP semuanya berurutan ke bawah; di laptop jadi dua kolom (lihat auth.css).
+ * Layar lengkap, terdiri dari dua "halaman":
+ *   p1 = pita + logo + form      p2 = sambutan + cara kerja + footer
+ * HP: satu halaman terlihat; tombol panah mengambang berpindah dengan animasi scale (atribut data-page).
+ * Laptop: kedua halaman dilebur jadi dua kolom (lihat auth.css).
  * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export const authScreenHTML = (mode) =>
-  '<section class="auth">' +
-  '<aside class="auth-side">' +
+  '<section class="auth" data-page="1">' +
+  '<div class="auth-pg auth-p1">' +
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
-  heroHTML() + infoHTML() +
-  '</aside>' +
   '<div class="auth-main"><div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
   bodyFor(mode) +
   '</div></div>' +
-  footerHTML() +
+  '</div>' +
+  '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + infoHTML() + '</div>' + footerHTML() + '</div>' +
+  '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
+  '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke halaman masuk">' + ICON.up + '</button>' +
   '</section>';

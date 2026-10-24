@@ -12,6 +12,11 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 6, tgl: '2026-10-24', v: '1.3', jenis: 'Tampilan', untuk: 'admin',
+    judul: 'Halaman masuk jadi dua halaman di HP',
+    poin: [
+      'Cara kerja dan info lain pindah ke halaman kedua. Ketuk panah di bawah layar untuk melihatnya.',
+      'Lonceng di halaman masuk kini menampilkan angka saat ada pembaruan.'] },
   { id: 5, tgl: '2026-10-24', v: '1.2', jenis: 'Tampilan', untuk: 'admin',
     judul: 'Halaman masuk lebih lengkap dan rapi',
     poin: [
