@@ -28,24 +28,60 @@ export function showAuth(mode) {
   document.body.classList.add('auth-mode');
   app.innerHTML = authScreenHTML(mode);
   if (email && $('#em')) $('#em').value = email;
+  initAuthScroll();
   renderChangelogBadge(); // isi titik di lonceng
   window.scrollTo(0, 0);
 }
 
 /**
- * Pindah halaman di layar masuk (khusus HP): 1 = form, 2 = cara kerja + footer.
- * Animasi dikerjakan CSS lewat atribut data-page. Di laptop atribut ini tidak berpengaruh.
+ * Gulir layar masuk (khusus HP) ke halaman 1 (form) atau 2 (cara kerja + footer).
+ * Animasinya dibuat manual: mulai agak "berat", lalu meluncur dan mendarat halus (easeInOutCubic).
  * @param {1|2} n halaman tujuan
  */
 export function setAuthPage(n) {
-  const a = $('.auth');
-  if (!a) return;
+  const sc = $('.auth-scroll');
+  const p1 = $('.auth-p1');
+  if (!sc || !p1) return;
   document.activeElement?.blur?.(); // tutup keyboard kalau sedang terbuka
-  a.dataset.page = String(n);
-  const pg = $(n === 2 ? '.auth-p2' : '.auth-p1');
-  if (pg) pg.scrollTop = 0;
-  // fokus ke tombol yang kini terlihat (untuk pengguna keyboard / pembaca layar)
-  setTimeout(() => $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true }), 350);
+  const from = sc.scrollTop;
+  const to = n === 2 ? p1.offsetHeight : 0;
+  const diam = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (diam || Math.abs(to - from) < 2) { sc.scrollTop = to; return; }
+
+  const dur = 800;
+  const t0 = performance.now();
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  sc.classList.add('animating'); // matikan snap selama animasi supaya tidak saling tarik
+  const step = (now) => {
+    const t = Math.min(1, (now - t0) / dur);
+    sc.scrollTop = from + (to - from) * ease(t);
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      sc.classList.remove('animating');
+      $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true }); // fokus ke tombol yang terlihat
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+/**
+ * Pasang pelacak gulir: menghitung seberapa jauh halaman 1 sudah bergeser (0 sampai 1)
+ * lalu menyimpannya di variabel CSS --p (dipakai untuk efek scale) dan di data-page (untuk tombol panah).
+ */
+function initAuthScroll() {
+  const sc = $('.auth-scroll');
+  const a = $('.auth');
+  const p1 = $('.auth-p1');
+  if (!sc || !a || !p1) return;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const p = Math.min(1, Math.max(0, sc.scrollTop / (p1.offsetHeight || 1)));
+    a.style.setProperty('--p', p.toFixed(3));
+    a.dataset.page = p > 0.5 ? '2' : '1';
+  };
+  sc.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  update();
 }
 
 /** Titik masuk admin: pastikan sudah login, muat profil, lalu pilih halaman. */

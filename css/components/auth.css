@@ -3,11 +3,11 @@
    Layar Masuk & Daftar. Hanya aktif saat <body class="auth-mode">.
 
    HP / layar sempit (dasar):
-     DUA HALAMAN dalam satu layar penuh.
-       .auth-p1 = pita cyan + logo + form        (halaman atas)
-       .auth-p2 = sambutan + cara kerja + footer (halaman bawah)
-     Panah mengambang (.auth-next / .auth-prev) berpindah halaman dengan
-     animasi scale. Posisi ditentukan atribut  .auth[data-page="1|2"].
+     Satu layar penuh yang BISA DIGULIR dan "menempel" (snap) di dua posisi.
+       .auth-p1 = pita cyan + logo + form        (tampilan awal; bagian bawahnya sengaja kosong)
+       .auth-p2 = sambutan + cara kerja + footer (muncul setelah digulir / ketuk panah)
+     Panah mengambang (.auth-next / .auth-prev) menggulir dengan animasi (lihat setAuthPage di JS).
+     Efek scale mengikuti gulir lewat variabel --p (0 = halaman 1, 1 = halaman 2).
    Laptop / PC (>=900px): kedua halaman dilebur jadi dua kolom (bagian paling bawah file).
    ===================================================================== */
 
@@ -17,9 +17,8 @@ body.auth-mode header,
 body.auth-mode #cl{display:none}
 body.auth-mode main{max-width:none;margin:0;padding:0}
 
-/* --- kerangka: satu layar penuh, halaman bertumpuk --- */
+/* --- kerangka: satu layar penuh; isinya (.auth-scroll) yang digulir --- */
 .auth{
-  --ease:cubic-bezier(.2,.8,.2,1);
   position:relative;
   height:100vh;               /* fallback browser lama */
   height:100svh;              /* stabil saat keyboard muncul; tidak pakai dvh agar tidak loncat */
@@ -28,37 +27,37 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 /* overflow:clip tidak bisa digeser oleh fokus input (hidden bisa, dan halaman jadi nyangkut bergeser) */
 @supports (overflow:clip){ .auth{overflow:clip} }
 
-/* gelombang dekoratif di pojok kanan bawah (di belakang halaman) */
+/* gelombang dekoratif di pojok kanan bawah (diam di belakang, tidak ikut tergulir) */
 .auth::after{
   content:"";position:absolute;right:0;bottom:0;z-index:0;pointer-events:none;
   width:min(60vw,440px);aspect-ratio:400/220;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 220' preserveAspectRatio='none'%3E%3Cpath d='M0 220C120 208 210 172 270 112C320 62 365 32 400 24V220Z' fill='%23ebf8f9'/%3E%3C/svg%3E") no-repeat right bottom/100% 100%;
 }
 
-/* --- halaman --- */
-.auth-pg{
+/* wadah gulir + snap. Saat mengetik (keyboard) atau saat animasi, snap dimatikan agar tidak loncat. */
+.auth-scroll{
   position:absolute;inset:0;z-index:1;
   overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
-  transform-origin:50% 35%;
-  /* keadaan TERLIHAT: visibility langsung berubah (tanpa jeda) */
-  transition:transform .55s var(--ease),opacity .45s ease,visibility 0s;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
 }
-.auth-p1{padding-bottom:calc(96px + var(--safe-b))}   /* ruang untuk panah & keyboard */
+.auth-scroll.animating,
+.auth:has(.auth-p1:focus-within) .auth-scroll{scroll-snap-type:none}
+
+/* --- dua halaman, masing-masing setinggi layar --- */
+.auth-pg{position:relative;min-height:100vh;min-height:100svh;scroll-snap-align:start;will-change:transform,opacity}
+.auth-p1{
+  padding-bottom:calc(96px + var(--safe-b));          /* ruang untuk panah & keyboard */
+  transform-origin:50% 100%;
+  transform:scale(calc(1 - var(--p,0) * .08));         /* mengecil pelan saat tergulir pergi */
+  opacity:calc(1 - var(--p,0) * .75);
+}
 .auth-p2{
   display:flex;flex-direction:column;
   padding-top:calc(78px + var(--safe-t));
-}
-/* keadaan TERSEMBUNYI: memudar + mengecil; visibility baru berubah setelah animasi selesai */
-.auth-p2,
-.auth[data-page="2"] .auth-p1{
-  opacity:0;visibility:hidden;pointer-events:none;
-  transition:transform .55s var(--ease),opacity .45s ease,visibility 0s linear .55s;
-}
-.auth-p2{transform:translateY(12%) scale(.94)}                       /* menunggu di bawah */
-.auth[data-page="2"] .auth-p1{transform:translateY(-6%) scale(.9)}   /* mengecil ke atas */
-.auth[data-page="2"] .auth-p2{
-  opacity:1;visibility:visible;pointer-events:auto;transform:none;
-  transition:transform .55s var(--ease),opacity .45s ease,visibility 0s;
+  transform-origin:50% 0;
+  transform:scale(calc(.9 + var(--p,0) * .1));         /* membesar pelan saat mendekat */
+  opacity:calc(.2 + var(--p,0) * .8);
 }
 
 /* --- tombol panah mengambang --- */
@@ -76,9 +75,9 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 @keyframes auth-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 /* di halaman 2: panah bawah hilang, panah atas muncul */
 .auth[data-page="2"] .auth-next{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility 0s linear .25s}
-.auth[data-page="2"] .auth-prev{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s ease .25s,visibility 0s}
+.auth[data-page="2"] .auth-prev{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s ease,visibility 0s}
 /* saat mengetik (keyboard terbuka), panah bawah disembunyikan supaya tidak menutupi isian */
-.auth-p1:focus-within ~ .auth-next{opacity:0;visibility:hidden;pointer-events:none}
+.auth:has(.auth-p1:focus-within) .auth-next{opacity:0;visibility:hidden;pointer-events:none}
 
 /* --- pita atas --- */
 .auth-head{height:calc(64px + var(--safe-t));background:var(--au);border-radius:0 0 24px 24px}
@@ -196,10 +195,8 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
     grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
     grid-template-rows:1fr auto;
   }
-  /* lebur halaman, dan pastikan tidak ada sisa keadaan "tersembunyi" (visibility diwariskan anak) */
-  .auth .auth-pg,.auth[data-page] .auth-pg{
-    display:contents;opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:none;
-  }
+  /* lebur wadah gulir + halaman supaya anaknya jadi item grid */
+  .auth-scroll,.auth .auth-pg,.auth[data-page] .auth-pg{display:contents}
   .auth-head,.auth-nav{display:none}
 
   /* panel kiri */

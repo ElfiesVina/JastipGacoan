@@ -104,12 +104,13 @@ const footerHTML = () =>
 /**
  * Layar lengkap, terdiri dari dua "halaman":
  *   p1 = pita + logo + form      p2 = sambutan + cara kerja + footer
- * HP: satu halaman terlihat; tombol panah mengambang berpindah dengan animasi scale (atribut data-page).
+ * HP: layar bisa digulir biasa (snap). Awalnya hanya p1 yang terlihat; panah mengambang menggulir ke p2.
  * Laptop: kedua halaman dilebur jadi dua kolom (lihat auth.css).
  * @param {'login'|'signup'|'forgot'|'newpass'} mode
  */
 export const authScreenHTML = (mode) =>
   '<section class="auth" data-page="1">' +
+  '<div class="auth-scroll">' +
   '<div class="auth-pg auth-p1">' +
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
   '<div class="auth-main"><div class="auth-in">' +
@@ -119,6 +120,7 @@ export const authScreenHTML = (mode) =>
   '</div></div>' +
   '</div>' +
   '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + infoHTML() + '</div>' + footerHTML() + '</div>' +
+  '</div>' +
   '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
   '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke halaman masuk">' + ICON.up + '</button>' +
   '</section>';
