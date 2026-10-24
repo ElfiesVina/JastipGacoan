@@ -120,20 +120,46 @@ const footerHTML = () =>
  * @param {'login'|'signup'|'forgot'|'otp'|'newpass'} mode
  * @param {{email?:string}} [ctx] data tambahan (mis. email tujuan kode)
  */
-export const authScreenHTML = (mode, ctx = {}) =>
-  '<section class="auth" data-page="1">' +
-  '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
-  '<div class="auth-scroll">' +
-  '<div class="auth-pg auth-p1">' +
-  '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
+/** Page 1 (default): Jastiper – input kode sesi */
+const jastiperBody = () =>
   '<div class="auth-main"><div class="auth-in">' +
   '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
-  '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
+  '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell +
+  '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
+  '<h2 class="auth-role-title">Jastiper</h2>' +
+  '<p class="auth-hint">Masukkan kode sesi dari jastip kamu, atau buka link yang dikirim.</p>' +
+  '<form class="auth-form" data-form="go-sesi" novalidate>' +
+  field('key', 'id="kode" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="Kode sesi (contoh: ABC123)"') +
+  '<button class="auth-btn" type="submit">Buka sesi</button>' +
+  '</form>' +
+  '<p class="auth-note" style="margin-top:18px;text-align:center">Belum punya kode? Minta link ke teman yang jadi jastip.</p>' +
+  '</div></div>';
+
+/** Page 2: Jastip (form login/signup yang sudah ada) */
+const jastipBody = (mode, ctx) =>
+  '<div class="auth-main"><div class="auth-in">' +
+  '<div class="auth-brand"><img src="img/me-gacoan.png" alt="Me Gacoan">' +
+  '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell +
+  '<span class="auth-dot" id="auth-dot" hidden></span></button></div>' +
+  '<h2 class="auth-role-title">Jastip</h2>' +
   bodyFor(mode, ctx) +
-  '</div></div>' +
+  '</div></div>';
+
+export const authScreenHTML = (mode, ctx = {}) =>
+  '<section class="auth" data-page="1">' +          // default = Jastiper
+  '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
+  '<div class="auth-scroll">' +
+    /* PAGE 1 – Jastiper */
+    '<div class="auth-pg auth-p1">' +
+      '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>' +
+      jastiperBody() +
+    '</div>' +
+    /* PAGE 2 – Jastip */
+    '<div class="auth-pg auth-p2">' +
+      jastipBody(mode, ctx) +
+      infoHTML() + footerHTML() +
+    '</div>' +
   '</div>' +
-  '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + infoHTML() + '</div>' + footerHTML() + '</div>' +
-  '</div>' +
-  '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
-  '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke halaman masuk">' + ICON.up + '</button>' +
+  '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Ke halaman Jastip">' + ICON.down + '</button>' +
+  '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke Jastiper">' + ICON.up + '</button>' +
   '</section>';
