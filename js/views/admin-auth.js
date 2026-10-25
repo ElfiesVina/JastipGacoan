@@ -7,7 +7,7 @@ import { app, $, $$ } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { store } from '../core/storage.js';
 import { LS_LAST } from '../core/constants.js';
-import { toast, lock, skeleton, setBusy } from '../core/ui.js';
+import { toast, lock, skeleton, setBusy, ready } from '../core/ui.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword, verifyResetCode } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
@@ -43,6 +43,7 @@ if (themeMeta) {
  * Disimpan di sini supaya layar yang digambar ulang (ganti ke Daftar, Lupa password, dst.) tetap di halaman yang sama.
  */
 let pane = 'jastiper';
+try { if (sessionStorage.getItem('pane') === 'jastip') pane = 'jastip'; } catch (_) {} // refresh tetap di halaman yang sama
 
 /** Sesi terakhir yang dibuka penitip di perangkat ini, atau null. */
 function lastSession() {
@@ -70,6 +71,7 @@ export function showAuth(mode, ctx = {}) {
   initPullRefresh();
   renderChangelogBadge(); // isi angka di lonceng
   window.scrollTo(0, 0);
+  ready();
 }
 
 /** Fungsi easing "berat dulu, lalu meluncur": easeInOutCubic. */
@@ -133,7 +135,14 @@ export function setAuthPane(nama) {
   if (!$('.auth') || nama === pane) return;
   document.activeElement?.blur?.();
   pane = nama;
+  try { sessionStorage.setItem('pane', nama); } catch (_) {}
   tandaiAktif();
+  $$('.sw-' + nama).forEach((t) => { // ikon yang baru dipilih membal
+    t.classList.remove('pop');
+    void t.offsetWidth;
+    t.classList.add('pop');
+    t.addEventListener('animationend', () => t.classList.remove('pop'), { once: true });
+  });
 }
 
 /**
@@ -203,7 +212,7 @@ function initPullRefresh() {
 
   $$('.auth-scroll').forEach((sc) => {
     sc.addEventListener('touchstart', (e) => {
-      if (loading || typing() || sc.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; }
+      if (loading || typing() || e.target.closest('input,textarea,select') || sc.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; }
       x0 = e.touches[0].clientX;
       y0 = e.touches[0].clientY;
       arah = '';

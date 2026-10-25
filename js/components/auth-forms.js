@@ -132,9 +132,9 @@ const infoHTML = (untuk, kelas = '') => {
     '<h2>' + (jastip ? 'Cara kerjanya' : 'Cara menitip') + '</h2><ol class="auth-steps">' +
     (jastip ? STEPS_JASTIP : STEPS_JASTIPER).map((s, i) =>
       '<li><span class="auth-n" aria-hidden="true">' + (i + 1) + '</span><span class="auth-st"><b>' + s[0] + '</b>' + s[1] + '</span></li>').join('') +
-    '</ol><p class="auth-note">' +
+    '</ol><p class="auth-note' + (jastip ? '' : ' goto-l') + '">' +
     (jastip
-      ? 'Halaman ini untuk jastip. Kalau kamu penitip, buka link dari jastip atau ' + goto('jastiper', 'Masuk sebagai Jastiper') + '.'
+      ? 'Halaman ini untuk jastip. Kalau kamu penitip, buka link dari jastip<span class="goto-l"> atau ' + goto('jastiper', 'Masuk sebagai Jastiper') + '</span>.'
       : 'Kamu yang membuka jastip dan mengelola sesi? ' + goto('jastip', 'Masuk sebagai Jastip') + '.') +
     '</p></section>'
   );

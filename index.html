@@ -7,6 +7,13 @@
 <meta name="theme-color" content="#07758f">
 <title>Titip Gacoan</title>
 
+<!-- Orientasi perangkat yang stabil: tinggi layar yang mengecil karena keyboard TIDAK dianggap landscape -->
+<script>
+(function(){var d=document.documentElement;function u(){var o=screen.orientation&&screen.orientation.type;var l=o?o.indexOf('landscape')===0:(typeof orientation==='number'?Math.abs(orientation)===90:screen.width>screen.height);d.dataset.orient=l?'land':'port'}u();
+addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',u)})();
+</script>
+<noscript><style>body.boot header,body.boot main{visibility:visible!important}body.boot::after{display:none!important}</style></noscript>
+
 <!-- Ikon: favicon tab browser (logo polos), ikon aplikasi/layar utama (logo bertulisan), dan manifest untuk pasang/APK -->
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
@@ -40,7 +47,7 @@
 <link rel="stylesheet" href="css/utilities.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
-<body>
+<body class="boot">
 
 <!-- Header: logo, status sesi, lonceng changelog -->
 <header>
