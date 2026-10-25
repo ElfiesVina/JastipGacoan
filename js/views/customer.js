@@ -8,7 +8,7 @@ import { state, draft } from '../core/state.js';
 import { store } from '../core/storage.js';
 import { toast, setBusy, lock, skeleton } from '../core/ui.js';
 import { isMie, rp, waLink, key } from '../core/format.js';
-import { POLL_MS, LS_NAME } from '../core/constants.js';
+import { POLL_MS, LS_NAME, LS_LAST } from '../core/constants.js';
 import { getPublicSesi } from '../api/sesi.api.js';
 import { listPublicPesanan, addPesanan, markPaid } from '../api/pesanan.api.js';
 import { uploadBukti } from '../api/bukti.api.js';
@@ -34,6 +34,30 @@ async function loadCustomerData(k) {
   return 'ok';
 }
 
+/** Buka sesi dari isian di halaman Jastiper: boleh link lengkap (…#/s/kode) atau kodenya saja. */
+export function joinSession() {
+  const v = ($('#kd')?.value || '').trim();
+  const m = v.match(/#\/s\/(\w+)/) || v.match(/^(\w+)$/);
+  if (!m) { toast('Tempel link atau kode dari jastip', 1); $('#kd')?.focus(); return; }
+  location.hash = '#/s/' + m[1];
+}
+
+/** Buka lagi sesi terakhir (tombol di halaman Jastiper). @param {HTMLElement} b */
+export function openLast(b) {
+  if (/^\w+$/.test(b.dataset.k || '')) location.hash = '#/s/' + b.dataset.k;
+}
+
+/** Langkah status sesi untuk pita kemajuan di atas halaman. */
+const LANGKAH = [['open', 'Daftar dibuka'], ['closed', 'Belanja'], ['settled', 'Rekap & bayar']];
+
+/** HTML pita kemajuan: langkah yang sudah lewat bertanda centang, yang sekarang disorot. @param {string} st */
+function stepperHTML(st) {
+  const now = LANGKAH.findIndex((x) => x[0] === st);
+  return '<ol class="stp" aria-label="Tahap sesi">' + LANGKAH.map((x, i) =>
+    '<li class="' + (i < now ? 'pas' : i === now ? 'now' : '') + '"' + (i === now ? ' aria-current="step"' : '') + '><span class="dot">' +
+    (i < now ? '✓' : i + 1) + '</span><span class="lbl">' + x[1] + '</span></li>').join('') + '</ol>';
+}
+
 /**
  * Titik masuk halaman penitip: reset keadaan, tampilkan skeleton, muat data, gambar.
  * @param {string} k kode sesi dari URL
@@ -41,6 +65,7 @@ async function loadCustomerData(k) {
 export async function showCustomer(k) {
   const my = ++state.rid;
   document.body.classList.remove('auth-mode');
+  document.body.classList.add('cust-mode');
   state.role = 'penitip';
   state.sesi = null; state.pesanan = []; state.built = ''; state.sig = '';
   renderHeader();
@@ -51,13 +76,14 @@ export async function showCustomer(k) {
   if (my !== state.rid) return; // pengguna sudah pindah halaman, abaikan
 
   if (hasil === 'err') {
-    app.innerHTML = '<div class="card"><h2>Gagal memuat</h2><p class="mu">Periksa koneksi internet, lalu coba lagi.</p><button type="button" data-act="retry">Coba lagi</button></div>';
+    app.innerHTML = '<div class="card ctr"><h2>Gagal memuat</h2><p class="mu">Periksa koneksi internet, lalu coba lagi.</p><button type="button" data-act="retry">Coba lagi</button></div>';
     return;
   }
   if (hasil === 'none') {
-    app.innerHTML = '<div class="card"><h2>Link tidak ditemukan</h2><p class="mu">Minta jastip mengirim ulang linknya.</p></div>';
+    app.innerHTML = '<div class="card ctr"><h2>Link tidak ditemukan</h2><p class="mu">Minta jastip mengirim ulang linknya, atau periksa kodenya.</p><a class="btn" href="#/">Kembali ke beranda</a></div>';
     return;
   }
+  store.set(LS_LAST, JSON.stringify({ k, j: state.sesi.judul || '' })); // untuk tombol "Buka lagi sesi terakhir"
   drawCustomer();
   state.timer = setInterval(() => pollCustomer(k, my), POLL_MS);
 }
@@ -93,7 +119,8 @@ export function drawCustomer() {
   if (state.built !== st) {
     state.built = st;
     state.sig = '';
-    app.innerHTML = '<div id="f"></div><div id="l"></div><div id="k"></div><div id="p"></div>';
+    app.innerHTML = '<div class="cust"><div id="s" class="cs"></div><div class="cc1"><div id="f"></div><div id="p"></div></div><div class="cc2"><div id="k"></div><div id="l"></div></div></div>';
+    $('#s').innerHTML = stepperHTML(st);
     if (st === 'open') {
       $('#f').innerHTML = orderFormHTML();
       syncChoice();

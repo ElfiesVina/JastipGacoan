@@ -3,8 +3,10 @@
  * Pintu masuk area jastip/admin (#/ dan #/a/<kode>): cek login,
  * tampilkan layar Masuk/Daftar, atau teruskan ke dashboard / detail sesi.
  */
-import { app, $ } from '../core/dom.js';
+import { app, $, $$ } from '../core/dom.js';
 import { state } from '../core/state.js';
+import { store } from '../core/storage.js';
+import { LS_LAST } from '../core/constants.js';
 import { toast, lock, skeleton, setBusy } from '../core/ui.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword, verifyResetCode } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
@@ -37,59 +39,136 @@ if (themeMeta) {
 }
 
 /**
- * Tampilkan layar Masuk / Daftar / Lupa password / Password baru
- * (header aplikasi disembunyikan lewat body.auth-mode).
+ * Halaman geser yang sedang tampil: 'jastiper' (penitip, bawaan saat pertama dibuka) atau 'jastip' (admin).
+ * Disimpan di sini supaya layar yang digambar ulang (ganti ke Daftar, Lupa password, dst.) tetap di halaman yang sama.
+ */
+let pane = 'jastiper';
+
+/** Sesi terakhir yang dibuka penitip di perangkat ini, atau null. */
+function lastSession() {
+  try {
+    const v = JSON.parse(store.get(LS_LAST) || 'null');
+    return v && /^\w+$/.test(v.k || '') ? { k: v.k, j: String(v.j || '').slice(0, 60) } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Tampilkan layar Masuk / Daftar / Lupa password / Password baru di halaman Jastip,
+ * berdampingan dengan halaman Jastiper (penitip). Header aplikasi disembunyikan lewat body.auth-mode.
  * @param {'login'|'signup'|'forgot'|'otp'|'newpass'} mode
  * @param {{email?:string}} [ctx] data tambahan (mis. email tujuan kode)
  */
 export function showAuth(mode, ctx = {}) {
   const email = ctx.email || $('#em')?.value || ''; // jangan hilangkan email yang sudah diketik saat pindah layar
+  if (mode === 'newpass') pane = 'jastip';          // dari link/kode reset: langsung ke form password baru
   document.body.classList.add('auth-mode');
-  app.innerHTML = authScreenHTML(mode, ctx);
+  app.innerHTML = authScreenHTML(mode, { ...ctx, pane, last: lastSession() });
   if (email && $('#em')) $('#em').value = email;
+  initAuthDeck();
   initAuthScroll();
   initPullRefresh();
-  renderChangelogBadge(); // isi titik di lonceng
+  renderChangelogBadge(); // isi angka di lonceng
   window.scrollTo(0, 0);
 }
 
-/**
- * Gulir layar masuk (khusus HP) ke halaman 1 (form) atau 2 (cara kerja + footer).
- * Animasinya dibuat manual: mulai agak "berat", lalu meluncur dan mendarat halus (easeInOutCubic).
- * @param {1|2} n halaman tujuan
- */
-export function setAuthPage(n) {
-  const sc = $('.auth-scroll');
-  const p1 = $('.auth-p1');
-  if (!sc || !p1) return;
-  document.activeElement?.blur?.(); // tutup keyboard kalau sedang terbuka
-  const from = sc.scrollTop;
-  const to = n === 2 ? p1.offsetHeight : 0;
-  const diam = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (diam || Math.abs(to - from) < 2) { sc.scrollTop = to; return; }
+/** Fungsi easing "berat dulu, lalu meluncur": easeInOutCubic. */
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-  const dur = 800;
+/** true jika pengguna meminta animasi dikurangi. */
+const diam = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Gulirkan satu wadah dengan animasi manual (snap dimatikan sementara lewat kelas .animating).
+ * @param {HTMLElement} el wadah @param {'scrollTop'|'scrollLeft'} prop arah @param {number} to tujuan
+ * @param {number} dur durasi ms @param {Function} [done] dipanggil setelah selesai
+ */
+function glide(el, prop, to, dur, done) {
+  const from = el[prop];
+  if (diam() || Math.abs(to - from) < 2) { el[prop] = to; done?.(); return; }
   const t0 = performance.now();
-  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  sc.classList.add('animating'); // matikan snap selama animasi supaya tidak saling tarik
+  el.classList.add('animating');
   const step = (now) => {
     const t = Math.min(1, (now - t0) / dur);
-    sc.scrollTop = from + (to - from) * ease(t);
+    el[prop] = from + (to - from) * easeInOut(t);
     if (t < 1) requestAnimationFrame(step);
-    else {
-      sc.classList.remove('animating');
-      $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true }); // fokus ke tombol yang terlihat
-    }
+    else { el.classList.remove('animating'); done?.(); }
   };
   requestAnimationFrame(step);
 }
 
 /**
- * Pasang pelacak gulir: menghitung seberapa jauh halaman 1 sudah bergeser (0 sampai 1)
- * lalu menyimpannya di variabel CSS --p (dipakai untuk efek scale) dan di data-page (untuk tombol panah).
+ * Gulir halaman Jastip (khusus HP) ke halaman 1 (form) atau 2 (cara kerja + footer).
+ * @param {1|2} n halaman tujuan
+ */
+export function setAuthPage(n) {
+  const sc = $('.pane-jastip .auth-scroll');
+  const p1 = $('.auth-p1');
+  if (!sc || !p1) return;
+  document.activeElement?.blur?.(); // tutup keyboard kalau sedang terbuka
+  glide(sc, 'scrollTop', n === 2 ? p1.offsetHeight : 0, 800, () =>
+    $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true })); // fokus ke tombol yang terlihat
+}
+
+/**
+ * Pindah antara halaman Jastip dan Jastiper (ketuk tab / tautan). Digeser dengan animasi + snap.
+ * @param {'jastip'|'jastiper'} nama
+ */
+export function setAuthPane(nama) {
+  const dk = $('.auth-deck');
+  if (!dk) return;
+  document.activeElement?.blur?.();
+  pane = nama;
+  glide(dk, 'scrollLeft', nama === 'jastiper' ? dk.scrollWidth - dk.clientWidth : 0, 560);
+}
+
+/** Pendengar resize layar auth yang aktif (diganti tiap layar digambar ulang). */
+let onResize = () => {};
+
+/**
+ * Pasang pelacak geser mendatar: menjaga posisi halaman (termasuk saat layar diputar/di-resize),
+ * mengisi variabel CSS --x (0 = Jastip, 1 = Jastiper) untuk penanda tab, dan mengunci halaman yang tidak terlihat (inert).
+ */
+function initAuthDeck() {
+  const dk = $('.auth-deck');
+  const a = $('.auth');
+  if (!dk || !a) return;
+  const lebar = () => Math.max(1, dk.scrollWidth - dk.clientWidth);
+  const tandai = () => {
+    const x = Math.min(1, Math.max(0, dk.scrollLeft / lebar()));
+    a.style.setProperty('--x', x.toFixed(3));
+    const nama = x > 0.5 ? 'jastiper' : 'jastip';
+    if (a.dataset.pane !== nama) a.dataset.pane = nama;
+    if (!dk.classList.contains('animating')) pane = nama;
+    $$('.auth-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.p === nama)));
+    $('.pane-jastip')?.toggleAttribute('inert', nama !== 'jastip');
+    $('.pane-jastiper')?.toggleAttribute('inert', nama !== 'jastiper');
+  };
+  let raf = 0;
+  dk.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; tandai(); }); }, { passive: true });
+  // taruh langsung di halaman awal (tanpa animasi, sebelum tergambar)
+  dk.style.scrollSnapType = 'none';
+  dk.scrollLeft = pane === 'jastiper' ? lebar() : 0;
+  dk.style.scrollSnapType = '';
+  tandai();
+  // layar diputar / jendela diubah: tetap di halaman yang sama
+  removeEventListener('resize', onResize);
+  onResize = () => {
+    const d = $('.auth-deck');
+    if (!d) { removeEventListener('resize', onResize); return; } // layar sudah diganti halaman lain
+    d.scrollLeft = pane === 'jastiper' ? d.scrollWidth - d.clientWidth : 0;
+    tandai();
+  };
+  addEventListener('resize', onResize);
+}
+
+/**
+ * Pasang pelacak gulir tegak halaman Jastip: menghitung seberapa jauh halaman 1 sudah bergeser (0 sampai 1)
+ * lalu menyimpannya di variabel CSS --p (efek scale) dan di data-page (untuk tombol panah).
  */
 function initAuthScroll() {
-  const sc = $('.auth-scroll');
+  const sc = $('.pane-jastip .auth-scroll');
   const a = $('.auth');
   const p1 = $('.auth-p1');
   if (!sc || !a || !p1) return;
@@ -107,16 +186,19 @@ function initAuthScroll() {
 /**
  * Tarik layar masuk ke bawah (saat sudah di paling atas) untuk memuat ulang halaman.
  * Biru header "memanjang" mengikuti jari, muncul indikator putar; lepas setelah cukup jauh = refresh.
- * Hanya jalan di layar sentuh; dilewati saat keyboard terbuka supaya isian tidak hilang tidak sengaja.
+ * Hanya jalan di layar sentuh, hanya untuk gerakan TEGAK (geser mendatar antar halaman tidak terganggu),
+ * dan dilewati saat keyboard terbuka supaya isian tidak hilang tidak sengaja.
  */
 function initPullRefresh() {
   const a = $('.auth');
-  const sc = $('.auth-scroll');
-  if (!a || !sc) return;
+  if (!a) return;
   const THRESH = 72;  // jarak tarik minimal (px) agar refresh
   const MAX = 130;    // jarak tarik maksimal
   const HOLD = 64;    // tinggi indikator saat memuat
-  let y0 = null;
+  const LOCK = 8;     // gerak minimal (px) sebelum arah ditentukan
+  let x0 = 0;
+  let y0 = null;      // null = tidak sedang menarik
+  let arah = '';      // '' belum ditentukan, 'v' tegak, 'h' mendatar
   let pull = 0;
   let loading = false;
 
@@ -126,41 +208,46 @@ function initPullRefresh() {
     a.style.setProperty('--ptr', String(Math.min(1, v / THRESH)));
   };
   const typing = () => /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || '');
+  const batal = () => { y0 = null; a.classList.remove('pulling'); if (pull) set(0); };
 
-  sc.addEventListener('touchstart', (e) => {
-    if (loading || typing() || sc.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; }
-    y0 = e.touches[0].clientY;
-    a.classList.add('pulling');
-  }, { passive: true });
+  $$('.auth-scroll').forEach((sc) => {
+    sc.addEventListener('touchstart', (e) => {
+      if (loading || typing() || sc.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; }
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      arah = '';
+    }, { passive: true });
 
-  sc.addEventListener('touchmove', (e) => {
-    if (y0 === null) return;
-    const dy = e.touches[0].clientY - y0;
-    if (dy > 0 && sc.scrollTop === 0) {
-      if (e.cancelable) e.preventDefault();           // jangan biarkan browser ikut menarik
-      set(Math.min(MAX, dy * 0.5));                   // 0.5 = terasa "berat" ditarik
-    } else {
-      set(0);
+    sc.addEventListener('touchmove', (e) => {
+      if (y0 === null) return;
+      const dx = e.touches[0].clientX - x0;
+      const dy = e.touches[0].clientY - y0;
+      if (!arah) {
+        if (Math.abs(dx) < LOCK && Math.abs(dy) < LOCK) return;
+        arah = Math.abs(dy) > Math.abs(dx) && dy > 0 ? 'v' : 'h';
+        if (arah === 'v') a.classList.add('pulling');
+      }
+      if (arah === 'h' || dy <= 0 || sc.scrollTop > 0) { batal(); arah = 'h'; return; }
+      if (e.cancelable) e.preventDefault();             // jangan biarkan browser ikut menarik
+      set(Math.min(MAX, dy * 0.5));                     // 0.5 = terasa "berat" ditarik
+    }, { passive: false });
+
+    const end = () => {
+      if (y0 === null) return;
       y0 = null;
       a.classList.remove('pulling');
-    }
-  }, { passive: false });
-
-  const end = () => {
-    if (y0 === null) return;
-    y0 = null;
-    a.classList.remove('pulling');
-    if (pull >= THRESH) {
-      loading = true;
-      a.classList.add('refreshing');
-      set(HOLD);
-      setTimeout(() => location.reload(), 650);
-    } else {
-      set(0);
-    }
-  };
-  sc.addEventListener('touchend', end);
-  sc.addEventListener('touchcancel', end);
+      if (pull >= THRESH) {
+        loading = true;
+        a.classList.add('refreshing');
+        set(HOLD);
+        setTimeout(() => location.reload(), 650);
+      } else {
+        set(0);
+      }
+    };
+    sc.addEventListener('touchend', end);
+    sc.addEventListener('touchcancel', end);
+  });
 }
 
 /** Titik masuk admin: pastikan sudah login, muat profil, lalu pilih halaman. */
@@ -172,6 +259,7 @@ export async function showAdmin() {
   state.sesi = null;
 
   const m = location.hash.match(/^#\/a\/(\w+)/); // #/a/<kode> = detail sesi
+  if (m) pane = 'jastip';                          // link admin: tampilkan halaman Jastip kalau perlu masuk
   const session = await getSession();
   if (my !== state.rid) return;
   state.user = session?.user || null;
@@ -180,7 +268,7 @@ export async function showAdmin() {
     return;
   } // dari link reset
   if (!state.user) {
-    if (RESET_LINK_EXPIRED) toast('Link reset sudah tidak berlaku. Minta link baru.', 1);
+    if (RESET_LINK_EXPIRED) { pane = 'jastip'; toast('Link reset sudah tidak berlaku. Minta link baru.', 1); }
     showAuth('login');
     return;
   }
@@ -252,6 +340,7 @@ export function authenticate(isSignUp) {
 /** Keluar dari akun lalu tampilkan layar masuk. */
 export async function logout() {
   await signOut();
+  pane = 'jastip'; // setelah keluar, tetap di halaman Jastip
   showAdmin();
 }
 
@@ -332,11 +421,4 @@ export function saveNewPassword() {
     toast('Password diubah ✓');
     showAdmin();
   });
-}
-
-if (form.dataset.form === 'go-sesi') {
-  const kode = ($('#kode')?.value || '').trim().toUpperCase();
-  if (!kode) { toast('Isi kode sesi dulu'); return; }
-  location.hash = '#/s/' + encodeURIComponent(kode);
-  return;
 }
