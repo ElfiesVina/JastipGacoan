@@ -23,6 +23,8 @@ const ICON = {
   eye: svg('<path d="M2.5 12C3.5 10 7 6 12 6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/>'),
   down: svg('<path d="M5 9l7 7 7-7"/>', 34, 2.6),
   up: svg('<path d="M5 15l7-7 7 7"/>', 34, 2.6),
+  shop: svg('<path d="M4 9l1.6-5h12.8L20 9"/><path d="M4 9a2.67 2.67 0 0 0 5.33 0 2.67 2.67 0 0 0 5.34 0A2.67 2.67 0 0 0 20 9"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4h4v4"/>', 22, 2),
+  who: svg('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/>', 22, 2),
   link: svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
@@ -132,8 +134,8 @@ const infoHTML = (untuk, kelas = '') => {
       '<li><span class="auth-n" aria-hidden="true">' + (i + 1) + '</span><span class="auth-st"><b>' + s[0] + '</b>' + s[1] + '</span></li>').join('') +
     '</ol><p class="auth-note">' +
     (jastip
-      ? 'Halaman ini khusus jastip. Kalau kamu penitip, buka link dari jastip atau ' + goto('jastiper', 'geser ke Jastiper') + '.'
-      : 'Kamu yang membuka jastip dan mengelola sesi? ' + goto('jastip', 'Masuk di halaman Jastip') + '.') +
+      ? 'Halaman ini untuk jastip. Kalau kamu penitip, buka link dari jastip atau ' + goto('jastiper', 'Masuk sebagai Jastiper') + '.'
+      : 'Kamu yang membuka jastip dan mengelola sesi? ' + goto('jastip', 'Masuk sebagai Jastip') + '.') +
     '</p></section>'
   );
 };
@@ -151,9 +153,17 @@ const footerHTML = (kelas = '') =>
   '<span class="auth-disc">Bukan aplikasi resmi Mie Gacoan. Logo dan merek milik pemiliknya masing-masing.</span>' +
   '</div></footer>';
 
-/** Pita cyan + logo Sakan (dipakai kedua halaman di HP). */
-const headHTML = () =>
-  '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div></div></div>';
+/**
+ * Pita cyan + logo Sakan + switch ikon (tanpa teks) untuk pindah Jastip / Jastiper.
+ * Switch ini hanya tampil di HP/tablet; di laptop dipakai tautan teks di panel kiri.
+ * @param {'jastip'|'jastiper'} aktif halaman yang sedang tampil
+ */
+const headHTML = (aktif) =>
+  '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div>' +
+  '<div class="auth-switch" role="tablist" aria-label="Pilih halaman">' +
+  '<button type="button" role="tab" class="sw sw-jastip" data-act="pane" data-p="jastip" aria-label="Jastip, untuk pengelola" title="Jastip" aria-selected="' + (aktif === 'jastip') + '">' + ICON.shop + '</button>' +
+  '<button type="button" role="tab" class="sw sw-jastiper" data-act="pane" data-p="jastiper" aria-label="Jastiper, untuk penitip" title="Jastiper" aria-selected="' + (aktif === 'jastiper') + '">' + ICON.who + '</button>' +
+  '</div></div></div>';
 
 /** Logo Me Gacoan + lonceng pembaruan. */
 const brandHTML = () =>
@@ -161,37 +171,35 @@ const brandHTML = () =>
   '<button type="button" class="auth-bell" data-act="cl" aria-label="Lihat yang baru">' + ICON.bell + '<span class="auth-dot" hidden></span></button></div>';
 
 /**
- * Layar lengkap = DUA halaman yang digeser mendatar (snap): Jastip | Jastiper.
- *   Jastip   : p1 = pita + logo + form masuk;  p2 = sambutan + cara kerja + footer (gulir tegak, panah V)
- *   Jastiper : pita + logo + tempel link sesi + cara menitip + footer (satu halaman, gulir biasa)
- * Laptop (>=900px): panel kiri berisi sambutan + cara kerja, kanan berisi tab + halaman yang digeser.
+ * Layar lengkap = DUA halaman yang bertukar dengan efek scale: Jastip | Jastiper.
+ * Masing-masing halaman punya dua "layar" yang digulir tegak (snap):
+ *   p1 = pita + logo + form (Jastip: masuk/daftar, Jastiper: tempel link sesi) — bagian bawahnya kosong, hanya panah V
+ *   p2 = sambutan + cara kerja/cara menitip + footer
+ * Laptop (>=900px): panel kiri berisi sambutan + cara kerja, kanan berisi halaman aktif.
+ * Pindah halaman: ikon di pita atas (HP/tablet) atau tautan teks "Masuk sebagai ..." (semua ukuran).
  * @param {'login'|'signup'|'forgot'|'otp'|'newpass'} mode  mode form Jastip
  * @param {{email?:string, pane?:'jastip'|'jastiper', last?:{k:string,j?:string}}} [ctx]
  */
-export const authScreenHTML = (mode, ctx = {}) =>
-  '<section class="auth" data-pane="' + (ctx.pane || 'jastiper') + '" data-page="1">' +
-  '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
-  '<div class="auth-right">' +
-  '<div class="auth-tabs" role="tablist" aria-label="Pilih halaman"><span class="auth-pill" aria-hidden="true"></span>' +
-  '<button type="button" role="tab" class="auth-tab t-jastip" data-act="pane" data-p="jastip" aria-label="Jastip, untuk pengelola">Jastip</button>' +
-  '<button type="button" role="tab" class="auth-tab t-jastiper" data-act="pane" data-p="jastiper" aria-label="Jastiper, untuk penitip">Jastiper</button></div>' +
-  '<div class="auth-deck">' +
-  /* --- halaman kiri: JASTIP (admin) --- */
-  '<div class="auth-pane pane-jastip" role="tabpanel">' +
-  '<div class="auth-scroll">' +
-  '<div class="auth-pg auth-p1">' + headHTML() +
-  '<div class="auth-main"><div class="auth-in">' + brandHTML() + bodyFor(mode, ctx) + '</div></div></div>' +
-  '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + infoHTML('jastip') + '</div>' + footerHTML('foot-m') + '</div>' +
-  '</div></div>' +
-  /* --- halaman kanan: JASTIPER (penitip) --- */
-  '<div class="auth-pane pane-jastiper" role="tabpanel">' +
-  '<div class="auth-scroll"><div class="auth-pg auth-pc">' + headHTML() +
-  '<div class="auth-main"><div class="auth-in">' + brandHTML() + joinBody(ctx) + '</div></div>' +
-  '<div class="auth-more">' + infoHTML('jastiper', 'info-m') + '</div>' + footerHTML('foot-m') + '</div></div></div>' +
-  '</div></div>' +
-  /* --- hanya laptop: panel kiri + footer --- */
-  '<aside class="auth-aside">' + heroHTML() + infoHTML('jastip') + infoHTML('jastiper') + '</aside>' +
-  footerHTML('foot-d') +
-  '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
-  '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke halaman masuk">' + ICON.up + '</button>' +
-  '</section>';
+export const authScreenHTML = (mode, ctx = {}) => {
+  const aktif = ctx.pane === 'jastip' ? 'jastip' : 'jastiper';
+  /** Satu halaman: layar 1 (isi utama) + layar 2 (sambutan, info, footer). */
+  const pane = (nama, isi, info, ke) =>
+    '<div class="auth-pane pane-' + nama + '" role="tabpanel"><div class="auth-scroll">' +
+    '<div class="auth-pg auth-p1">' + headHTML(aktif) + '<div class="auth-main"><div class="auth-in">' + brandHTML() + isi + '<div class="auth-swap">' + goto(ke, ke === 'jastip' ? 'Masuk sebagai Jastip' : 'Masuk sebagai Jastiper') + '</div></div></div></div>' +
+    '<div class="auth-pg auth-p2"><div class="auth-side">' + heroHTML() + info + '</div>' + footerHTML('foot-m') + '</div>' +
+    '</div></div>';
+  return (
+    '<section class="auth" data-pane="' + aktif + '" data-page="1">' +
+    '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
+    '<div class="auth-right"><div class="auth-deck">' +
+    pane('jastip', bodyFor(mode, ctx), infoHTML('jastip'), 'jastiper') +
+    pane('jastiper', joinBody(ctx), infoHTML('jastiper'), 'jastip') +
+    '</div></div>' +
+    /* --- hanya laptop: panel kiri + footer --- */
+    '<aside class="auth-aside">' + heroHTML() + infoHTML('jastip') + infoHTML('jastiper') + '</aside>' +
+    footerHTML('foot-d') +
+    '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
+    '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke atas">' + ICON.up + '</button>' +
+    '</section>'
+  );
+};
