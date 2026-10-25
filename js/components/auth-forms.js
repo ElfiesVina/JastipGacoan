@@ -87,15 +87,19 @@ const newPasswordBody = () =>
  * Isi halaman JASTIPER (penitip): tempel link / kode sesi dari jastip lalu buka.
  * @param {{last?:{k:string,j?:string}}} ctx last = sesi yang terakhir dibuka di perangkat ini
  */
+/** Slot di bawah tombol: link sesi terbaru (yang baru dibuat jastip / dibuka penitip di perangkat ini). */
+const recentHTML = (list) => !list || !list.length ? '' :
+  '<div class="auth-recent"><div class="auth-rt">Sesi terbaru di perangkat ini</div>' +
+  list.map((x) => '<button type="button" class="auth-last" data-act="last" data-k="' + esc(x.k) + '"><b>' + esc(x.j || x.k) + '</b><span>/s/' + esc(x.k) + '</span></button>').join('') +
+  '</div>';
+
 const joinBody = (ctx) =>
   '<form class="auth-form" data-form="join" novalidate>' +
   '<h2 class="auth-title">Mau titip pesanan?</h2>' +
   '<p class="auth-hint">Tempel link atau kode sesi dari jastip. Tidak perlu daftar atau masuk.</p>' +
   field('link', 'id="kd" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Link atau kode sesi"') +
   '<button class="auth-btn" type="submit">Buka daftar titipan</button>' +
-  (ctx.last
-    ? '<button type="button" class="auth-last" data-act="last" data-k="' + esc(ctx.last.k) + '"><span>Buka lagi sesi terakhir</span><b>' + esc(ctx.last.j || ctx.last.k) + '</b></button>'
-    : '') +
+  recentHTML(ctx.recent) +
   '</form>';
 
 /** Pilih isi form sesuai mode. @param {string} mode */
@@ -161,8 +165,8 @@ const footerHTML = (kelas = '') =>
 const headHTML = (aktif) =>
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div>' +
   '<div class="auth-switch" role="tablist" aria-label="Pilih halaman">' +
-  '<button type="button" role="tab" class="sw sw-jastip" data-act="pane" data-p="jastip" aria-label="Jastip, untuk pengelola" title="Jastip" aria-selected="' + (aktif === 'jastip') + '">' + ICON.shop + '</button>' +
-  '<button type="button" role="tab" class="sw sw-jastiper" data-act="pane" data-p="jastiper" aria-label="Jastiper, untuk penitip" title="Jastiper" aria-selected="' + (aktif === 'jastiper') + '">' + ICON.who + '</button>' +
+  '<button type="button" role="tab" class="sw sw-jastip" data-act="pane" data-p="jastip" aria-label="Jastip, untuk pengelola" title="Jastip" aria-selected="' + (aktif === 'jastip') + '">' + ICON.shop + '<span class="sw-t">Jastip</span></button>' +
+  '<button type="button" role="tab" class="sw sw-jastiper" data-act="pane" data-p="jastiper" aria-label="Jastiper, untuk penitip" title="Jastiper" aria-selected="' + (aktif === 'jastiper') + '">' + ICON.who + '<span class="sw-t">Jastiper</span></button>' +
   '</div></div></div>';
 
 /** Logo Me Gacoan + lonceng pembaruan. */

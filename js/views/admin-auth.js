@@ -6,7 +6,7 @@
 import { app, $, $$ } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { store } from '../core/storage.js';
-import { LS_LAST } from '../core/constants.js';
+import { getRecent } from '../core/recent.js';
 import { toast, lock, skeleton, setBusy, ready } from '../core/ui.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword, verifyResetCode } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
@@ -45,15 +45,6 @@ if (themeMeta) {
 let pane = 'jastiper';
 try { if (sessionStorage.getItem('pane') === 'jastip') pane = 'jastip'; } catch (_) {} // refresh tetap di halaman yang sama
 
-/** Sesi terakhir yang dibuka penitip di perangkat ini, atau null. */
-function lastSession() {
-  try {
-    const v = JSON.parse(store.get(LS_LAST) || 'null');
-    return v && /^\w+$/.test(v.k || '') ? { k: v.k, j: String(v.j || '').slice(0, 60) } : null;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Tampilkan layar Masuk / Daftar / Lupa password / Password baru di halaman Jastip,
@@ -65,7 +56,7 @@ export function showAuth(mode, ctx = {}) {
   const email = ctx.email || $('#em')?.value || ''; // jangan hilangkan email yang sudah diketik saat pindah layar
   if (mode === 'newpass') pane = 'jastip';          // dari link/kode reset: langsung ke form password baru
   document.body.classList.add('auth-mode');
-  app.innerHTML = authScreenHTML(mode, { ...ctx, pane, last: lastSession() });
+  app.innerHTML = authScreenHTML(mode, { ...ctx, pane, recent: getRecent() });
   if (email && $('#em')) $('#em').value = email;
   initAuthScroll();
   initPullRefresh();

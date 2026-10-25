@@ -3,13 +3,16 @@
 <head>
 <meta charset="utf-8">
 <!-- viewport-fit=cover: konten boleh sampai tepi layar; jarak aman notch diatur di CSS lewat env(safe-area-inset-*) -->
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-visual">
 <meta name="theme-color" content="#07758f">
 <title>Titip Gacoan</title>
 
 <!-- Orientasi perangkat yang stabil: tinggi layar yang mengecil karena keyboard TIDAK dianggap landscape -->
 <script>
 (function(){var d=document.documentElement;function u(){var o=screen.orientation&&screen.orientation.type;var l=o?o.indexOf('landscape')===0:(typeof orientation==='number'?Math.abs(orientation)===90:screen.width>screen.height);d.dataset.orient=l?'land':'port'}u();
+/* tinggi layar "pendek" dihitung HANYA saat tidak mengetik, supaya keyboard tidak membuat tampilan menciut */
+function h(){var a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;if(innerHeight<=660)d.dataset.short='1';else delete d.dataset.short}h();
+addEventListener('resize',h);addEventListener('focusout',function(){setTimeout(h,300)});
 addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',u)})();
 </script>
 <noscript><style>body.boot header,body.boot main{visibility:visible!important}body.boot::after{display:none!important}</style></noscript>
@@ -44,6 +47,7 @@ addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.or
 <link rel="stylesheet" href="css/components/changelog.css">
 <link rel="stylesheet" href="css/components/dialog.css">
 <link rel="stylesheet" href="css/components/auth.css">
+<link rel="stylesheet" href="css/components/dash.css">
 <link rel="stylesheet" href="css/utilities.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>

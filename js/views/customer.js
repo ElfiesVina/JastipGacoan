@@ -8,6 +8,7 @@ import { state, draft } from '../core/state.js';
 import { store } from '../core/storage.js';
 import { toast, setBusy, lock, skeleton } from '../core/ui.js';
 import { isMie, rp, waLink, key } from '../core/format.js';
+import { addRecent } from '../core/recent.js';
 import { POLL_MS, LS_NAME, LS_LAST } from '../core/constants.js';
 import { getPublicSesi } from '../api/sesi.api.js';
 import { listPublicPesanan, addPesanan, markPaid } from '../api/pesanan.api.js';
@@ -83,7 +84,7 @@ export async function showCustomer(k) {
     app.innerHTML = '<div class="card ctr"><h2>Link tidak ditemukan</h2><p class="mu">Minta jastip mengirim ulang linknya, atau periksa kodenya.</p><a class="btn" href="#/">Kembali ke beranda</a></div>';
     return;
   }
-  store.set(LS_LAST, JSON.stringify({ k, j: state.sesi.judul || '' })); // untuk tombol "Buka lagi sesi terakhir"
+  addRecent(k, state.sesi.judul); // pintasan di halaman Jastiper
   drawCustomer();
   state.timer = setInterval(() => pollCustomer(k, my), POLL_MS);
 }

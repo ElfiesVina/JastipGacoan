@@ -1,0 +1,51 @@
+/* =====================================================================
+   components/dash.css
+   Beranda Jastip (dashboard): sapaan + ringkasan, dua kolom di layar lebar.
+   ===================================================================== */
+body:has(.dash){--wrap:1040px}
+.dash{display:block}
+.dhero{
+  position:relative;overflow:hidden;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;
+  margin:14px 0;padding:20px 18px;border-radius:24px;color:#fff;
+  background:linear-gradient(150deg,var(--au) 0%,var(--ab) 100%);
+  box-shadow:0 18px 30px -22px #07758faa;
+}
+.dhero::after{content:"";position:absolute;right:-60px;top:-70px;width:200px;height:200px;border-radius:50%;background:#ffffff14;pointer-events:none}
+.dava{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#fff;color:var(--ab);font:800 24px var(--f-head)}
+.dhi{font:800 24px/1.05 var(--f-head);letter-spacing:.02em;text-transform:uppercase;overflow-wrap:anywhere}
+.dsub{margin-top:2px;font-size:13px;color:#ffffffe0}
+.dstats{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;position:relative;z-index:1}
+.dst{padding:10px 8px;border-radius:16px;background:#ffffff26;text-align:center}
+.dst b{display:block;font:800 24px/1 var(--f-head)}
+.dst span{font-size:12px;color:#ffffffe0}
+.dash .card{margin:14px 0}
+.dnew{border-color:#bfe3ec;background:linear-gradient(180deg,#f4fbfd,#fff)}
+.dprof summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;list-style:none;font:800 18px var(--f-head);letter-spacing:.03em;text-transform:uppercase;color:var(--te)}
+.dprof summary::-webkit-details-marker{display:none}
+.dprof summary i{width:9px;height:9px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);transition:transform .2s}
+.dprof[open] summary i{transform:rotate(-135deg)}
+.dprof form{margin-top:6px}
+.dlist .srow{padding:14px 12px;margin:0 -12px;border-radius:14px;border-bottom:0}
+.dlist .srow + .srow{border-top:1px solid var(--ln);border-radius:0 0 14px 14px}
+.dlist .srow:hover,.dlist .srow:active{background:var(--tint)}
+.srt{min-width:0}
+.srt b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srt .mu{font-size:12.5px}
+.dempty{display:grid;gap:4px;padding:26px 8px;text-align:center;color:var(--mu);font-size:13.5px}
+.dempty b{color:var(--te);font-size:16px}
+.dout{margin:6px 0 24px}
+.dout button{flex:0 1 auto;min-width:140px}
+/* HP: urutan = sesi baru, sesi saya, profil */
+.dcols{display:flex;flex-direction:column}
+.dleft,.dright{display:contents}
+.dnew{order:1}.dlist{order:2}.dprof{order:3}
+@media (min-width:760px){
+  .dleft,.dright{display:block}
+  .dhero{grid-template-columns:auto 1fr auto;padding:24px 26px}
+  .dstats{grid-column:auto;margin-top:0;min-width:300px}
+  .dava{width:60px;height:60px}
+  .dhi{font-size:30px}
+  .dcols{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:20px;align-items:start}
+  .dleft,.dright{min-width:0}
+  .dleft .card:first-child,.dright .card{margin-top:0}
+}

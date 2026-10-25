@@ -62,22 +62,9 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 }
 .auth:not(.pulling) .auth-deck{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .auth-pane{position:absolute;inset:0}
+/* pindah halaman Jastip <-> Jastiper: langsung, tanpa animasi */
 .auth[data-pane="jastip"] .pane-jastiper,
-.auth[data-pane="jastiper"] .pane-jastip{
-  visibility:hidden;pointer-events:none;
-  transition:visibility 0s linear .5s;
-}
-.auth-p1 > :not(.auth-head),
-.auth-p2 > *{
-  transform-origin:50% 35%;
-  transition:opacity .4s ease,transform .5s cubic-bezier(.2,.7,.2,1);
-}
-.auth[data-pane="jastip"] .pane-jastiper .auth-p1 > :not(.auth-head),
-.auth[data-pane="jastip"] .pane-jastiper .auth-p2 > *,
-.auth[data-pane="jastiper"] .pane-jastip .auth-p1 > :not(.auth-head),
-.auth[data-pane="jastiper"] .pane-jastip .auth-p2 > *{
-  opacity:0;transform:scale(.9);
-}
+.auth[data-pane="jastiper"] .pane-jastip{visibility:hidden;pointer-events:none}
 
 /* wadah gulir tegak di tiap halaman. Saat mengetik (keyboard) atau animasi, snap dimatikan agar tidak loncat. */
 .auth-scroll{
@@ -246,15 +233,16 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
 }
 
 /* HP berlayar pendek (<=660px): rapatkan form supaya tidak tertimpa panah V dan tab di bawah */
-@media (max-height:660px) and (max-width:899px){
-  .auth-brand{margin-top:62px;margin-bottom:14px}
-  .auth-brand img{width:100px}
-  .auth-title{font-size:21px}
-  .auth-hint{margin-bottom:12px}
-  .auth-field{margin-bottom:10px}
-  .auth-btn{min-height:46px;margin-top:14px}
-  .auth-links{margin-top:6px}
-  .auth-forgot{margin-top:-2px}
+/* HP berlayar pendek: rapatkan form. Penanda html[data-short] diset skrip dan TIDAK ikut berubah saat keyboard muncul. */
+@media (max-width:599px){
+  html[data-short] .auth-brand{margin-top:62px;margin-bottom:14px}
+  html[data-short] .auth-brand img{width:100px}
+  html[data-short] .auth-title{font-size:21px}
+  html[data-short] .auth-hint{margin-bottom:12px}
+  html[data-short] .auth-field{margin-bottom:10px}
+  html[data-short] .auth-btn{min-height:46px;margin-top:14px}
+  html[data-short] .auth-links{margin-top:6px}
+  html[data-short] .auth-forgot{margin-top:-2px}
 }
 
 /* tautan teks "Masuk sebagai ...": HIDUP hanya di layar landscape (dan laptop >=900px); di potret dipakai ikon di pita atas */
@@ -379,4 +367,55 @@ html[data-orient="land"] .auth-hero h1{font-size:28px}
   .auth-aside .auth-steps{gap:12px 18px}
   .auth-main{padding-block:20px}
   .auth-brand{margin-bottom:22px}
+}
+
+
+/* --- slot di bawah tombol (halaman Jastiper): link sesi terbaru --- */
+.auth-recent{margin-top:22px}
+.auth-rt{margin:0 0 8px;font:800 11.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--mu);text-align:center}
+.auth-recent .auth-last{margin:8px 0 0}
+.auth-recent .auth-last b{font-size:15px}
+.auth-recent .auth-last span{font-weight:600;font-size:12px;opacity:.8}
+
+/* --- label teks pada switch: dipakai di layar >=600px (tablet / jendela split), ikon saja di HP --- */
+.sw-t{display:none}
+@media (min-width:600px) and (max-width:899px){
+  html[data-orient="port"] .auth-switch{padding:4px;gap:4px}
+  html[data-orient="port"] .sw{width:auto;min-width:0;padding:0 18px 0 14px;gap:8px;border-radius:999px;height:46px;min-height:46px;grid-auto-flow:column;font:800 15px var(--f-body)}
+  html[data-orient="port"] .sw-jastiper{flex-direction:row-reverse;padding:0 14px 0 18px}
+  html[data-orient="port"] .sw-t{display:inline}
+  html[data-orient="port"] .auth-head{height:calc(84px + var(--safe-t));border-radius:0 0 32px 32px}
+  html[data-orient="port"] .auth-switch{top:calc(14px + var(--safe-t))}
+  html[data-orient="port"] .auth-sakan{width:100px;height:100px;top:calc(26px + var(--safe-t))}
+  html[data-orient="port"] .auth-sakan img{width:82px}
+  html[data-orient="port"] /* kolom lebih lebar,html[data-orient="port"] huruf & isian lebih besar */
+  .auth-in,html[data-orient="port"] .auth-hero,html[data-orient="port"] .auth-info{width:min(calc(100% - 96px),520px)}
+  html[data-orient="port"] .auth-brand{margin:104px auto 34px}
+  html[data-orient="port"] .auth-brand img{width:170px}
+  html[data-orient="port"] .auth-bell{width:52px;height:52px;top:-4px}
+  html[data-orient="port"] .auth-title{font-size:32px}
+  html[data-orient="port"] .auth-hint{font-size:16px;margin-bottom:22px}
+  html[data-orient="port"] .auth-field{margin-bottom:16px}
+  html[data-orient="port"] .auth-field input:not(.vh){height:58px;font-size:17px;border-radius:18px;padding-left:54px}
+  html[data-orient="port"] .auth-field .ico{left:20px}
+  html[data-orient="port"] .auth-btn{min-height:58px;font-size:18px;border-radius:999px}
+  html[data-orient="port"] .auth-links{font-size:15px}
+  html[data-orient="port"] .auth-links button{font-size:16px}
+  html[data-orient="port"] .auth-recent .auth-last{min-height:62px}
+  html[data-orient="port"] .auth-p2{padding-top:calc(110px + var(--safe-t))}
+  html[data-orient="port"] .auth-hero h1{font-size:44px}
+  html[data-orient="port"] .auth-st{font-size:15px}
+  html[data-orient="port"] .auth-st b{font-size:16px}
+  html[data-orient="port"] .auth-info h2{font-size:19px}
+}
+
+/* laptop / jendela split sempit (900-1199px): kolom kiri dirapatkan agar tidak berdesakan */
+@media (min-width:900px) and (max-width:1199px){
+  .auth{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .auth-aside{padding:44px 36px;gap:24px;border-radius:0 32px 32px 0}
+  .auth-hero h1{font-size:clamp(32px,4vw,44px)}
+  .auth-hero-logo{width:80px;height:80px;margin-bottom:22px}
+  .auth-hero-logo img{width:64px}
+  .auth-aside .auth-steps{grid-template-columns:1fr;gap:14px}
+  .auth-main{padding:24px}
 }

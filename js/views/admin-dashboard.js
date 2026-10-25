@@ -4,6 +4,7 @@
  */
 import { app, $ } from '../core/dom.js';
 import { state } from '../core/state.js';
+import { addRecent } from '../core/recent.js';
 import { toast, lock } from '../core/ui.js';
 import { newCode, normalizePhone } from '../core/format.js';
 import { getProfile, saveProfile as saveProfileApi } from '../api/profile.api.js';
@@ -44,6 +45,7 @@ export function createSession() {
       if (!r.error || r.error.code !== '23505') break;
     }
     if (r.error) { toast(r.error.message, 1); return; }
+    addRecent(r.data.kode, r.data.judul); // muncul di halaman Jastiper sebagai pintasan
     location.hash = '#/a/' + r.data.kode;
   });
 }
