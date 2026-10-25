@@ -15,12 +15,16 @@ import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast } from '../views/customer.js';
 import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
+import { toggleTheme } from './theme.js';
+import { copyRecent } from './recent.js';
 import { saveProfile, createSession } from '../views/admin-dashboard.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
 /** Aksi tombol (data-act). Parameter: elemen tombol yang diketuk. */
 const ACT = {
   cl: openChangelog,
+  theme: toggleTheme,
+  'copy-recent': copyRecent,
   x: () => dlg.close(),
   retry: () => route(),
   reload: reloadSession,

@@ -26,6 +26,10 @@ const ICON = {
   shop: svg('<path d="M4 9l1.6-5h12.8L20 9"/><path d="M4 9a2.67 2.67 0 0 0 5.33 0 2.67 2.67 0 0 0 5.34 0A2.67 2.67 0 0 0 20 9"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4h4v4"/>', 22, 2),
   who: svg('<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/>', 22, 2),
   link: svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+  moon: svg('<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>', 22, 2),
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>', 22, 2),
+  copy: svg('<rect x="9" y="9" width="11" height="11" rx="3"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>', 20, 2),
+  check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 20, 2.6),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
 
@@ -87,19 +91,21 @@ const newPasswordBody = () =>
  * Isi halaman JASTIPER (penitip): tempel link / kode sesi dari jastip lalu buka.
  * @param {{last?:{k:string,j?:string}}} ctx last = sesi yang terakhir dibuka di perangkat ini
  */
-/** Slot di bawah tombol: link sesi terbaru (yang baru dibuat jastip / dibuka penitip di perangkat ini). */
+/** Slot di atas kolom isian: link sesi terbaru sebagai TEKS (tidak bisa disalin dengan menekannya) + ikon salin. */
 const recentHTML = (list) => !list || !list.length ? '' :
-  '<div class="auth-recent"><div class="auth-rt">Sesi terbaru di perangkat ini</div>' +
-  list.map((x) => '<button type="button" class="auth-last" data-act="last" data-k="' + esc(x.k) + '"><b>' + esc(x.j || x.k) + '</b><span>/s/' + esc(x.k) + '</span></button>').join('') +
+  '<div class="auth-recent"><div class="auth-rt">Sesi terbaru</div>' +
+  list.map((x) =>
+    '<div class="rc-row"><div class="rc-tx"><b>' + esc(x.j || x.k) + '</b><span>' + esc(location.host + location.pathname.replace(/index\.html$/, '') + '#/s/' + x.k) + '</span></div>' +
+    '<button type="button" class="rc-copy" data-act="copy-recent" data-k="' + esc(x.k) + '" aria-label="Salin link ' + esc(x.j || x.k) + '"><span class="i-c">' + ICON.copy + '</span><span class="i-ok">' + ICON.check + '</span></button></div>').join('') +
   '</div>';
 
 const joinBody = (ctx) =>
   '<form class="auth-form" data-form="join" novalidate>' +
   '<h2 class="auth-title">Mau titip pesanan?</h2>' +
-  '<p class="auth-hint">Tempel link atau kode sesi dari jastip. Tidak perlu daftar atau masuk.</p>' +
+  '<p class="auth-hint">Tempel link di bawah ini untuk mengakses beranda</p>' +
+  recentHTML(ctx.recent) +
   field('link', 'id="kd" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Link atau kode sesi"') +
   '<button class="auth-btn" type="submit">Buka daftar titipan</button>' +
-  recentHTML(ctx.recent) +
   '</form>';
 
 /** Pilih isi form sesuai mode. @param {string} mode */
@@ -162,12 +168,16 @@ const footerHTML = (kelas = '') =>
  * Switch ini hanya tampil di HP/tablet; di laptop dipakai tautan teks di panel kiri.
  * @param {'jastip'|'jastiper'} aktif halaman yang sedang tampil
  */
+const themeBtn = () =>
+  '<button type="button" class="theme-btn" data-act="theme" aria-label="Ganti tema terang / gelap">' +
+  '<span class="i-moon">' + ICON.moon + '</span><span class="i-sun">' + ICON.sun + '</span></button>';
+
 const headHTML = (aktif) =>
   '<div class="auth-head"><div class="auth-in"><div class="auth-sakan"><img src="img/sakan.png" alt="Sakan Al-Kalim at-Tayyib"></div>' +
   '<div class="auth-switch" role="tablist" aria-label="Pilih halaman">' +
   '<button type="button" role="tab" class="sw sw-jastip" data-act="pane" data-p="jastip" aria-label="Jastip, untuk pengelola" title="Jastip" aria-selected="' + (aktif === 'jastip') + '">' + ICON.shop + '<span class="sw-t">Jastip</span></button>' +
   '<button type="button" role="tab" class="sw sw-jastiper" data-act="pane" data-p="jastiper" aria-label="Jastiper, untuk penitip" title="Jastiper" aria-selected="' + (aktif === 'jastiper') + '">' + ICON.who + '<span class="sw-t">Jastiper</span></button>' +
-  '</div></div></div>';
+  '</div>' + themeBtn() + '</div></div>';
 
 /** Logo Me Gacoan + lonceng pembaruan. */
 const brandHTML = () =>
@@ -200,7 +210,7 @@ export const authScreenHTML = (mode, ctx = {}) => {
     pane('jastiper', joinBody(ctx), infoHTML('jastiper'), 'jastip') +
     '</div></div>' +
     /* --- hanya laptop: panel kiri + footer --- */
-    '<aside class="auth-aside">' + heroHTML() + infoHTML('jastip') + infoHTML('jastiper') + '</aside>' +
+    '<aside class="auth-aside">' + themeBtn() + heroHTML() + infoHTML('jastip') + infoHTML('jastiper') + '</aside>' +
     footerHTML('foot-d') +
     '<button type="button" class="auth-nav auth-next" data-act="down" aria-label="Lihat cara kerja">' + ICON.down + '</button>' +
     '<button type="button" class="auth-nav auth-prev" data-act="up" aria-label="Kembali ke atas">' + ICON.up + '</button>' +
