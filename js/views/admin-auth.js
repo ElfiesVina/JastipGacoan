@@ -39,7 +39,7 @@ if (themeMeta) {
 }
 
 /**
- * Halaman geser yang sedang tampil: 'jastiper' (penitip, bawaan saat pertama dibuka) atau 'jastip' (admin).
+ * Halaman yang sedang tampil: 'jastiper' (penitip, bawaan saat pertama dibuka) atau 'jastip' (admin).
  * Disimpan di sini supaya layar yang digambar ulang (ganti ke Daftar, Lupa password, dst.) tetap di halaman yang sama.
  */
 let pane = 'jastiper';
@@ -66,7 +66,6 @@ export function showAuth(mode, ctx = {}) {
   document.body.classList.add('auth-mode');
   app.innerHTML = authScreenHTML(mode, { ...ctx, pane, last: lastSession() });
   if (email && $('#em')) $('#em').value = email;
-  initAuthDeck();
   initAuthScroll();
   initPullRefresh();
   renderChangelogBadge(); // isi angka di lonceng
@@ -81,106 +80,98 @@ const diam = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Gulirkan satu wadah dengan animasi manual (snap dimatikan sementara lewat kelas .animating).
- * @param {HTMLElement} el wadah @param {'scrollTop'|'scrollLeft'} prop arah @param {number} to tujuan
- * @param {number} dur durasi ms @param {Function} [done] dipanggil setelah selesai
+ * @param {HTMLElement} el wadah @param {number} to tujuan scrollTop @param {number} dur durasi ms @param {Function} [done]
  */
-function glide(el, prop, to, dur, done) {
-  const from = el[prop];
-  if (diam() || Math.abs(to - from) < 2) { el[prop] = to; done?.(); return; }
+function glide(el, to, dur, done) {
+  const from = el.scrollTop;
+  if (diam() || Math.abs(to - from) < 2) { el.scrollTop = to; done?.(); return; }
   const t0 = performance.now();
   el.classList.add('animating');
   const step = (now) => {
     const t = Math.min(1, (now - t0) / dur);
-    el[prop] = from + (to - from) * easeInOut(t);
+    el.scrollTop = from + (to - from) * easeInOut(t);
     if (t < 1) requestAnimationFrame(step);
     else { el.classList.remove('animating'); done?.(); }
   };
   requestAnimationFrame(step);
 }
 
+/** Halaman (Jastip / Jastiper) yang sedang tampil. */
+const paneAktif = () => $('.pane-' + pane);
+
+/** Sinkronkan penanda halaman aktif: data-page (panah), aria-selected (ikon), inert (halaman tersembunyi). */
+function tandaiAktif() {
+  const a = $('.auth');
+  if (!a) return;
+  a.dataset.pane = pane;
+  $$('.auth-pane').forEach((el) => el.toggleAttribute('inert', !el.classList.contains('pane-' + pane)));
+  $$('.sw').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.p === pane)));
+  const sc = paneAktif()?.querySelector('.auth-scroll');
+  const p1 = paneAktif()?.querySelector('.auth-p1');
+  a.dataset.page = sc && p1 && sc.scrollTop / (p1.offsetHeight || 1) > 0.5 ? '2' : '1';
+}
+
 /**
- * Gulir halaman Jastip (khusus HP) ke halaman 1 (form) atau 2 (cara kerja + footer).
- * @param {1|2} n halaman tujuan
+ * Gulir halaman yang sedang tampil (khusus HP) ke layar 1 (isi utama) atau 2 (cara kerja + footer).
+ * @param {1|2} n layar tujuan
  */
 export function setAuthPage(n) {
-  const sc = $('.pane-jastip .auth-scroll');
-  const p1 = $('.auth-p1');
+  const sc = paneAktif()?.querySelector('.auth-scroll');
+  const p1 = paneAktif()?.querySelector('.auth-p1');
   if (!sc || !p1) return;
   document.activeElement?.blur?.(); // tutup keyboard kalau sedang terbuka
-  glide(sc, 'scrollTop', n === 2 ? p1.offsetHeight : 0, 800, () =>
+  glide(sc, n === 2 ? p1.offsetHeight : 0, 800, () =>
     $(n === 2 ? '.auth-prev' : '.auth-next')?.focus({ preventScroll: true })); // fokus ke tombol yang terlihat
 }
 
 /**
- * Pindah antara halaman Jastip dan Jastiper (ketuk tab / tautan). Digeser dengan animasi + snap.
+ * Pindah antara halaman Jastip dan Jastiper. Halaman lama mengecil dan memudar,
+ * halaman baru membesar masuk (animasinya di CSS, lewat atribut data-pane).
  * @param {'jastip'|'jastiper'} nama
  */
 export function setAuthPane(nama) {
-  const dk = $('.auth-deck');
-  if (!dk) return;
+  if (!$('.auth') || nama === pane) return;
   document.activeElement?.blur?.();
   pane = nama;
-  glide(dk, 'scrollLeft', nama === 'jastiper' ? dk.scrollWidth - dk.clientWidth : 0, 560);
-}
-
-/** Pendengar resize layar auth yang aktif (diganti tiap layar digambar ulang). */
-let onResize = () => {};
-
-/**
- * Pasang pelacak geser mendatar: menjaga posisi halaman (termasuk saat layar diputar/di-resize),
- * mengisi variabel CSS --x (0 = Jastip, 1 = Jastiper) untuk penanda tab, dan mengunci halaman yang tidak terlihat (inert).
- */
-function initAuthDeck() {
-  const dk = $('.auth-deck');
-  const a = $('.auth');
-  if (!dk || !a) return;
-  const lebar = () => Math.max(1, dk.scrollWidth - dk.clientWidth);
-  const tandai = () => {
-    const x = Math.min(1, Math.max(0, dk.scrollLeft / lebar()));
-    a.style.setProperty('--x', x.toFixed(3));
-    const nama = x > 0.5 ? 'jastiper' : 'jastip';
-    if (a.dataset.pane !== nama) a.dataset.pane = nama;
-    if (!dk.classList.contains('animating')) pane = nama;
-    $$('.auth-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.p === nama)));
-    $('.pane-jastip')?.toggleAttribute('inert', nama !== 'jastip');
-    $('.pane-jastiper')?.toggleAttribute('inert', nama !== 'jastiper');
-  };
-  let raf = 0;
-  dk.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; tandai(); }); }, { passive: true });
-  // taruh langsung di halaman awal (tanpa animasi, sebelum tergambar)
-  dk.style.scrollSnapType = 'none';
-  dk.scrollLeft = pane === 'jastiper' ? lebar() : 0;
-  dk.style.scrollSnapType = '';
-  tandai();
-  // layar diputar / jendela diubah: tetap di halaman yang sama
-  removeEventListener('resize', onResize);
-  onResize = () => {
-    const d = $('.auth-deck');
-    if (!d) { removeEventListener('resize', onResize); return; } // layar sudah diganti halaman lain
-    d.scrollLeft = pane === 'jastiper' ? d.scrollWidth - d.clientWidth : 0;
-    tandai();
-  };
-  addEventListener('resize', onResize);
+  tandaiAktif();
 }
 
 /**
- * Pasang pelacak gulir tegak halaman Jastip: menghitung seberapa jauh halaman 1 sudah bergeser (0 sampai 1)
- * lalu menyimpannya di variabel CSS --p (efek scale) dan di data-page (untuk tombol panah).
+ * Pasang pelacak gulir tegak untuk tiap halaman: menghitung seberapa jauh layar 1 sudah bergeser (0 sampai 1)
+ * lalu menyimpannya di variabel CSS --p milik halaman itu (efek scale) dan di data-page (untuk panah).
+ * Juga memasang geser mendatar (kiri/kanan) sebagai jalan pintas pindah halaman.
  */
 function initAuthScroll() {
-  const sc = $('.pane-jastip .auth-scroll');
   const a = $('.auth');
-  const p1 = $('.auth-p1');
-  if (!sc || !a || !p1) return;
-  let raf = 0;
-  const update = () => {
-    raf = 0;
-    const p = Math.min(1, Math.max(0, sc.scrollTop / (p1.offsetHeight || 1)));
-    a.style.setProperty('--p', p.toFixed(3));
-    a.dataset.page = p > 0.5 ? '2' : '1';
-  };
-  sc.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
-  update();
+  if (!a) return;
+  $$('.auth-pane').forEach((pn) => {
+    const sc = pn.querySelector('.auth-scroll');
+    const p1 = pn.querySelector('.auth-p1');
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const p = Math.min(1, Math.max(0, sc.scrollTop / (p1.offsetHeight || 1)));
+      pn.style.setProperty('--p', p.toFixed(3));
+      if (pn === paneAktif()) a.dataset.page = p > 0.5 ? '2' : '1';
+    };
+    sc.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    update();
+
+    // geser mendatar cepat = pindah halaman (kiri = Jastiper, kanan = Jastip)
+    let x0 = 0; let y0 = 0; let ok = false;
+    sc.addEventListener('touchstart', (e) => {
+      ok = e.touches.length === 1 && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName);
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive: true });
+    sc.addEventListener('touchend', (e) => {
+      if (!ok) return;
+      ok = false;
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) setAuthPane(dx < 0 ? 'jastiper' : 'jastip');
+    }, { passive: true });
+  });
+  tandaiAktif();
 }
 
 /**

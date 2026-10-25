@@ -12,6 +12,12 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 10, tgl: '2026-10-25', v: '1.6', jenis: 'Tampilan', untuk: 'semua',
+    judul: 'Pindah Jastip / Jastiper lewat ikon di header',
+    poin: [
+      'Dua ikon di pojok kanan atas untuk pindah halaman, dengan efek scale. Menggeser layar ke kiri atau kanan juga bisa.',
+      'Bagian bawah layar dikosongkan, hanya ada panah turun. Panah naik kini ikut bergerak.',
+      'Di laptop dan layar landscape, pindah halaman lewat tautan "Masuk sebagai Jastip" atau "Masuk sebagai Jastiper".'] },
   { id: 9, tgl: '2026-10-25', v: '1.5', jenis: 'Tampilan', untuk: 'penitip',
     judul: 'Halaman titip lebih rapi di HP, tablet, dan laptop',
     poin: [
