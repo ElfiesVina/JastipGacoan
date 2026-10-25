@@ -56,3 +56,6 @@ export async function lock(fn) {
 
 /** HTML placeholder loading. */
 export const skeleton = '<div class="card sk"><i></i><i></i><i></i></div>';
+
+/** Tandai aplikasi siap: buang layar tunggu (body.boot) setelah halaman pertama tergambar. */
+export function ready() { document.body.classList.remove('boot'); }

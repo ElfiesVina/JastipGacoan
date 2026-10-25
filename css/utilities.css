@@ -9,3 +9,14 @@
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important}
 }
+
+/* layar tunggu saat aplikasi dimuat/di-refresh: sembunyikan header & konten bawaan HTML sampai skrip siap */
+body.boot header,body.boot main{visibility:hidden}
+body.boot{background:#fff}
+body.boot::after{
+  content:"";position:fixed;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+  border:3px solid #d6edf2;border-top-color:#07758f;opacity:0;
+  animation:boot-in .2s .5s forwards,boot-spin .8s linear infinite;
+}
+@keyframes boot-in{to{opacity:1}}
+@keyframes boot-spin{to{transform:rotate(360deg)}}

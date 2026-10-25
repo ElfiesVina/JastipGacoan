@@ -4,10 +4,12 @@
  */
 import { $, esc } from '../core/dom.js';
 import { state } from '../core/state.js';
+import { ready } from '../core/ui.js';
 import { STATUS_HEADER } from '../core/constants.js';
 
 /** Perbarui baris status di header sesuai `state.sesi`. */
 export function renderHeader() {
+  ready(); // header sudah diisi: buang layar tunggu
   const s = state.sesi;
   $('#st').innerHTML = s
     ? (s.judul ? '<b class="st-t">' + esc(s.judul) + '</b>' : '') +

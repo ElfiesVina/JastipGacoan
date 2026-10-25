@@ -15,5 +15,8 @@
 import { bindEvents } from './core/events.js';
 import { route } from './core/router.js';
 
+import { ready } from './core/ui.js';
+
 bindEvents();
 route();
+setTimeout(ready, 6000); // pengaman: jangan biarkan layar tunggu tertahan bila ada galat
