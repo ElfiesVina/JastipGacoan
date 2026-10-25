@@ -5,7 +5,7 @@
  * di localStorage tiap browser.
  */
 import { CHANGELOG } from '../data/changelog-data.js';
-import { $, dlg, esc } from '../core/dom.js';
+import { $, $$, dlg, esc } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { store } from '../core/storage.js';
 import { LS_SEEN_PREFIX } from '../core/constants.js';
@@ -43,11 +43,10 @@ export function renderChangelogBadge() {
   const b = $('#bdg');
   b.hidden = !u.length;
   b.textContent = u.length > 9 ? '9+' : u.length;
-  const dot = $('#auth-dot'); // badge angka di lonceng layar masuk/daftar
-  if (dot) {
+  $$('.auth-dot').forEach((dot) => { // badge angka di lonceng layar masuk (ada di dua halaman geser)
     dot.hidden = !u.length;
     dot.textContent = u.length > 9 ? '9+' : u.length;
-  }
+  });
   $('#cl').innerHTML = u.length
     ? '<button type="button" class="tz" data-act="cl"><span class="tzd"></span><span class="tzt"><b>' +
       u.length + ' pembaruan baru</b><span>' + esc(u[0].judul) + '</span></span><span class="tzg">Lihat</span></button>'

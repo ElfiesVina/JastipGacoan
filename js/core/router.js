@@ -13,5 +13,6 @@ import { showAdmin } from '../views/admin-auth.js';
 export function route() {
   clearInterval(state.timer); // hentikan polling halaman sebelumnya
   const m = location.hash.match(/^#\/s\/(\w+)/);
+  document.body.classList.toggle('cust-mode', !!m); // lebar & tata letak khusus halaman penitip
   m ? showCustomer(m[1]) : showAdmin();
 }

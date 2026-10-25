@@ -13,8 +13,8 @@ import { route } from './router.js';
 import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
-import { submitOrder, submitPayment, refreshWhenVisible } from '../views/customer.js';
-import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage } from '../views/admin-auth.js';
+import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast } from '../views/customer.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
 import { saveProfile, createSession } from '../views/admin-dashboard.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -33,6 +33,8 @@ const ACT = {
   resend: resendCode,
   down: () => setAuthPage(2), // layar masuk: ke halaman cara kerja
   up: () => setAuthPage(1),   // layar masuk: kembali ke form
+  pane: (b) => setAuthPane(b.dataset.p), // tab / tautan: geser ke Jastip atau Jastiper
+  last: openLast,             // Jastiper: buka lagi sesi terakhir
   out: logout,
   sets: (b) => setStatus(b.dataset.s),
   del: deleteOrder,
@@ -47,6 +49,7 @@ const FORM = {
   signup: () => authenticate(true),
   reset: sendReset,
   otp: verifyCode,
+  join: joinSession,
   newpass: saveNewPassword,
   prof: saveProfile,
   news: createSession,

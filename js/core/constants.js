@@ -23,6 +23,7 @@ export const TOAST_MS = 3800;
 
 /** Kunci localStorage. */
 export const LS_NAME = 'nm';        // nama terakhir yang diisi penitip
+export const LS_LAST = 'last';       // sesi terakhir yang dibuka penitip: {k, j}
 export const LS_SEEN_PREFIX = 'cl_'; // + peran => id changelog terakhir dibaca
 
 /** Teks status sesi untuk daftar di dashboard admin. */

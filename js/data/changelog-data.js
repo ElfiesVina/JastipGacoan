@@ -12,6 +12,19 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 9, tgl: '2026-10-25', v: '1.5', jenis: 'Tampilan', untuk: 'penitip',
+    judul: 'Halaman titip lebih rapi di HP, tablet, dan laptop',
+    poin: [
+      'Ada pita tahap: Daftar dibuka, Belanja, lalu Rekap dan bayar.',
+      'Di layar lebar, form ada di kiri dan daftar serta rekap di kanan.',
+      'Tombol Titip dan Bayar menempel di bawah layar HP supaya mudah dijangkau.',
+      'Halaman awal punya kolom tempel link atau kode sesi.'] },
+  { id: 8, tgl: '2026-10-25', v: '1.5', jenis: 'Fitur', untuk: 'semua',
+    judul: 'Halaman awal: Jastip | Jastiper',
+    poin: [
+      'Dua halaman yang bisa digeser: Jastiper (penitip) tampil lebih dulu, Jastip (pengelola) ada di sebelahnya.',
+      'Pindah dengan mengetuk tab atau menggeser layar.',
+      'Panah turun kini tanpa lingkaran dan bayangan, animasinya tetap ada.'] },
   { id: 7, tgl: '2026-10-24', v: '1.4', jenis: 'Fitur', untuk: 'admin',
     judul: 'Lupa password lewat kode email',
     poin: [

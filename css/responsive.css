@@ -56,24 +56,3 @@
   .lv span:hover{border-color:var(--pk)}
   .srow:hover b{text-decoration:underline}
 }
-
-/* --- Tablet ke atas: form customer lebih lega --- */
-@media (min-width:768px){
-  :root{ --wrap: 720px; }
-  .card{ padding: 24px 28px; border-radius: 22px; }
-  .opts{ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-  .lvs{ grid-template-columns: repeat(8, 1fr); max-width: 420px; }
-  .tot{ font-size: 56px; letter-spacing: -0.02em; }
-}
-
-/* --- Laptop / desktop --- */
-@media (min-width:1024px){
-  :root{ --wrap: 860px; }
-  main{ padding-bottom: 140px; }
-}
-
-/* Landscape HP: rapatkan */
-@media (max-height:480px) and (orientation:landscape){
-  header{ padding-top: calc(10px + var(--safe-t)); padding-bottom: 24px; }
-  .card{ padding: 14px 16px; }
-}
