@@ -23,3 +23,24 @@ export async function shrink(f) {
   } catch { /* lanjut ke cadangan */ }
   return { blob: f, ext: (f.type.split('/')[1] || 'jpg').replace(/\W/g, '') };
 }
+
+/**
+ * Potong tengah jadi persegi lalu kecilkan ke `side` px (JPEG). Hasilnya data URL kecil untuk foto profil.
+ * @param {File} file foto @param {number} [side] sisi akhir (px)
+ * @returns {Promise<string>} data URL, atau '' bila gagal
+ */
+export async function squareAvatar(file, side = 256) {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const crop = Math.min(bitmap.width, bitmap.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = side;
+    canvas.height = side;
+    canvas.getContext('2d').drawImage(
+      bitmap, (bitmap.width - crop) / 2, (bitmap.height - crop) / 2, crop, crop, 0, 0, side, side,
+    );
+    return canvas.toDataURL('image/jpeg', 0.82);
+  } catch {
+    return '';
+  }
+}

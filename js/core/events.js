@@ -17,13 +17,18 @@ import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast }
 import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
-import { saveProfile, createSession } from '../views/admin-dashboard.js';
+import { createSession, scrollToSection } from '../views/admin-dashboard.js';
+import { openProfileForm, closeProfileForm, saveProfileForm, toggleOnline, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
 /** Aksi tombol (data-act). Parameter: elemen tombol yang diketuk. */
 const ACT = {
   cl: openChangelog,
   theme: toggleTheme,
+  'profile-edit': openProfileForm,
+  'profile-cancel': closeProfileForm,
+  'profile-online': toggleOnline,
+  'scroll-to': scrollToSection,
   'copy-recent': copyRecent,
   x: () => dlg.close(),
   retry: () => route(),
@@ -55,7 +60,7 @@ const FORM = {
   otp: verifyCode,
   join: joinSession,
   newpass: saveNewPassword,
-  prof: saveProfile,
+  prof: saveProfileForm,
   news: createSession,
   settle: publishRecap,
 };
@@ -93,6 +98,7 @@ export function bindEvents() {
     const t = e.target;
     if (t.name === 'item') { draft.i = t.value; syncChoice(); }
     else if (t.name === 'who') draft.who = t.value;
+    else if (t.id === 'pfoto') previewPhoto(t);
     else if (t.id === 'bk') {
       draft.f = t.files[0] || null;
       $('#fn').textContent = draft.f ? draft.f.name : 'Pilih foto bukti';
