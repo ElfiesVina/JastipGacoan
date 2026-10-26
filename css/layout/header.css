@@ -62,3 +62,58 @@ header .wrap{max-width:var(--wrap);margin:0 auto}
 .hd .bell + .bell {
   margin-left: -2px;
 }
+
+/* =====================================================================
+   Header ringkas untuk halaman jastip (beranda & detail sesi):
+   baris 1 = logo + tombol tema + lonceng, baris 2 = status / teks statis.
+   Halaman penitip (cust-mode) dan layar masuk tidak terpengaruh.
+   ===================================================================== */
+body:not(.cust-mode):not(.auth-mode) header {
+  padding-top: calc(14px + var(--safe-t));
+  padding-bottom: 24px;
+  border-radius: 0 0 24px 24px;
+}
+
+body:not(.cust-mode):not(.auth-mode) header .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "logo theme bell"
+    "status status status";
+  align-items: center;
+  gap: 8px 10px;
+}
+
+body:not(.cust-mode):not(.auth-mode) .hd {
+  display: contents;
+}
+
+body:not(.cust-mode):not(.auth-mode) .lg {
+  grid-area: logo;
+  font-size: clamp(24px, 7vw, 38px);
+}
+
+body:not(.cust-mode):not(.auth-mode) #themebtn {
+  grid-area: theme;
+}
+
+body:not(.cust-mode):not(.auth-mode) #bell {
+  grid-area: bell;
+}
+
+body:not(.cust-mode):not(.auth-mode) #st {
+  grid-area: status;
+  min-height: 0;
+  padding-top: 0;
+}
+
+body:not(.cust-mode):not(.auth-mode) .bell {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+}
+
+body:not(.cust-mode):not(.auth-mode) .st-t {
+  margin-bottom: 4px;
+  font-size: clamp(22px, 6vw, 28px);
+}

@@ -20,7 +20,7 @@ const reloadBtn = '<button type="button" class="gh" data-act="reload">Segarkan</
 
 /** Pembuka kartu kontrol (link sesi + tombol salin). Kartu ditutup oleh pemanggil. */
 const controlHead = () =>
-  '<div class="card"><h2>Kontrol</h2><a href="#/">← Semua sesi</a><div class="lb">Link untuk penitip</div>' +
+  '<div class="card"><h2>Kontrol</h2><a class="back-link" href="#/">← Semua sesi</a><div class="lb">Link untuk penitip</div>' +
   '<div class="lk">' + esc(linkSesi()) + '</div><div class="acts"><button type="button" class="gh" data-act="copy">Salin link</button>';
 
 /** Form harga per menu + pajak + fee (saat sesi ditutup). */
@@ -56,5 +56,7 @@ export function sessionDetailHTML() {
       '<a class="btn" target="_blank" rel="noopener" href="' + esc(waLink('', teksRekap())) + '">Kirim rekap ke WA</a></div>' +
       '<div class="acts">' + statusBtn('Ubah harga', 'closed', 'gh') + reloadBtn + '</div></div>';
   }
-  return atas + '<div id="l">' + orderListHTML(true) + '</div>' + (s === 'settled' ? recapCardHTML() : '');
+  // dua kolom di layar lebar/landscape: kiri = kontrol & harga, kanan = daftar titipan & rekap
+  return '<div class="session-layout"><div class="session-main">' + atas + '</div><div class="session-side">' +
+    '<div id="l">' + orderListHTML(true) + '</div>' + (s === 'settled' ? recapCardHTML() : '') + '</div></div>';
 }

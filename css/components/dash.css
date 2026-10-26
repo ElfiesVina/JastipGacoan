@@ -220,3 +220,44 @@ body:has(.dash) {
 body:has(.dash) #cl {
   display: none;
 }
+
+/* --- breakpoint dua kolom diturunkan ke 720px agar HP landscape & tablet kecil juga dua kolom --- */
+@media (min-width: 720px) and (max-width: 899px) {
+  .dash {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .dash-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .slot-profile,
+  .slot-nav,
+  .slot-active,
+  .slot-create,
+  .slot-mine {
+    order: 0;
+  }
+}
+
+/* --- HP landscape (pendek): rapatkan kartu --- */
+@media (max-height: 520px) {
+  .dash {
+    padding-top: 14px;
+  }
+
+  .profile-card {
+    padding: 14px;
+  }
+
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+  }
+}
