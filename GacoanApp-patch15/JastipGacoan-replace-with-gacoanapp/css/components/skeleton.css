@@ -1,0 +1,8 @@
+/* =====================================================================
+   components/skeleton.css
+   Placeholder berkilau saat data dimuat.
+   ===================================================================== */
+.sk i{display:block;height:16px;border-radius:8px;margin:12px 0;background:linear-gradient(90deg,#e9eef4 25%,#f5f8fb 50%,#e9eef4 75%);background-size:200% 100%;animation:sh 1.3s linear infinite}
+.sk i:first-child{width:40%}
+.sk i:last-child{width:70%}
+@keyframes sh{to{background-position:-200% 0}}

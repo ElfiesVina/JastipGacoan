@@ -1,0 +1,20 @@
+/* =====================================================================
+   components/dialog.css
+   Bottom-sheet (elemen <dialog>) untuk changelog.
+   Di HP menempel di bawah; di layar lebar jadi kartu di tengah (responsive.css).
+   ===================================================================== */
+dialog{
+  border:0;padding:0;margin:auto auto 0;
+  width:min(100%,var(--wrap));max-width:100%;
+  max-height:86vh;max-height:86dvh;           /* dvh = tinggi layar yang sudah memperhitungkan bar alamat */
+  border-radius:26px 26px 0 0;
+  background:var(--sf);color:var(--tx);overflow:hidden;
+}
+dialog[open]{display:flex;flex-direction:column;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+dialog::backdrop{background:#10192b80}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+
+.shh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 10px;border-bottom:1px solid var(--ln)}
+.shh h3{margin:0;font:800 26px var(--f-head);letter-spacing:.02em}
+.shh button{margin:0;min-height:40px;padding:0 16px;background:var(--bg);color:var(--tx)}
+.shb{overflow:auto;overscroll-behavior:contain;padding:6px 18px calc(28px + var(--safe-b))}   /* bagian isi yang bisa di-scroll */

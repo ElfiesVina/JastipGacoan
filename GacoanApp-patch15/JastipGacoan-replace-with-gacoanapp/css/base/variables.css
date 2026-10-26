@@ -1,0 +1,51 @@
+/* =====================================================================
+   base/variables.css
+   Semua "token" desain ada di sini (warna, font, lebar, jarak aman layar).
+   Mau ganti warna/lebar aplikasi? Cukup ubah di file ini saja.
+   ===================================================================== */
+:root{
+  /* --- warna --- */
+  --bg:#f2f6f9;      /* latar halaman */
+  --sf:#fff;         /* permukaan kartu */
+  --tx:#10192b;      /* teks utama */
+  --mu:#5d6a80;      /* teks redup */
+  --ln:#dfe6ee;      /* garis / border */
+  --te:#07758f;      /* teal utama (kontras 5,3 dengan teks putih) */
+  --te2:#0a8fb0;     /* teal terang (fokus, aksen) */
+  --tint:#e4f3f7;    /* latar teal muda */
+  --pk:#e6007e;      /* pink aksen */
+  --pkt:#fff0f8;     /* latar pink muda */
+  --ok:#0a8a58;      /* hijau sukses */
+      /* --- layar masuk/daftar --- */
+  --au:#1db3d5;      /* cyan pita atas, tautan, fokus */
+  --ab:#0c7a94;      /* tombol utama masuk/daftar */
+  /* --- font --- */
+  --f-body:"Plus Jakarta Sans",system-ui,sans-serif;
+  --f-head:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif-condensed,sans-serif;
+
+  /* --- lebar konten: mobile dulu, membesar lewat responsive.css --- */
+  --wrap:560px;
+
+  /* --- area aman layar (notch / bar gestur). 0px di perangkat tanpa notch --- */
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}
+
+/* --- tema gelap: nilai token diganti; dipasang lewat <html data-theme="dark"> --- */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1823; --sf:#172433; --tx:#e9f0f7; --mu:#9fb0c4; --ln:#27394d;
+  --te:#1b94b0; --te2:#3cc0df; --tint:#173a49; --pkt:#33172a; --ok:#35c58d;
+}
+html[data-theme="dark"] .gh{background:var(--sf);color:#6fd3ea;box-shadow:inset 0 0 0 1.5px #2a8aa3}
+html[data-theme="dark"] input:not(.vh):focus{background:#1b2b3d}
+html[data-theme="dark"] .card h2,html[data-theme="dark"] .dprof summary,html[data-theme="dark"] .srow b{color:#6fd3ea}
+html[data-theme="dark"] .tz{background:var(--sf);color:var(--tx)}
+html[data-theme="dark"] .tz *{color:inherit}
+html[data-theme="dark"] .done{background:#12302a;border-color:#1f5a47}
+html[data-theme="dark"] .s-closed{background:#3a2e10;color:#f1c768}
+html[data-theme="dark"] .stp .dot{background:var(--sf)}
+html[data-theme="dark"] .dnew{background:linear-gradient(180deg,#183041,var(--sf));border-color:#27506a}
+html[data-theme="dark"] dialog{background:var(--sf);color:var(--tx)}

@@ -1,0 +1,30 @@
+/* =====================================================================
+   components/list.css
+   Daftar titipan (baris, avatar, chip item), pil status, daftar sesi.
+   ===================================================================== */
+.row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--ln)}
+.row:last-child{border:0;padding-bottom:0}
+.av{flex:none;width:38px;height:38px;border-radius:50%;background:var(--tint);color:var(--te);display:grid;place-items:center;font:800 18px var(--f-head)}
+.rb{flex:1;min-width:0}
+.rb b{word-break:break-word}
+.its{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.it{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--bg);font-size:13px;font-weight:600;color:#33415a}
+.r{text-align:right;flex:none;margin-left:auto}
+
+/* pil Lunas / Belum */
+.pill{display:inline-flex;min-height:0;padding:3px 10px;margin:4px 0 0;border-radius:999px;font:800 12.5px var(--f-body)}
+.pill.ok{background:#e3f6ee;color:var(--ok)}
+.pill.no{background:var(--pkt);color:var(--pk)}
+button.pill{min-height:32px;padding:0 12px;cursor:pointer}   /* versi tombol (admin) tetap mudah diketuk */
+.bk{display:block;font-size:13px;font-weight:600;margin-top:2px}
+
+/* label status sesi */
+.s-open,.s-closed,.s-settled{font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.s-open{background:#e3f6ee;color:var(--ok)}
+.s-closed{background:#fff4dc;color:#8a5a00}
+.s-settled{background:var(--tint);color:var(--te)}
+
+/* baris "Sesi saya" di dashboard admin */
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border-bottom:1px solid var(--ln);text-decoration:none;color:inherit}
+.srow:last-child{border:0;padding-bottom:0}
+.srow b{color:var(--te)}

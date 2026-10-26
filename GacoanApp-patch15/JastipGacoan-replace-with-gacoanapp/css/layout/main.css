@@ -1,0 +1,81 @@
+/* =====================================================================
+   layout/main.css
+   Wadah konten utama. Ditarik sedikit ke atas supaya menimpa lengkung header.
+   padding-bottom besar = ruang napas di bawah (tetap, bukan vh, supaya
+   halaman tidak "melompat" ketika keyboard HP muncul).
+   ===================================================================== */
+main{
+  max-width:var(--wrap);
+  margin:-16px auto 0;
+  padding:0 calc(14px + var(--safe-r)) calc(96px + var(--safe-b)) calc(14px + var(--safe-l));
+}
+
+/* =====================================================================
+   Halaman PENITIP (body.cust-mode, dari link #/s/<kode>)
+   HP: satu kolom -> pita tahap, form / rekap, bayar, daftar.
+   >=800px (tablet, laptop, HP lanskap): dua kolom. Kiri = form (menempel saat digulir),
+   kanan = rekap + daftar titipan.
+   ===================================================================== */
+
+.cust{display:grid;grid-template-columns:minmax(0,1fr)}
+.cc1,.cc2{display:contents}                 /* HP: anak-anaknya langsung jadi item grid, urutan diatur di bawah */
+.cust > .cs{order:0}
+.cc1 > #f{order:1}
+.cc2 > #k{order:2}
+.cc1 > #p{order:3}
+.cc2 > #l{order:4}
+.cust :is(#f,#p,#k,#l,.cs):empty{display:none}
+
+/* pita tahap sesi: Daftar dibuka -> Belanja -> Rekap & bayar */
+.cs{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:16px 10px 12px;margin:14px 0 0;box-shadow:0 10px 24px -16px #07758f66}
+.stp{list-style:none;margin:0;padding:0;display:flex}
+.stp li{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:12px;line-height:1.25;font-weight:700;color:var(--mu)}
+.stp li::before{content:"";position:absolute;top:13px;right:50%;width:100%;height:3px;background:var(--ln)}
+.stp li:first-child::before{display:none}
+.stp li.pas::before,.stp li.now::before{background:var(--te2)}
+.stp .dot{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--ln);font:800 13px var(--f-body)}
+.stp .pas .dot{background:var(--te);border-color:var(--te);color:#fff}
+.stp .now{color:var(--tx)}
+.stp .now .dot{border-color:var(--pk);color:var(--pk);box-shadow:0 0 0 4px #e6007e1c}
+.stp .lbl{padding:0 2px}
+
+/* tombol kirim menempel di bawah layar HP selama form masih terlihat */
+.cust #go,.cust #pay{position:sticky;bottom:calc(12px + var(--safe-b));z-index:2;box-shadow:0 14px 26px -12px #07758fcc}
+.cust #pay{box-shadow:0 14px 26px -12px #e6007ecc}
+
+/* kartu pesan (gagal memuat / link tidak ditemukan) */
+.ctr{text-align:center;padding:30px 20px}
+.ctr .mu{margin-bottom:14px}
+.ctr .btn,.ctr button{margin:0}
+
+/* >=600px: pilihan menu jadi grid */
+@media (min-width:600px){
+  .cust .opts{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+}
+
+/* >=800px: dua kolom */
+@media (min-width:800px){
+  body.cust-mode{--wrap:1080px}
+  body.cust-mode dialog{width:min(100%,680px)}
+  .cust{grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:22px;align-items:start}
+  .cc1,.cc2{display:block;min-width:0}
+  .cc1{grid-column:1;position:sticky;top:16px}
+  .cc2{grid-column:2}
+  .cust > .cs{grid-column:1 / -1;padding:18px 28px 14px}
+  .cust > .cc1,.cust > .cc2{grid-row:2}
+  .cust #go,.cust #pay{position:static;box-shadow:none}
+  .cs .stp li{font-size:13.5px}
+  .cust .opts{grid-template-columns:minmax(0,1fr)}   /* kolom kiri sempit: pilihan menumpuk */
+  .cust .card{padding:22px 22px}
+}
+
+/* >=1100px: kolom kiri lebih lega */
+@media (min-width:1100px){
+  .cust{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);column-gap:28px}
+  .cust .opts{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+}
+
+/* HP lanskap / layar pendek: kolom kiri tidak menempel (bisa lebih tinggi dari layar) */
+@media (min-width:800px) and (max-height:620px){
+  .cc1{position:static}
+}
