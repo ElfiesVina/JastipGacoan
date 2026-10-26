@@ -12,6 +12,35 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 15, tgl: '2026-10-26', v: '2.0', jenis: 'Tampilan', untuk: 'admin',
+    judul: 'Halaman jastip lebih rapi, termasuk di layar landscape',
+    poin: [
+      'Header halaman jastip dibuat lebih ringkas: logo, tombol tema, dan lonceng sebaris.',
+      'Detail sesi tampil dua kolom di layar lebar dan HP landscape: kontrol di kiri, daftar titipan dan rekap di kanan.',
+      'Beranda jastip juga dua kolom di tablet dan HP landscape, kartunya dirapatkan.',
+      'Tombol Semua sesi dan deretan tombol aksi dirapikan.'] },
+  { id: 14, tgl: '2026-10-26', v: '1.9', jenis: 'Fitur', untuk: 'admin',
+    judul: 'Profil jastip lengkap dan beranda baru',
+    poin: [
+      'Kartu profil berisi foto, nama dengan status Online/Offline, title, kampus, kutipan, dan kontak. Nomor WA tidak ditampilkan, hanya tulisan WhatsApp.',
+      'Jastip baru diminta melengkapi profil dulu. Setelah tersimpan, muncul pintasan Buat Sesi dan Sesi Saya, kartu sesi aktif, form buat sesi, dan daftar sesi.',
+      'Tombol Keluar dipindah ke dalam Detail profil.',
+      'Angka ringkasan (Sesi, Dibuka, Rekap) kini tampil di bawah labelnya.',
+      'Tombol tema terang/gelap juga ada di header beranda, dan ganti tema tidak lagi menggeser tampilan.'] },
+  { id: 13, tgl: '2026-10-25', v: '1.8', jenis: 'Tampilan', untuk: 'semua',
+    judul: 'Header berlabel, mode gelap, dan link sesi di halaman Jastiper',
+    poin: [
+      'Pilihan Jastip dan Jastiper di header kini berlabel teks, ditambah tombol bulan untuk mode gelap yang diingat di perangkat.',
+      'Link sesi terbaru muncul di atas kolom isian dengan ikon salin. Link hanya bisa disalin lewat ikon itu.',
+      'Lonceng dinaikkan, dan kalimat petunjuk disesuaikan.'] },
+  { id: 12, tgl: '2026-10-25', v: '1.7', jenis: 'Perbaikan', untuk: 'semua',
+    judul: 'Layar tidak menciut saat keyboard muncul',
+    poin: [
+      'Tampilan tetap sama ukurannya saat mengetik, tidak lagi mengecil atau terdorong ke bawah.',
+      'Saat halaman dimuat ulang, layar tunggu tampil dulu sehingga beranda bawaan tidak sempat berkedip. Halaman Jastip atau Jastiper yang dibuka tetap diingat.',
+      'Pindah Jastip dan Jastiper kini langsung tanpa animasi.',
+      'Tampilan tablet dan jendela laptop yang sempit dirapikan.',
+      'Beranda Jastip didesain ulang, dan ikon aplikasi serta favicon dibuat bulat.'] },
   { id: 10, tgl: '2026-10-25', v: '1.6', jenis: 'Tampilan', untuk: 'semua',
     judul: 'Pindah Jastip / Jastiper lewat ikon di header',
     poin: [
