@@ -46,3 +46,19 @@ header .wrap{max-width:var(--wrap);margin:0 auto}
   body.cust-mode .st-t{font-size:clamp(26px,2.6vw,34px);margin-bottom:8px}
   body.cust-mode .st-m{justify-content:flex-end}
 }
+
+/* --- teks statis di header beranda jastip (bukan tombol) --- */
+.header-label {
+  display: inline-block;
+  margin-right: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+/* tombol tema + lonceng berdampingan */
+.hd .bell + .bell {
+  margin-left: -2px;
+}

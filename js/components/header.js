@@ -15,5 +15,5 @@ export function renderHeader() {
     ? (s.judul ? '<b class="st-t">' + esc(s.judul) + '</b>' : '') +
       '<span class="st-m"><span class="st-p st-' + esc(s.status) + '">' + esc(STATUS_HEADER[s.status] || '') + '</span>' +
       (s.nama ? '<span class="st-j">Jastip: ' + esc(s.nama) + '</span>' : '') + '</span>'
-    : 'Titip pesanan, rekap otomatis';
+    : '<span class="header-label">Titip Pesanan</span><span class="header-label">Rekap Otomatis</span>'; // teks statis, bukan tombol
 }

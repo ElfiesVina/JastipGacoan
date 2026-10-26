@@ -1,61 +1,16 @@
 /**
  * js/components/admin-forms.js
- * HTML untuk halaman admin/jastip: login, profil, sesi baru, daftar sesi,
- * kartu kontrol, dan form harga. Hanya membuat HTML.
+ * HTML untuk detail sesi admin: kartu kontrol dan form harga. Hanya membuat HTML.
+ * (Beranda & profil ada di components/dashboard.js dan profile-card.js.)
  */
 import { state } from '../core/state.js';
 import { esc } from '../core/dom.js';
-import { STATUS_LABEL } from '../core/constants.js';
 import { waLink } from '../core/format.js';
 import { hargaDasar, linkSesi, pajak, teksRekap } from '../services/calc.js';
 import { orderListHTML } from './order-list.js';
 import { recapCardHTML } from './recap-card.js';
 
 
-
-/** Kartu profil jastip (dilipat; terbuka otomatis kalau profil belum diisi). */
-const profileCard = () =>
-  '<details class="card dprof"' + (state.profil?.nama ? '' : ' open') + '><summary><span>Profil jastip</span><i aria-hidden="true"></i></summary>' +
-  '<form data-form="prof">' +
-  '<label class="lb" for="pn">Nama</label><input id="pn" autocomplete="name" placeholder="Nama" value="' + esc(state.profil?.nama || '') + '">' +
-  '<label class="lb" for="pr">Info transfer</label><input id="pr" placeholder="DANA 0812… a.n. Nama" value="' + esc(state.profil?.rek || '') + '">' +
-  '<label class="lb" for="pwa">Nomor WA</label><input id="pwa" inputmode="tel" placeholder="62812…" value="' + esc(state.profil?.wa || '') + '">' +
-  '<div class="acts"><button type="submit">Simpan profil</button></div></form></details>';
-
-/** Kartu "Sesi baru". */
-const newSessionCard = () =>
-  '<form class="card dnew" data-form="news"><h2>Buat sesi baru</h2><p class="mu" style="margin:0 0 6px">Linknya langsung muncul di halaman Jastiper di perangkat ini, lalu bagikan ke penitip.</p>' +
-  '<label class="lb" for="jd">Judul</label><input id="jd" placeholder="mis. Gacoan Jumat malam">' +
-  '<button class="pk b" type="submit">Buat sesi</button></form>';
-
-/** Kepala sapaan + ringkasan. @param {Array} data */
-function dashHero(data) {
-  const n = (state.profil?.nama || '').trim();
-  const list = data || [];
-  const hitung = (st) => list.filter((x) => x.status === st).length;
-  const stat = (v, t) => '<div class="dst"><b>' + v + '</b><span>' + t + '</span></div>';
-  return (
-    '<section class="dhero"><div class="dava" aria-hidden="true">' + esc((n[0] || 'J').toUpperCase()) + '</div>' +
-    '<div class="dtx"><div class="dhi">Halo, ' + esc(n || 'Jastip') + '</div><div class="dsub">Kelola sesi titipan kamu di sini.</div></div>' +
-    '<div class="dstats">' + stat(list.length, 'Sesi') + stat(hitung('open'), 'Dibuka') + stat(hitung('settled'), 'Rekap') + '</div></section>'
-  );
-}
-
-/** Kartu "Sesi saya". @param {Array|null} data daftar sesi @param {*} error galat jika gagal */
-function mySessionsCard(data, error) {
-  const baris = (data || []).map((s) =>
-    '<a class="srow" href="#/a/' + esc(s.kode) + '"><span class="srt"><b>' + esc(s.judul || s.kode) + '</b><span class="mu">' +
-    esc(s.tgl || '') + ' · ' + esc(s.kode) + '</span></span><span class="s-' + esc(s.status) + '">' + esc(STATUS_LABEL[s.status] || s.status) + '</span></a>').join('');
-  return (
-    '<div class="card dlist"><h2>Sesi saya</h2>' +
-    (error ? '<p class="mu">Gagal memuat sesi.</p>' : baris || '<div class="dempty"><b>Belum ada sesi</b><span>Buat sesi pertamamu lewat kartu “Buat sesi baru”.</span></div>') + '</div>'
-  );
-}
-
-/** Halaman dashboard lengkap: sapaan, lalu dua kolom (sesi baru + profil | daftar sesi). */
-export const dashboardHTML = (data, error) =>
-  '<div class="dash">' + dashHero(data) + '<div class="dcols"><div class="dleft">' + newSessionCard() + profileCard() + '</div><div class="dright">' + mySessionsCard(data, error) + '</div></div>' +
-  '<div class="acts dout"><button type="button" class="gh" data-act="out">Keluar</button></div></div>';
 
 /** Tombol ganti status sesi. @param {string} t teks @param {string} v status tujuan @param {string} c kelas */
 const statusBtn = (t, v, c) => '<button type="button" class="' + c + '" data-act="sets" data-s="' + v + '">' + t + '</button>';

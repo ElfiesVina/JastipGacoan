@@ -139,8 +139,7 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
   background:none;color:#fff;
 }
 .theme-btn:active{background:#ffffff30;transform:none}
-.theme-btn .i-sun,html[data-theme="dark"] .theme-btn .i-moon{display:none}
-html[data-theme="dark"] .theme-btn .i-sun{display:block}
+
 .theme-btn svg{display:block}
 
 /* --- pita atas --- */
@@ -475,4 +474,5 @@ html[data-theme="dark"] .auth[data-pane="jastiper"] .sw-jastiper{background:#e9f
   .auth-right .theme-btn{display:none}
 }
 /* logo PNG berlatar putih: beri "kartu" putih membulat di tema gelap */
-html[data-theme="dark"] .auth-brand img{background:#fff;border-radius:18px;padding:6px 10px;box-sizing:content-box}
+/* kartu putih lewat box-shadow (tidak memakai padding) supaya ukuran logo sama di kedua tema */
+html[data-theme="dark"] .auth-brand img{background:#fff;border-radius:12px;box-shadow:0 0 0 6px #fff}
