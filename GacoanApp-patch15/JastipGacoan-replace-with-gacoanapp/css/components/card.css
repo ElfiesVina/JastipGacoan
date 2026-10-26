@@ -1,0 +1,68 @@
+/* =====================================================================
+   components/card.css
+   Kartu putih, header kartu, kartu catatan & kartu selesai.
+   ===================================================================== */
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px 16px;margin:14px 0;box-shadow:0 10px 24px -16px #07758f66}
+.ch{display:flex;align-items:baseline;justify-content:space-between;gap:10px}  /* judul + jumlah */
+.cnt{font-size:13px;font-weight:600;color:var(--mu)}
+.note{background:var(--tint);border-color:#bfe2ec;box-shadow:none}
+.done{border-color:#bfe8d6;background:#f2fbf7}
+.lk{padding:10px 12px;margin:0 0 8px;border-radius:12px;background:var(--bg);font-size:13px;word-break:break-all;color:var(--mu)}
+
+/* =====================================================================
+   Detail sesi jastip: dua kolom di layar lebar / landscape.
+   ===================================================================== */
+.session-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.session-main,
+.session-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.session-layout .card {
+  margin: 0;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-bottom: 8px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background-color: var(--tint);
+  color: var(--te);
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.session-layout .acts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+@media (min-width: 720px) {
+  .session-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .session-main {
+    position: sticky;
+    top: 12px;
+  }
+}
+
+body:has(.session-layout) {
+  --wrap: 1040px;
+}

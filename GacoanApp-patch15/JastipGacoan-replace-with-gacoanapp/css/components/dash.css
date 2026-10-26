@@ -1,0 +1,263 @@
+/* =====================================================================
+   components/dash.css
+   Beranda jastip. Urutan di HP: profil, navigasi, sesi aktif, buat sesi, sesi saya.
+   Layar lebar (>=900px): dua kolom (profil + navigasi | sesi).
+   ===================================================================== */
+
+body:has(.dash) {
+  --wrap: 1040px;
+}
+
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 26px;
+}
+
+.dash-slot > .card,
+.dash-slot > .profile-card {
+  margin: 0;
+}
+
+.slot-profile {
+  order: 1;
+}
+
+.slot-nav {
+  order: 2;
+}
+
+.slot-active {
+  order: 3;
+}
+
+.slot-create {
+  order: 4;
+}
+
+.slot-mine {
+  order: 5;
+}
+
+/* bagian yang dituju CTA berhenti sedikit di bawah tepi atas */
+.create-card,
+.mine-card {
+  scroll-margin-top: 16px;
+}
+
+/* --- kartu navigasi --- */
+.nav-card {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--ln);
+  border-radius: 22px;
+  background-color: var(--sf);
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  margin: 0;
+  padding: 0 14px 0 8px;
+  border-radius: 16px;
+  background-color: var(--tint);
+  color: var(--te);
+  font: 800 15px var(--f-body);
+  text-align: left;
+}
+
+.nav-button-accent {
+  background-color: var(--te);
+  color: #fff;
+}
+
+.nav-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background-color: #ffffff30;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+/* --- kartu sesi aktif --- */
+.slot-active {
+  display: grid;
+  gap: 10px;
+}
+
+.active-card {
+  display: block;
+  padding: 16px;
+  border-radius: 22px;
+  background: linear-gradient(150deg, var(--au) 0%, var(--ab) 100%);
+  color: #fff;
+  text-decoration: none;
+}
+
+.active-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.active-kicker {
+  font-weight: 800;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.active-title {
+  margin: 8px 0 6px;
+  font: 800 24px/1.1 var(--f-head);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  color: #fff;
+}
+
+.active-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+
+.active-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.active-counts span {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background-color: #ffffff2b;
+  font-size: 13px;
+}
+
+/* --- buat sesi & sesi saya --- */
+.create-card {
+  border-color: #bfe3ec;
+}
+
+.create-note {
+  margin: 0 0 6px;
+}
+
+.srt {
+  min-width: 0;
+}
+
+.srt b {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.srt .mu {
+  font-size: 12.5px;
+}
+
+.dempty {
+  display: grid;
+  gap: 4px;
+  padding: 26px 8px;
+  text-align: center;
+  color: var(--mu);
+  font-size: 13.5px;
+}
+
+.dempty b {
+  color: var(--te);
+  font-size: 16px;
+}
+
+/* --- layar lebar: dua kolom (HP: kolom "dilebur" supaya urutan mengikuti `order`) --- */
+.dash-column {
+  display: contents;
+}
+
+@media (min-width: 900px) {
+  .dash {
+    display: grid;
+    grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+  }
+
+  .dash-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .slot-profile,
+  .slot-nav,
+  .slot-active,
+  .slot-create,
+  .slot-mine {
+    order: 0;
+  }
+}
+
+/* beranda hanya berisi kartu-kartu yang diminta: teaser pembaruan disembunyikan (lonceng tetap ada) */
+body:has(.dash) #cl {
+  display: none;
+}
+
+/* --- breakpoint dua kolom diturunkan ke 720px agar HP landscape & tablet kecil juga dua kolom --- */
+@media (min-width: 720px) and (max-width: 899px) {
+  .dash {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .dash-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .slot-profile,
+  .slot-nav,
+  .slot-active,
+  .slot-create,
+  .slot-mine {
+    order: 0;
+  }
+}
+
+/* --- HP landscape (pendek): rapatkan kartu --- */
+@media (max-height: 520px) {
+  .dash {
+    padding-top: 14px;
+  }
+
+  .profile-card {
+    padding: 14px;
+  }
+
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+  }
+}
