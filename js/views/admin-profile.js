@@ -70,13 +70,6 @@ export function saveProfileForm() {
   });
 }
 
-/** Ketuk pil Online/Offline: simpan lalu gambar ulang. */
-export function toggleOnline() {
-  return lock(async () => {
-    if (await persist({ online: !state.profil?.online })) await showDashboard(state.rid);
-  });
-}
-
 /** Foto dipilih: kecilkan jadi persegi, tampilkan pratinjau (disimpan saat menekan Simpan). */
 export async function previewPhoto(input) {
   const file = input.files?.[0];

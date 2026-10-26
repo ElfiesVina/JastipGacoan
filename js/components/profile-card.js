@@ -4,7 +4,7 @@
  * Info yang tampil publik: nama aplikasi/akun saja, tidak pernah nomor WA, rekening, atau e-wallet.
  */
 import { esc } from '../core/dom.js';
-import { roleLabel, publicContactRows, isProfileComplete } from '../services/profile-rules.js';
+import { roleLabels, publicContactRows, isProfileComplete } from '../services/profile-rules.js';
 import { PROFILE_ICON, contactIcon, DEFAULT_AVATAR_SVG } from './profile-icons.js';
 
 const MESSAGE_INCOMPLETE = 'Buka &amp; Lengkapi Profile<br>Sebelum Resmi Menjadi Jastip';
@@ -14,13 +14,14 @@ const avatarHTML = (photo) =>
   '<div class="profile-avatar">' +
   (photo ? '<img src="' + esc(photo) + '" alt="Foto profil">' : DEFAULT_AVATAR_SVG) + '</div>';
 
-/** Pil Online/Offline. Bisa diketuk (menyimpan ke database) hanya bila profil sudah lengkap. */
-function statusHTML(isOnline, canToggle) {
+/**
+ * Pil Online/Offline. Hanya penanda (bukan tombol) — statusnya otomatis mengikuti
+ * sesi login (lihat services/presence.js), jadi tidak bisa diketuk untuk diubah manual.
+ */
+function statusHTML(isOnline) {
   const state = isOnline ? 'is-online' : 'is-offline';
   const label = isOnline ? 'Online' : 'Offline';
-  return canToggle
-    ? '<button type="button" class="profile-status ' + state + '" data-act="profile-online" aria-pressed="' + isOnline + '" aria-label="Status ' + label + ', ketuk untuk mengubah">' + label + '</button>'
-    : '<span class="profile-status ' + state + '">' + label + '</span>';
+  return '<span class="profile-status ' + state + '">' + label + '</span>';
 }
 
 /** Tiga baris: universitas, jurusan, semester. */
@@ -60,16 +61,16 @@ const detailHTML = (canEdit) =>
 
 /**
  * Kartu profil.
- * @param {{profile:object|null, displayName:string, stats:{total:number,dibuka:number,rekap:number}}} model
+ * @param {{profile:object|null, displayName:string, stats:{total:number,dibuka:number,rekap:number}, email?:string}} model
  */
-export function profileCardHTML({ profile, displayName, stats }) {
+export function profileCardHTML({ profile, displayName, stats, email }) {
   const data = profile || {};
   const complete = isProfileComplete(profile);
   const header =
     '<div class="profile-main">' + avatarHTML(data.foto) +
     '<div class="profile-identity"><div class="profile-name-row"><h2 class="profile-name">' + esc(data.nama || displayName) + '</h2>' +
-    statusHTML(Boolean(data.online) && complete, complete) + '</div>' +
-    '<p class="profile-role">' + esc(roleLabel(data.title)) + '</p>' + (complete ? schoolHTML(data) : '') + '</div></div>';
+    statusHTML(Boolean(data.online) && complete) + '</div>' +
+    '<p class="profile-role">' + esc(roleLabels(data, email).join(' · ')) + '</p>' + (complete ? schoolHTML(data) : '') + '</div></div>';
 
   if (!complete) {
     return (

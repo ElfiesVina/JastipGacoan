@@ -11,6 +11,10 @@
   border-radius: 22px;
   background-color: var(--sf);
   box-shadow: 0 10px 24px -16px #07758f66;
+  /* lebar kartu ini berubah-ubah menurut tempatnya (kolom sempit di dashboard dua kolom,
+     atau hampir selebar layar di HP) — bukan lebar jendela. Jadi tata letak di dalamnya
+     (lihat .social-row) mengikuti lebar KARTU lewat container query, bukan media query. */
+  container-type: inline-size;
 }
 
 /* --- bagian atas: foto + identitas --- */
@@ -395,7 +399,12 @@ textarea.form-input {
     width: 92px;
     height: 92px;
   }
+}
 
+/* Baris media sosial (aplikasi + cara tampil + nama akun) jadi satu baris hanya kalau
+   KARTUNYA cukup lebar untuk itu — supaya tidak terjepit saat kartu berada di kolom sempit
+   (mis. kolom profil di dashboard dua-kolom pada tablet/laptop), walau jendelanya sendiri lebar. */
+@container (min-width: 460px) {
   .social-row {
     grid-template-columns: 1fr 1fr 1.2fr;
   }
@@ -403,4 +412,62 @@ textarea.form-input {
   .social-row input {
     grid-column: auto;
   }
+}
+
+/* --- panel developer: Kelola Co Jastip --- */
+.cojastip-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cojastip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--ln);
+}
+
+.cojastip-row .profile-status {
+  flex: none;
+}
+
+.cojastip-who {
+  display: grid;
+  flex: 1 1 160px;
+  min-width: 0;
+  gap: 1px;
+}
+
+.cojastip-who b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cojastip-who small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--mu);
+}
+
+.cojastip-tag {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background-color: var(--tint);
+  font: 800 11.5px var(--f-body);
+  color: var(--te);
+}
+
+.cojastip-btn {
+  flex: none;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 13.5px;
 }

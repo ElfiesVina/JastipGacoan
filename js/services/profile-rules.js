@@ -4,14 +4,39 @@
  * dan teks yang aman ditampilkan di profil publik.
  */
 import { normalizePhone } from '../core/format.js';
+import { CFG } from '../config.js';
 import {
-  ROLE_OPTIONS, SOCIAL_APPS, SOCIAL_SLOTS, EWALLET_OPTIONS, BANK_OPTIONS, MAX_QUOTE_LENGTH, MAX_SEMESTER,
+  SOCIAL_APPS, SOCIAL_SLOTS, EWALLET_OPTIONS, BANK_OPTIONS, MAX_QUOTE_LENGTH, MAX_SEMESTER,
 } from '../data/profile-options.js';
 
 const text = (value) => String(value ?? '').trim();
 
-/** Label title (Jastip / Co Jastip / Developer); nilai tak dikenal jadi Jastip. */
-export const roleLabel = (value) => (ROLE_OPTIONS.find((r) => r.value === value) || ROLE_OPTIONS[0]).label;
+/**
+ * Title TIDAK PERNAH dipilih sendiri lewat form — selalu dihitung dari data lain:
+ *  - "Developer": otomatis untuk SATU akun (CFG.DEV_EMAIL), dicocokkan dari email akun yang login.
+ *    Dicek ulang di database (fungsi is_developer()) supaya tidak bisa dipalsukan dari klien.
+ *  - "Co Jastip": dari kolom profiles.cojastip (boolean). Hanya developer yang boleh mengubahnya
+ *    (lewat RPC set_cojastip, ditolak di database kalau bukan developer). Developer SELALU
+ *    otomatis punya title ini juga secara tampilan (default "co" ada di developer).
+ *  - Selain itu: "Jastip".
+ */
+
+/** true bila email yang diberikan adalah akun developer. */
+export const isDeveloperEmail = (email) => text(email).toLowerCase() === CFG.DEV_EMAIL.toLowerCase();
+
+/**
+ * Title yang tampil di kartu profil (bisa lebih dari satu, mis. akun developer = "Developer" + "Co Jastip").
+ * @param {object|null} profile baris profil dari database @param {string} [email] email akun yang login
+ * @returns {string[]}
+ */
+export function roleLabels(profile, email) {
+  const dev = isDeveloperEmail(email);
+  const labels = [];
+  if (dev) labels.push('Developer');
+  if (dev || profile?.cojastip) labels.push('Co Jastip');
+  if (!labels.length) labels.push('Jastip');
+  return labels;
+}
 
 /** Label aplikasi media sosial dari nilainya. */
 export const socialLabel = (value) => SOCIAL_APPS.find((a) => a.value === value)?.label || '';
@@ -64,8 +89,9 @@ export function buildProfilePatch(raw) {
     });
   }
   return {
+    // title & online TIDAK diisi lewat form ini: title dihitung (lihat roleLabels), online
+    // dikelola otomatis oleh services/presence.js mengikuti status masuk/keluar akun.
     nama: text(raw.nama).slice(0, 60),
-    title: ROLE_OPTIONS.some((r) => r.value === raw.title) ? raw.title : 'jastip',
     kampus: text(raw.kampus).slice(0, 80),
     jurusan: text(raw.jurusan).slice(0, 80),
     semester: semester >= 1 && semester <= MAX_SEMESTER ? semester : null,
@@ -75,7 +101,6 @@ export function buildProfilePatch(raw) {
     sosmed,
     ewallet: EWALLET_OPTIONS.includes(raw.ewallet) ? raw.ewallet : null,
     bank: BANK_OPTIONS.includes(raw.bank) ? raw.bank : null,
-    online: raw.online === 'on',
   };
 }
 

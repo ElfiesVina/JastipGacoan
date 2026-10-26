@@ -4,7 +4,7 @@
  */
 import { esc } from '../core/dom.js';
 import {
-  ROLE_OPTIONS, SOCIAL_APPS, SOCIAL_DISPLAY, SOCIAL_SLOTS, EWALLET_OPTIONS, BANK_OPTIONS, MAX_QUOTE_LENGTH, MAX_SEMESTER,
+  SOCIAL_APPS, SOCIAL_DISPLAY, SOCIAL_SLOTS, EWALLET_OPTIONS, BANK_OPTIONS, MAX_QUOTE_LENGTH, MAX_SEMESTER,
 } from '../data/profile-options.js';
 import { PROFILE_ICON, DEFAULT_AVATAR_SVG } from './profile-icons.js';
 
@@ -51,7 +51,6 @@ export function profileFormHTML(profile, fallbackName) {
     '<label class="photo-button" for="pfoto">' + PROFILE_ICON.camera + 'Ganti foto</label>' +
     '<input class="vh visually-hidden" id="pfoto" type="file" accept="image/*"></div>' +
     field('nama', 'Nama jastip', 'autocomplete="name" maxlength="60" placeholder="Nama"', p.nama || fallbackName) +
-    select('title', 'Title', ROLE_OPTIONS.map((r) => option(r.value, r.label, p.title || 'jastip')).join('')) +
     field('kampus', 'Universitas', 'maxlength="80" placeholder="mis. Universitas Indonesia"', p.kampus) +
     field('jurusan', 'Jurusan', 'maxlength="80" placeholder="mis. Informatika"', p.jurusan) +
     select('semester', 'Semester', option('', 'Pilih semester', p.semester) + semesters) +
@@ -65,7 +64,7 @@ export function profileFormHTML(profile, fallbackName) {
     '<span class="form-label">Media sosial</span>' + Array.from({ length: SOCIAL_SLOTS }, (_, i) => socialRowHTML(sosmed[i], i)).join('') +
     select('ewallet', 'E-Wallet (nama saja)', option('', '— Tidak ditampilkan —', p.ewallet) + EWALLET_OPTIONS.map((n) => option(n, n, p.ewallet)).join('')) +
     select('bank', 'Bank (nama saja)', option('', '— Tidak ditampilkan —', p.bank) + BANK_OPTIONS.map((n) => option(n, n, p.bank)).join('')) +
-    '<label class="form-check"><input type="checkbox" name="online"' + (p.online ? ' checked' : '') + '><span>Tampilkan status Online</span></label>' +
+    '<p class="form-note">Status Online/Offline sekarang otomatis mengikuti kamu masuk/keluar akun, tidak perlu diatur manual.</p>' +
     '<div class="profile-actions"><button type="submit" class="profile-button-primary">Simpan</button>' +
     '<button type="button" class="profile-button-ghost" data-act="profile-cancel">Batal</button></div>' +
     '</form>'

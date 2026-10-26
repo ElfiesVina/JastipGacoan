@@ -4,13 +4,6 @@
  * tidak pernah nomor rekening / nomor e-wallet.
  */
 
-/** Title jastip: nilai disimpan di database, label tampil di layar. */
-export const ROLE_OPTIONS = [
-  { value: 'jastip', label: 'Jastip' },
-  { value: 'cojastip', label: 'Co Jastip' },
-  { value: 'developer', label: 'Developer' },
-];
-
 /** Aplikasi media sosial selain WhatsApp (WhatsApp memakai kolom `wa`). */
 export const SOCIAL_APPS = [
   { value: 'instagram', label: 'Instagram' },

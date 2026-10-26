@@ -10,10 +10,26 @@
 <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 <!-- Orientasi perangkat yang stabil: tinggi layar yang mengecil karena keyboard TIDAK dianggap landscape -->
 <script>
-(function(){var d=document.documentElement;function u(){var o=screen.orientation&&screen.orientation.type;var l=o?o.indexOf('landscape')===0:(typeof orientation==='number'?Math.abs(orientation)===90:screen.width>screen.height);d.dataset.orient=l?'land':'port'}u();
+(function(){
+var d=document.documentElement;
+/* laptop/PC asli (mouse/trackpad) -- TERMASUK jendela yang displit berdampingan -- dibedakan dari HP/tablet layar sentuh.
+   Alasannya: di HP, orientasi dibaca dari LAYAR FISIK (bukan innerWidth/innerHeight) supaya tidak berubah saat keyboard
+   membuat tinggi jendela mengecil. Tapi layar monitor laptop/PC selalu landscape walau JENDELA browsernya displit jadi
+   sempit & tinggi (potret) -- kalau tetap dibaca dari layar fisik, jendela displit itu salah dianggap "landscape"
+   dan memicu tata letak auth yang dirancang untuk HP rebah (pendek), jadi mengambang di tengah jendela yang tinggi.
+   Maka untuk perangkat berpointer presisi, orientasi dibaca dari JENDELA (yang memang tidak diganggu keyboard virtual). */
+var fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+function u(){
+  if(fine){d.dataset.orient=innerWidth>innerHeight?'land':'port';return}
+  var o=screen.orientation&&screen.orientation.type;
+  var l=o?o.indexOf('landscape')===0:(typeof orientation==='number'?Math.abs(orientation)===90:screen.width>screen.height);
+  d.dataset.orient=l?'land':'port';
+}
+u();
 /* tinggi layar "pendek" dihitung HANYA saat tidak mengetik, supaya keyboard tidak membuat tampilan menciut */
 function h(){var a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;if(innerHeight<=660)d.dataset.short='1';else delete d.dataset.short}h();
-addEventListener('resize',h);addEventListener('focusout',function(){setTimeout(h,300)});
+addEventListener('resize',function(){h();if(fine)u()});
+addEventListener('focusout',function(){setTimeout(h,300)});
 addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',u)})();
 </script>
 <noscript><style>body.boot header,body.boot main{visibility:visible!important}body.boot::after{display:none!important}</style></noscript>

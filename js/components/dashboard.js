@@ -49,15 +49,17 @@ function mySessionsHTML(sessions, error) {
 
 /**
  * Kerangka beranda. `profileHTML` sudah jadi (kartu atau form). Bagian sesi hanya ada bila profil lengkap.
- * @param {{profileHTML:string, complete:boolean, sessions:Array|null, error:*, activeSessions:Array, orderSummary:object}} model
+ * `cojastipHTML` opsional: panel "Kelola Co Jastip", hanya diisi untuk akun developer.
+ * @param {{profileHTML:string, complete:boolean, sessions:Array|null, error:*, activeSessions:Array, orderSummary:object, cojastipHTML?:string}} model
  */
-export function dashboardHTML({ profileHTML, complete, sessions, error, activeSessions, orderSummary }) {
+export function dashboardHTML({ profileHTML, complete, sessions, error, activeSessions, orderSummary, cojastipHTML }) {
   const slot = (cls, html) => '<div class="dash-slot ' + cls + '">' + html + '</div>';
   const column = (cls, html) => '<div class="dash-column ' + cls + '">' + html + '</div>';
   const navigation = complete ? slot('slot-nav', navigationHTML()) : '';
+  const cojastip = cojastipHTML ? slot('slot-cojastip', cojastipHTML) : '';
   const sessionSlots = complete
     ? (activeSessions.length ? slot('slot-active', activeSessions.map((s) => activeSessionHTML(s, orderSummary[s.id])).join('')) : '') +
       slot('slot-create', createSessionHTML()) + slot('slot-mine', mySessionsHTML(sessions, error))
     : '';
-  return '<div class="dash">' + column('column-profile', slot('slot-profile', profileHTML) + navigation) + column('column-sessions', sessionSlots) + '</div>';
+  return '<div class="dash">' + column('column-profile', slot('slot-profile', profileHTML) + navigation + cojastip) + column('column-sessions', sessionSlots) + '</div>';
 }

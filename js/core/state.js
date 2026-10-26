@@ -13,6 +13,8 @@ export const state = {
   pesanan: [],
   /** Pengguna admin yang sedang login (Supabase user) atau null. */
   user: null,
+  /** Token sesi akun yang login (dipakai presence.js untuk menandai offline saat tab ditutup). */
+  accessToken: null,
   /** Profil admin (nama, info transfer, WA). */
   profil: null,
   /** id setInterval untuk polling. */

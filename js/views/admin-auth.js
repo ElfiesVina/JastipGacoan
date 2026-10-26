@@ -14,6 +14,7 @@ import { getProfile, saveProfile } from '../api/profile.api.js';
 import { renderHeader } from '../components/header.js';
 import { authScreenHTML } from '../components/auth-forms.js';
 import { renderChangelogBadge } from '../services/changelog.js';
+import { markOnline, markOffline } from '../services/presence.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
 
@@ -254,6 +255,7 @@ export async function showAdmin() {
   const session = await getSession();
   if (my !== state.rid) return;
   state.user = session?.user || null;
+  state.accessToken = session?.access_token || null;
   if (state.user && OPENED_FROM_RECOVERY_LINK && !recoveryHandled) {
     if (!$('[data-form=newpass]')) showAuth('newpass'); // sudah tampil? jangan hapus yang sedang diketik
     return;
@@ -274,6 +276,8 @@ export async function showAdmin() {
     const s = await saveProfile({ id: state.user.id, nama });
     if (!s.error) state.profil = { id: state.user.id, nama, rek: '', wa: '' };
   }
+  if (my !== state.rid) return;
+  await markOnline(); // "masuk" -> online (hanya menulis sekali, lihat services/presence.js)
   if (my !== state.rid) return;
 
   // Baru ganti ke beranda: kosongkan form auth dulu, baru tampilkan header (hindari tumpang tindih)
@@ -330,6 +334,7 @@ export function authenticate(isSignUp) {
 
 /** Keluar dari akun lalu tampilkan layar masuk. */
 export async function logout() {
+  await markOffline(); // "keluar" -> offline (sebelum signOut, selagi masih bisa menulis profil sendiri)
   await signOut();
   pane = 'jastip'; // setelah keluar, tetap di halaman Jastip
   showAdmin();

@@ -15,4 +15,11 @@ export const CFG = {
 
   /** Daftar menu yang bisa dipilih penitip. Menu yang mengandung kata "mie" otomatis punya level pedas. */
   MENU: ['Mie Gacoan', 'Udang Keju', 'Thai Tea Iced'],
+
+  /**
+   * Email akun developer (pemilik aplikasi). Title "Developer" terpasang OTOMATIS untuk akun ini
+   * (bukan dipilih sendiri), dan hanya akun ini yang boleh menyerahkan/mencabut title "Co Jastip"
+   * ke akun lain. Dicek juga di database (fungsi is_developer()) supaya tidak bisa dilewati dari luar.
+   */
+  DEV_EMAIL: 'vifie14@gmail.com',
 };

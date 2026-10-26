@@ -40,6 +40,10 @@ body:has(.dash) {
   order: 5;
 }
 
+.slot-cojastip {
+  order: 6;
+}
+
 /* bagian yang dituju CTA berhenti sedikit di bawah tepi atas */
 .create-card,
 .mine-card {
@@ -211,7 +215,8 @@ body:has(.dash) {
   .slot-nav,
   .slot-active,
   .slot-create,
-  .slot-mine {
+  .slot-mine,
+  .slot-cojastip {
     order: 0;
   }
 }
@@ -241,8 +246,32 @@ body:has(.dash) #cl {
   .slot-nav,
   .slot-active,
   .slot-create,
-  .slot-mine {
+  .slot-mine,
+  .slot-cojastip {
     order: 0;
+  }
+}
+
+/*
+ * Saat kolom sesi (kanan) KOSONG (profil belum lengkap, atau sedang diedit — lihat
+ * admin-dashboard.js: `complete` sengaja false selagi mengedit), jangan biarkan tata letak dua
+ * kolom tetap dipakai: kartu profil akan menggantung kecil di kiri dengan ruang kosong raksasa
+ * di sisa layar lebar. Tengahkan saja kolom profil selebar wajar.
+ */
+@media (min-width: 720px) {
+  .dash:has(.column-sessions:empty) {
+    display: flex;
+    justify-content: center;
+  }
+
+  .dash:has(.column-sessions:empty) .column-sessions {
+    display: none;
+  }
+
+  .dash:has(.column-sessions:empty) .column-profile {
+    width: 100%;
+    max-width: 460px;
+    margin-inline: auto;
   }
 }
 

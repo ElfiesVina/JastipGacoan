@@ -17,8 +17,8 @@ import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast }
 import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
-import { createSession, scrollToSection } from '../views/admin-dashboard.js';
-import { openProfileForm, closeProfileForm, saveProfileForm, toggleOnline, previewPhoto } from '../views/admin-profile.js';
+import { createSession, scrollToSection, toggleCojastip } from '../views/admin-dashboard.js';
+import { openProfileForm, closeProfileForm, saveProfileForm, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
 /** Aksi tombol (data-act). Parameter: elemen tombol yang diketuk. */
@@ -27,8 +27,8 @@ const ACT = {
   theme: toggleTheme,
   'profile-edit': openProfileForm,
   'profile-cancel': closeProfileForm,
-  'profile-online': toggleOnline,
   'scroll-to': scrollToSection,
+  'cojastip-toggle': toggleCojastip,
   'copy-recent': copyRecent,
   x: () => dlg.close(),
   retry: () => route(),
