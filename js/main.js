@@ -12,12 +12,14 @@
  *   views/         halaman: penitip & admin
  *   data/          data statis (changelog)
  */
+import { initLang } from './core/i18n.js';
 import { bindEvents } from './core/events.js';
 import { route } from './core/router.js';
 import { armOfflineOnClose } from './services/presence.js';
 
 import { ready } from './core/ui.js';
 
+initLang(); // bahasa dipasang sebelum halaman pertama digambar
 bindEvents();
 armOfflineOnClose(); // usaha terbaik: tandai offline saat tab/jendela ditutup
 route();

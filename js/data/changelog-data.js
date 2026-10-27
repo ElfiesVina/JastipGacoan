@@ -12,6 +12,13 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 17, tgl: '2026-10-27', v: '2.2', jenis: 'Fitur', untuk: 'admin',
+    judul: 'Persetujuan admin, setelan, dan pilihan bahasa',
+    poin: [
+      'Beranda kini hanya berisi profil dan pintasan; Buat Sesi, Sesi Aktif, dan Sesi Saya membuka halamannya sendiri.',
+      'Tab Persetujuan aktif: pengajuan admin jastip disetujui atau ditolak developer.',
+      'Tab Setelan aktif: pilih bahasa (Indonesia, English, العربية) dan ganti tema.',
+      'Logo Me Gacoan berlatar transparan, jadi rapi di tema gelap.'] },
   { id: 16, tgl: '2026-10-27', v: '2.1', jenis: 'Tampilan', untuk: 'admin',
     judul: 'Navigasi bawah, foto profil potret, dan form edit profil dirapikan',
     poin: [

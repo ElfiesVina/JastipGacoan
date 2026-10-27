@@ -18,6 +18,7 @@ import { markOnline, markOffline } from '../services/presence.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
 import { showTab } from './admin-tabs.js';
+import { showSessionsPage } from './admin-sessions.js';
 import { renderBottomNav, tabFromHash } from '../components/bottom-nav.js';
 
 /** true setelah password baru berhasil disimpan (supaya layar "password baru" tidak muncul lagi). */
@@ -282,7 +283,9 @@ export async function showAdmin() {
   renderChangelogBadge();
   const tab = tabFromHash(location.hash);
   renderBottomNav(tab); // detail sesi (#/a/..) dan beranda sama-sama menyalakan tab Beranda
+  const sub = location.hash.match(/^#\/(buat|aktif|sesi)\/?$/);
   if (m) showSessionDetail(m[1], my);
+  else if (sub) showSessionsPage(sub[1], my);
   else if (tab === 'home') showDashboard(my);
   else showTab(tab, my);
 }
@@ -290,7 +293,7 @@ export async function showAdmin() {
 /** Terjemahkan pesan galat Supabase yang umum ke bahasa Indonesia. */
 function authError(err, isSignUp) {
   const m = err?.message || '';
-  if (isSignUp && /database error/i.test(m)) return 'Email ini belum diizinkan jadi jastip. Hubungi admin.';
+  if (isSignUp && /database error/i.test(m)) return 'Email ini belum diizinkan jadi jastip. Ketuk “Ajukan persetujuan” di bawah.';
   if (/invalid login credentials/i.test(m)) return 'Email atau password salah.';
   if (/email not confirmed/i.test(m)) return 'Email belum dikonfirmasi. Cek kotak masuk (dan Spam), ketuk link konfirmasinya.';
   if (/already registered|already been registered/i.test(m)) return 'Email ini sudah terdaftar. Silakan masuk.';

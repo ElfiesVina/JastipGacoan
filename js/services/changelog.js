@@ -72,6 +72,7 @@ function entryHTML(c, baru) {
 export function openChangelog() {
   const list = forRole();
   const sn = seenId();
+  $('#dlt').textContent = 'Yang baru'; // sheet ini juga dipakai form pengajuan
   $('#dl').innerHTML = list.length
     ? list.map((c) => entryHTML(c, c.id > sn)).join('')
     : '<p class="mu" style="padding-top:16px">Belum ada catatan perubahan.</p>';

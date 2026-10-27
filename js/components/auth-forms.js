@@ -5,6 +5,7 @@
  * beda isi form.
  */
 
+import { t } from '../core/i18n.js';
 import { esc } from '../core/dom.js';
 import { CHANGELOG } from '../data/changelog-data.js';
 
@@ -60,7 +61,8 @@ const signupBody = () =>
   field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
   field('lock', 'id="pw" type="password" autocomplete="new-password" minlength="6" placeholder="New password"', true) +
   '<button class="auth-btn" type="submit">Daftar</button>' +
-  '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div></form>';
+  '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div>' +
+  '<div class="auth-links end">' + t('rq.hint') + '<button type="button" data-act="req-open">' + t('rq.open') + '</button></div></form>';
 
 /** Isi form LUPA PASSWORD: email -> kirim link reset. */
 const forgotBody = () =>
