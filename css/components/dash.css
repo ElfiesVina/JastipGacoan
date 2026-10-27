@@ -69,7 +69,7 @@ body:has(.dash) {
   background-color: var(--tint);
   color: var(--te);
   font: 800 15px var(--f-body);
-  text-align: left;
+  text-align: start;
 }
 
 .nav-button-accent {

@@ -1,70 +1,77 @@
 /**
  * js/components/dashboard.js
- * HTML beranda jastip: kartu navigasi, sesi aktif, buat sesi, sesi saya, dan kerangka halaman.
- * Hanya membuat HTML. Urutan di layar: profil, navigasi, sesi aktif, buat sesi, sesi saya.
- * (Panel Kelola Co Jastip sudah pindah ke tab Admin di bottom nav.)
+ * HTML beranda jastip (hanya kartu profil + kartu pintasan) dan potongan HTML untuk halaman sesi:
+ * #/buat (buat sesi), #/aktif (sesi aktif), #/sesi (sesi saya). Hanya membuat HTML.
  */
 import { esc } from '../core/dom.js';
 import { STATUS_LABEL } from '../core/constants.js';
+import { t } from '../core/i18n.js';
 import { PROFILE_ICON } from './profile-icons.js';
 
 export const SECTION_CREATE_ID = 'section-create';
-export const SECTION_ACTIVE_ID = 'section-active';
-export const SECTION_MINE_ID = 'section-mine';
 
-/** Kartu CTA yang menggulir halus ke bagiannya. Tombol "Sesi Aktif" hanya ada bila ada sesi berjalan. @param {number} activeCount */
+/** Teks status sesi menurut bahasa aktif (jatuh ke teks bawaan bila belum ada). @param {string} status */
+const statusText = (status) => {
+  const key = 'status.' + status;
+  const text = t(key);
+  return text === key ? (STATUS_LABEL[status] || status) : text;
+};
+
+/** Satu tautan pintasan. */
+const shortcut = (href, icon, label, { accent = false, badge = 0 } = {}) =>
+  '<a class="nav-button' + (accent ? ' nav-button-accent' : '') + '" href="' + href + '">' +
+  '<span class="nav-icon">' + icon + '</span><span class="nav-label">' + label + '</span>' +
+  (badge ? '<span class="nav-count">' + badge + '</span>' : '') + PROFILE_ICON.chevron + '</a>';
+
+/** Kartu pintasan: tiga tautan ke halaman sendiri. @param {number} activeCount jumlah sesi aktif */
 const navigationHTML = (activeCount) =>
-  '<nav class="nav-card" aria-label="Pintasan beranda">' +
-  '<button type="button" class="nav-button nav-button-accent" data-act="scroll-to" data-target="' + SECTION_CREATE_ID + '">' +
-  '<span class="nav-icon">' + PROFILE_ICON.calendarPlus + '</span><span class="nav-label">Buat Sesi</span>' + PROFILE_ICON.chevron + '</button>' +
-  (activeCount
-    ? '<button type="button" class="nav-button" data-act="scroll-to" data-target="' + SECTION_ACTIVE_ID + '">' +
-      '<span class="nav-icon">' + PROFILE_ICON.activity + '</span><span class="nav-label">Sesi Aktif</span>' +
-      '<span class="nav-count">' + activeCount + '</span>' + PROFILE_ICON.chevron + '</button>'
-    : '') +
-  '<button type="button" class="nav-button" data-act="scroll-to" data-target="' + SECTION_MINE_ID + '">' +
-  '<span class="nav-icon">' + PROFILE_ICON.user + '</span><span class="nav-label">Sesi Saya</span>' + PROFILE_ICON.chevron + '</button></nav>';
+  '<nav class="nav-card" aria-label="' + t('dash.shortcuts') + '">' +
+  shortcut('#/buat', PROFILE_ICON.calendarPlus, t('dash.create'), { accent: true }) +
+  shortcut('#/aktif', PROFILE_ICON.activity, t('dash.active'), { badge: activeCount }) +
+  shortcut('#/sesi', PROFILE_ICON.user, t('dash.mine')) + '</nav>';
 
 /** Satu kartu sesi aktif dengan jumlah order asli. @param {object} session @param {{total:number,unpaid:number}} [orders] */
-const activeSessionHTML = (session, orders) => {
+export const activeSessionHTML = (session, orders) => {
   const summary = orders || { total: 0, unpaid: 0 };
   return (
     '<a class="active-card" href="#/a/' + esc(session.kode) + '">' +
-    '<div class="active-top"><span class="active-kicker">Sesi aktif</span><span class="s-' + esc(session.status) + '">' + esc(STATUS_LABEL[session.status] || session.status) + '</span></div>' +
+    '<div class="active-top"><span class="active-kicker">' + t('active.kicker') + '</span><span class="s-' + esc(session.status) + '">' + esc(statusText(session.status)) + '</span></div>' +
     '<h2 class="active-title">' + esc(session.judul || session.kode) + '</h2>' +
     '<p class="active-meta">' + PROFILE_ICON.clock + '<span>' + esc(session.tgl || '') + '</span></p>' +
-    '<div class="active-counts"><span><b>' + summary.total + '</b> order</span><span><b>' + summary.unpaid + '</b> belum bayar</span></div></a>'
+    '<div class="active-counts"><span><b>' + summary.total + '</b> ' + t('active.orders') + '</span><span><b>' + summary.unpaid + '</b> ' + t('active.unpaid') + '</span></div></a>'
   );
 };
 
+/** Halaman daftar sesi aktif (atau pesan kosong). @param {Array} sessions @param {object} orderSummary */
+export const activeListHTML = (sessions, orderSummary) =>
+  '<h2 class="page-title">' + t('dash.active') + '</h2>' +
+  (sessions.length
+    ? '<div class="active-list">' + sessions.map((s) => activeSessionHTML(s, orderSummary[s.id])).join('') + '</div>'
+    : '<div class="dempty"><b>' + t('active.empty') + '</b><span>' + t('active.emptyNote') + '</span></div>');
+
 /** Kartu "Buat sesi baru". */
-const createSessionHTML = () =>
-  '<form class="card create-card" id="' + SECTION_CREATE_ID + '" data-form="news"><h2>Buat sesi baru</h2>' +
-  '<p class="mu create-note">Linknya langsung muncul di halaman Jastiper di perangkat ini, lalu bagikan ke penitip.</p>' +
-  '<label class="lb" for="jd">Judul</label><input id="jd" placeholder="mis. Gacoan Jumat malam">' +
-  '<button class="pk b" type="submit">Buat sesi</button></form>';
+export const createSessionHTML = () =>
+  '<form class="card create-card" id="' + SECTION_CREATE_ID + '" data-form="news"><h2>' + t('create.title') + '</h2>' +
+  '<p class="mu create-note">' + t('create.note') + '</p>' +
+  '<label class="lb" for="jd">' + t('create.label') + '</label><input id="jd" placeholder="' + esc(t('create.ph')) + '">' +
+  '<button class="pk b" type="submit">' + t('create.btn') + '</button></form>';
 
 /** Kartu "Sesi saya". @param {Array|null} sessions @param {*} error */
-function mySessionsHTML(sessions, error) {
+export function mySessionsHTML(sessions, error) {
   const rows = (sessions || []).map((s) =>
     '<a class="srow" href="#/a/' + esc(s.kode) + '"><span class="srt"><b>' + esc(s.judul || s.kode) + '</b><span class="mu">' +
-    esc(s.tgl || '') + ' · ' + esc(s.kode) + '</span></span><span class="s-' + esc(s.status) + '">' + esc(STATUS_LABEL[s.status] || s.status) + '</span></a>').join('');
-  const empty = '<div class="dempty"><b>Belum ada sesi</b><span>Buat sesi pertamamu lewat kartu “Buat sesi baru”.</span></div>';
-  return '<div class="card mine-card" id="' + SECTION_MINE_ID + '"><h2>Sesi saya</h2>' +
-    (error ? '<p class="mu">Gagal memuat sesi.</p>' : rows || empty) + '</div>';
+    esc(s.tgl || '') + ' · ' + esc(s.kode) + '</span></span><span class="s-' + esc(s.status) + '">' + esc(statusText(s.status)) + '</span></a>').join('');
+  const empty = '<div class="dempty"><b>' + t('mine.empty') + '</b><span>' + t('mine.emptyNote') + '</span></div>';
+  return '<div class="card mine-card"><h2>' + t('dash.mine') + '</h2>' +
+    (error ? '<p class="mu">' + t('mine.error') + '</p>' : rows || empty) + '</div>';
 }
 
 /**
- * Kerangka beranda. `profileHTML` sudah jadi (kartu atau form). Bagian sesi hanya ada bila profil lengkap.
- * @param {{profileHTML:string, complete:boolean, sessions:Array|null, error:*, activeSessions:Array, orderSummary:object}} model
+ * Kerangka beranda: kartu profil (atau form), lalu kartu pintasan bila profil sudah lengkap.
+ * @param {{profileHTML:string, complete:boolean, activeCount:number}} model
  */
-export function dashboardHTML({ profileHTML, complete, sessions, error, activeSessions, orderSummary }) {
-  const slot = (cls, html, id) => '<div class="dash-slot ' + cls + '"' + (id ? ' id="' + id + '"' : '') + '>' + html + '</div>';
-  const column = (cls, html) => '<div class="dash-column ' + cls + '">' + html + '</div>';
-  const navigation = complete ? slot('slot-nav', navigationHTML(activeSessions.length)) : '';
-  const sessionSlots = complete
-    ? (activeSessions.length ? slot('slot-active', activeSessions.map((s) => activeSessionHTML(s, orderSummary[s.id])).join(''), SECTION_ACTIVE_ID) : '') +
-      slot('slot-create', createSessionHTML()) + slot('slot-mine', mySessionsHTML(sessions, error))
-    : '';
-  return '<div class="dash">' + column('column-profile', slot('slot-profile', profileHTML) + navigation) + column('column-sessions', sessionSlots) + '</div>';
+export function dashboardHTML({ profileHTML, complete, activeCount }) {
+  const slot = (cls, html) => '<div class="dash-slot ' + cls + '">' + html + '</div>';
+  return '<div class="dash dash-single"><div class="dash-column column-profile">' +
+    slot('slot-profile', profileHTML) + (complete ? slot('slot-nav', navigationHTML(activeCount)) : '') + '</div></div>';
 }

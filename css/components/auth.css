@@ -472,9 +472,7 @@ html[data-theme="dark"] .auth[data-pane="jastiper"] .sw-jastiper{background:#e9f
   html[data-theme="dark"] .auth-aside .auth-goto{color:#fff}
   .auth-right .theme-btn{display:none}
 }
-/* logo PNG berlatar putih: beri "kartu" putih membulat di tema gelap */
-/* kartu putih lewat box-shadow (tidak memakai padding) supaya ukuran logo sama di kedua tema */
-html[data-theme="dark"] .auth-brand img{background:#fff;border-radius:12px;box-shadow:0 0 0 6px #fff}
+/* logo berlatar transparan: tampil apa adanya di tema terang maupun gelap (tanpa kartu putih) */
 
 /* =====================================================================
    HP LANDSCAPE (html[data-orient="land"], lebar < 900px): logo di kiri, form di kanan

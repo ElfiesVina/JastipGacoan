@@ -17,8 +17,9 @@ import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast }
 import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
-import { createSession, scrollToSection } from '../views/admin-dashboard.js';
-import { toggleCojastip } from '../views/admin-tabs.js';
+import { createSession } from '../views/admin-dashboard.js';
+import { toggleCojastip, approveRequest, rejectRequest, chooseLanguage } from '../views/admin-tabs.js';
+import { openRequestForm, submitRequest } from '../views/admin-request.js';
 import { openProfileForm, closeProfileForm, saveProfileForm, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -28,8 +29,11 @@ const ACT = {
   theme: toggleTheme,
   'profile-edit': openProfileForm,
   'profile-cancel': closeProfileForm,
-  'scroll-to': scrollToSection,
   'cojastip-toggle': toggleCojastip,
+  'req-approve': approveRequest,
+  'req-reject': rejectRequest,
+  'req-open': openRequestForm,
+  'set-lang': chooseLanguage,
   'copy-recent': copyRecent,
   x: () => dlg.close(),
   retry: () => route(),
@@ -63,6 +67,7 @@ const FORM = {
   newpass: saveNewPassword,
   prof: saveProfileForm,
   news: createSession,
+  request: submitRequest,
   settle: publishRecap,
 };
 

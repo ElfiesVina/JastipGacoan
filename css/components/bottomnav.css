@@ -106,3 +106,143 @@ body.has-bnav:not(.auth-mode):not(.cust-mode) main {
     justify-content: center;
   }
 }
+
+/* --- halaman sesi (#/buat, #/aktif, #/sesi): tautan kembali + judul --- */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: start;
+  min-height: 40px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--te);
+  text-decoration: none;
+}
+
+.back-link svg {
+  transform: scaleX(-1); /* chevron kanan dibalik jadi panah kembali */
+}
+
+.page-title {
+  margin: 0;
+}
+
+.active-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* pintasan beranda berupa tautan (<a>), bukan tombol */
+a.nav-button {
+  text-decoration: none;
+}
+
+.dash-single {
+  max-width: 560px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* --- Persetujuan: kartu pengajuan --- */
+.request-row {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--ln);
+  list-style: none;
+}
+
+.request-row:last-child {
+  border-bottom: 0;
+}
+
+.request-who {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.request-who small {
+  color: var(--mu);
+  overflow-wrap: anywhere;
+}
+
+.request-msg {
+  margin: 4px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.request-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.request-actions > * {
+  flex: 1 1 0;
+  margin: 0;
+}
+
+.request-form .request-send {
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* --- Setelan: pilihan bahasa --- */
+.lang-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 16px;
+  border: 1.5px solid var(--ln);
+  border-radius: 16px;
+  background-color: transparent;
+  color: var(--tx);
+  font: 700 16px var(--f-body);
+  text-align: start;
+}
+
+.lang-option.is-active {
+  border-color: var(--te);
+  background-color: var(--tint);
+  color: var(--te);
+}
+
+.theme-switch {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* --- Arab (kanan-ke-kiri): balik hal yang bergantung arah --- */
+[dir="rtl"] .nav-button > svg:last-child {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .back-link svg {
+  transform: none;
+}
+
+[dir="rtl"] select.form-input {
+  padding: 0 14px 0 38px;
+  background-position: left 13px center;
+}
+
+[dir="rtl"] .social-row select.form-input {
+  padding: 0 12px 0 28px;
+  background-position: left 9px center;
+}
+
+[dir="rtl"] .nav-button {
+  text-align: right;
+}

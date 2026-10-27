@@ -4,15 +4,14 @@
  * Info yang tampil publik: nama aplikasi/akun saja, tidak pernah nomor WA, rekening, atau e-wallet.
  */
 import { esc } from '../core/dom.js';
+import { t } from '../core/i18n.js';
 import { roleLabels, publicContactRows, isProfileComplete } from '../services/profile-rules.js';
 import { PROFILE_ICON, contactIcon, DEFAULT_AVATAR_SVG } from './profile-icons.js';
-
-const MESSAGE_INCOMPLETE = 'Buka &amp; Lengkapi Profile<br>Sebelum Resmi Menjadi Jastip';
 
 /** Foto profil atau siluet bawaan. */
 const avatarHTML = (photo) =>
   '<div class="profile-avatar">' +
-  (photo ? '<img src="' + esc(photo) + '" alt="Foto profil">' : DEFAULT_AVATAR_SVG) + '</div>';
+  (photo ? '<img src="' + esc(photo) + '" alt="' + t('p.photoAlt') + '">' : DEFAULT_AVATAR_SVG) + '</div>';
 
 /**
  * Pil Online/Offline. Hanya penanda (bukan tombol) — statusnya otomatis mengikuti
@@ -20,7 +19,7 @@ const avatarHTML = (photo) =>
  */
 function statusHTML(isOnline) {
   const state = isOnline ? 'is-online' : 'is-offline';
-  const label = isOnline ? 'Online' : 'Offline';
+  const label = isOnline ? t('p.online') : t('p.offline');
   return '<span class="profile-status ' + state + '">' + label + '</span>';
 }
 
@@ -29,7 +28,7 @@ function schoolHTML(profile) {
   const rows = [
     [PROFILE_ICON.school, profile.kampus],
     [PROFILE_ICON.book, profile.jurusan],
-    [PROFILE_ICON.semester, profile.semester ? 'Semester ' + profile.semester : ''],
+    [PROFILE_ICON.semester, profile.semester ? t('p.semester', { n: profile.semester }) : ''],
   ].filter((row) => row[1]);
   return rows.length
     ? '<ul class="profile-school">' + rows.map((r) => '<li>' + r[0] + '<span>' + esc(r[1]) + '</span></li>').join('') + '</ul>'
@@ -48,15 +47,15 @@ function contactsHTML(profile) {
 /** Tiga angka ringkasan: label di atas, angka di bawahnya. */
 const statsHTML = (stats) =>
   '<dl class="profile-stats">' +
-  [['Sesi', stats.total], ['Dibuka', stats.dibuka], ['Rekap', stats.rekap]].map((s) =>
+  [[t('p.stat.total'), stats.total], [t('p.stat.open'), stats.dibuka], [t('p.stat.recap'), stats.rekap]].map((s) =>
     '<div class="stat-item"><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>').join('') + '</dl>';
 
 /** Detail profil: tombol Edit dan Keluar (Keluar hanya ada di sini). */
 const detailHTML = (canEdit) =>
-  '<details class="profile-detail"><summary><span>Detail profil</span>' + PROFILE_ICON.chevronDown + '</summary>' +
+  '<details class="profile-detail"><summary><span>' + t('p.detail') + '</span>' + PROFILE_ICON.chevronDown + '</summary>' +
   '<div class="profile-actions">' +
-  (canEdit ? '<button type="button" class="profile-button-primary" data-act="profile-edit">' + PROFILE_ICON.pencil + 'Edit profil</button>' : '') +
-  '<button type="button" class="profile-button-danger" data-act="out">' + PROFILE_ICON.logout + 'Keluar</button>' +
+  (canEdit ? '<button type="button" class="profile-button-primary" data-act="profile-edit">' + PROFILE_ICON.pencil + t('p.edit') + '</button>' : '') +
+  '<button type="button" class="profile-button-danger" data-act="out">' + PROFILE_ICON.logout + t('p.logout') + '</button>' +
   '</div></details>';
 
 /**
@@ -75,8 +74,8 @@ export function profileCardHTML({ profile, displayName, stats, email }) {
   if (!complete) {
     return (
       '<section class="profile-card profile-card-new" id="profile-card">' + header +
-      '<div class="profile-cta">' + PROFILE_ICON.profileDoc + '<p class="profile-cta-text">' + MESSAGE_INCOMPLETE + '</p>' +
-      '<button type="button" class="profile-button-primary" data-act="profile-edit">Lengkapi Profile</button></div>' +
+      '<div class="profile-cta">' + PROFILE_ICON.profileDoc + '<p class="profile-cta-text">' + t('p.incomplete') + '</p>' +
+      '<button type="button" class="profile-button-primary" data-act="profile-edit">' + t('p.complete') + '</button></div>' +
       detailHTML(false) + '</section>'
     );
   }
