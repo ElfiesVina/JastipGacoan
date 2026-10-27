@@ -40,12 +40,9 @@ body:has(.dash) {
   order: 5;
 }
 
-.slot-cojastip {
-  order: 6;
-}
-
 /* bagian yang dituju CTA berhenti sedikit di bawah tepi atas */
 .create-card,
+.slot-active,
 .mine-card {
   scroll-margin-top: 16px;
 }
@@ -91,6 +88,17 @@ body:has(.dash) {
 
 .nav-label {
   flex: 1;
+}
+
+/* jumlah sesi aktif di tombol "Sesi Aktif" */
+.nav-count {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: var(--te);
+  font-size: 12.5px;
+  text-align: center;
+  color: #fff;
 }
 
 /* --- kartu sesi aktif --- */
@@ -215,8 +223,7 @@ body:has(.dash) {
   .slot-nav,
   .slot-active,
   .slot-create,
-  .slot-mine,
-  .slot-cojastip {
+  .slot-mine {
     order: 0;
   }
 }
@@ -246,8 +253,7 @@ body:has(.dash) #cl {
   .slot-nav,
   .slot-active,
   .slot-create,
-  .slot-mine,
-  .slot-cojastip {
+  .slot-mine {
     order: 0;
   }
 }
@@ -285,8 +291,8 @@ body:has(.dash) #cl {
     padding: 14px;
   }
 
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
+  .profile-main .profile-avatar {
+    width: 72px;
+    min-height: 96px;
   }
 }

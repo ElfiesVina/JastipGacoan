@@ -2,19 +2,26 @@
  * js/components/dashboard.js
  * HTML beranda jastip: kartu navigasi, sesi aktif, buat sesi, sesi saya, dan kerangka halaman.
  * Hanya membuat HTML. Urutan di layar: profil, navigasi, sesi aktif, buat sesi, sesi saya.
+ * (Panel Kelola Co Jastip sudah pindah ke tab Admin di bottom nav.)
  */
 import { esc } from '../core/dom.js';
 import { STATUS_LABEL } from '../core/constants.js';
 import { PROFILE_ICON } from './profile-icons.js';
 
 export const SECTION_CREATE_ID = 'section-create';
+export const SECTION_ACTIVE_ID = 'section-active';
 export const SECTION_MINE_ID = 'section-mine';
 
-/** Kartu dua CTA yang menggulir halus ke bagiannya. */
-const navigationHTML = () =>
+/** Kartu CTA yang menggulir halus ke bagiannya. Tombol "Sesi Aktif" hanya ada bila ada sesi berjalan. @param {number} activeCount */
+const navigationHTML = (activeCount) =>
   '<nav class="nav-card" aria-label="Pintasan beranda">' +
   '<button type="button" class="nav-button nav-button-accent" data-act="scroll-to" data-target="' + SECTION_CREATE_ID + '">' +
   '<span class="nav-icon">' + PROFILE_ICON.calendarPlus + '</span><span class="nav-label">Buat Sesi</span>' + PROFILE_ICON.chevron + '</button>' +
+  (activeCount
+    ? '<button type="button" class="nav-button" data-act="scroll-to" data-target="' + SECTION_ACTIVE_ID + '">' +
+      '<span class="nav-icon">' + PROFILE_ICON.activity + '</span><span class="nav-label">Sesi Aktif</span>' +
+      '<span class="nav-count">' + activeCount + '</span>' + PROFILE_ICON.chevron + '</button>'
+    : '') +
   '<button type="button" class="nav-button" data-act="scroll-to" data-target="' + SECTION_MINE_ID + '">' +
   '<span class="nav-icon">' + PROFILE_ICON.user + '</span><span class="nav-label">Sesi Saya</span>' + PROFILE_ICON.chevron + '</button></nav>';
 
@@ -49,17 +56,15 @@ function mySessionsHTML(sessions, error) {
 
 /**
  * Kerangka beranda. `profileHTML` sudah jadi (kartu atau form). Bagian sesi hanya ada bila profil lengkap.
- * `cojastipHTML` opsional: panel "Kelola Co Jastip", hanya diisi untuk akun developer.
- * @param {{profileHTML:string, complete:boolean, sessions:Array|null, error:*, activeSessions:Array, orderSummary:object, cojastipHTML?:string}} model
+ * @param {{profileHTML:string, complete:boolean, sessions:Array|null, error:*, activeSessions:Array, orderSummary:object}} model
  */
-export function dashboardHTML({ profileHTML, complete, sessions, error, activeSessions, orderSummary, cojastipHTML }) {
-  const slot = (cls, html) => '<div class="dash-slot ' + cls + '">' + html + '</div>';
+export function dashboardHTML({ profileHTML, complete, sessions, error, activeSessions, orderSummary }) {
+  const slot = (cls, html, id) => '<div class="dash-slot ' + cls + '"' + (id ? ' id="' + id + '"' : '') + '>' + html + '</div>';
   const column = (cls, html) => '<div class="dash-column ' + cls + '">' + html + '</div>';
-  const navigation = complete ? slot('slot-nav', navigationHTML()) : '';
-  const cojastip = cojastipHTML ? slot('slot-cojastip', cojastipHTML) : '';
+  const navigation = complete ? slot('slot-nav', navigationHTML(activeSessions.length)) : '';
   const sessionSlots = complete
-    ? (activeSessions.length ? slot('slot-active', activeSessions.map((s) => activeSessionHTML(s, orderSummary[s.id])).join('')) : '') +
+    ? (activeSessions.length ? slot('slot-active', activeSessions.map((s) => activeSessionHTML(s, orderSummary[s.id])).join(''), SECTION_ACTIVE_ID) : '') +
       slot('slot-create', createSessionHTML()) + slot('slot-mine', mySessionsHTML(sessions, error))
     : '';
-  return '<div class="dash">' + column('column-profile', slot('slot-profile', profileHTML) + navigation + cojastip) + column('column-sessions', sessionSlots) + '</div>';
+  return '<div class="dash">' + column('column-profile', slot('slot-profile', profileHTML) + navigation) + column('column-sessions', sessionSlots) + '</div>';
 }

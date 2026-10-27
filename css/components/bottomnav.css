@@ -1,0 +1,108 @@
+/* =====================================================================
+   components/bottomnav.css
+   Navigasi bawah area jastip. Dibuat oleh js/components/bottom-nav.js.
+   Tidak tampil di layar masuk (body.auth-mode) dan halaman penitip (body.cust-mode).
+   ===================================================================== */
+
+:root {
+  --bnav-h: 64px;
+}
+
+.bnav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  padding: 0 var(--safe-r) var(--safe-b) var(--safe-l);
+  border-top: 1px solid var(--ln);
+  background-color: var(--sf);
+  box-shadow: 0 -10px 24px -18px #07758f66;
+}
+
+.bnav-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: var(--wrap);
+  height: var(--bnav-h);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 100%;
+  color: var(--mu);
+  font-weight: 700;
+  font-size: 11.5px;
+  text-decoration: none;
+}
+
+.bnav-item.is-active {
+  color: var(--te);
+}
+
+/* penanda tab aktif: garis kecil di tepi atas */
+.bnav-list li:has(.is-active)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 28px;
+  height: 3px;
+  margin-left: -14px;
+  border-radius: 0 0 3px 3px;
+  background-color: var(--te);
+}
+
+.bnav-list li {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.bnav-list li > a {
+  width: 100%;
+}
+
+html[data-theme="dark"] .bnav-item.is-active {
+  color: #6fd3ea;
+}
+
+body.auth-mode .bnav,
+body.cust-mode .bnav {
+  display: none;
+}
+
+/* ruang di bawah konten supaya kartu terakhir tidak tertutup bottom nav */
+body.has-bnav:not(.auth-mode):not(.cust-mode) main {
+  padding-bottom: calc(var(--bnav-h) + 40px + var(--safe-b));
+}
+
+/* kerangka halaman tab (Admin, Persetujuan, Setelan) */
+.tab-page {
+  display: grid;
+  gap: 14px;
+  padding-top: 26px;
+}
+
+.tab-card {
+  margin: 0;
+}
+
+@media (max-height: 520px) {
+  :root {
+    --bnav-h: 52px;
+  }
+
+  .bnav-item {
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+  }
+}

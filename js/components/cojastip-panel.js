@@ -1,6 +1,6 @@
 /**
  * js/components/cojastip-panel.js
- * Panel "Kelola Co Jastip" — hanya terlihat & terisi untuk akun developer (lihat
+ * Panel "List admin jastip" (tab Admin di bottom nav) — hanya terlihat & terisi untuk akun developer (lihat
  * services/profile-rules.js isDeveloperEmail). Menyerahkan/mencabut title Co Jastip ke akun lain.
  */
 import { esc } from '../core/dom.js';
@@ -31,7 +31,7 @@ export function cojastipPanelHTML(accounts) {
     : '<p class="form-note">Belum ada akun jastip lain.</p>';
   return (
     '<section class="profile-card cojastip-panel">' +
-    '<h2 class="form-title">Kelola Co Jastip</h2>' +
+    '<h2 class="form-title">List admin jastip</h2>' +
     '<p class="form-note">Hanya kamu (developer) yang bisa menyerahkan atau mencabut title Co Jastip.</p>' +
     list + '</section>'
   );

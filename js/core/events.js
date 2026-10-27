@@ -17,7 +17,8 @@ import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast }
 import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
-import { createSession, scrollToSection, toggleCojastip } from '../views/admin-dashboard.js';
+import { createSession, scrollToSection } from '../views/admin-dashboard.js';
+import { toggleCojastip } from '../views/admin-tabs.js';
 import { openProfileForm, closeProfileForm, saveProfileForm, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
