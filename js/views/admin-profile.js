@@ -7,7 +7,7 @@ import { $ } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { toast, lock } from '../core/ui.js';
 import { updateProfile } from '../api/profile.api.js';
-import { squareAvatar } from '../services/image.js';
+import { portraitAvatar } from '../services/image.js';
 import { buildProfilePatch, validateProfilePatch } from '../services/profile-rules.js';
 import { showDashboard } from './admin-dashboard.js';
 
@@ -70,11 +70,11 @@ export function saveProfileForm() {
   });
 }
 
-/** Foto dipilih: kecilkan jadi persegi, tampilkan pratinjau (disimpan saat menekan Simpan). */
+/** Foto dipilih: potong jadi potret 3:4, tampilkan pratinjau (disimpan saat menekan Simpan). */
 export async function previewPhoto(input) {
   const file = input.files?.[0];
   if (!file) return;
-  const dataUrl = await squareAvatar(file);
+  const dataUrl = await portraitAvatar(file);
   if (!dataUrl) { toast('Foto tidak bisa dibaca. Coba foto lain.', 1); return; }
   pendingPhoto = dataUrl;
   $('#photo-preview').innerHTML = '<img src="' + dataUrl + '" alt="Pratinjau foto profil">';

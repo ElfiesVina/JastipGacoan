@@ -16,8 +16,8 @@ export const SOCIAL_APPS = [
 
 /** Cara menampilkan media sosial di profil. */
 export const SOCIAL_DISPLAY = [
-  { value: 'aplikasi', label: 'Nama aplikasi' },
-  { value: 'akun', label: 'Nama akun' },
+  { value: 'aplikasi', label: 'Nama app' },
+  { value: 'akun', label: '@akun' },
 ];
 
 export const EWALLET_OPTIONS = ['DANA', 'OVO', 'GoPay', 'ShopeePay', 'LinkAja'];

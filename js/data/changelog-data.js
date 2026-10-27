@@ -12,6 +12,14 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 16, tgl: '2026-10-27', v: '2.1', jenis: 'Tampilan', untuk: 'admin',
+    judul: 'Navigasi bawah, foto profil potret, dan form edit profil dirapikan',
+    poin: [
+      'Ada menu di bawah layar: Beranda, Admin, Persetujuan, dan Setelan.',
+      'Foto profil kini berbentuk potret dan tingginya mengikuti teks di sebelahnya.',
+      'Form edit profil dibagi per kotak (foto, data diri, kontak, media sosial) dengan tombol Simpan yang menempel di bawah.',
+      'Tombol Sesi Aktif ditambahkan di pintasan beranda.',
+      'Kelola Co Jastip pindah dari profil ke menu Admin.'] },
   { id: 15, tgl: '2026-10-26', v: '2.0', jenis: 'Tampilan', untuk: 'admin',
     judul: 'Halaman jastip lebih rapi, termasuk di layar landscape',
     poin: [

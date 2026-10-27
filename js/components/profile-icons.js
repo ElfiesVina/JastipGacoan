@@ -25,14 +25,19 @@ export const PROFILE_ICON = {
   camera: icon('<path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>', 18, 1.9),
   clock: icon('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', 16, 2),
   moon: icon('<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>', 22, 2),
+  home: icon('<path d="M4 11l8-7 8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-9"/>', 24, 2),
+  users: icon('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.4c2 .7 3.5 2.6 3.5 5.6"/>', 24, 2),
+  userCheck: icon('<circle cx="9" cy="8" r="3.8"/><path d="M2.5 20c0-3.7 2.9-6 6.5-6 1.4 0 2.6.3 3.6.9"/><path d="M15 17.5l2.2 2.2 4-4.4"/>', 24, 2),
+  settings: icon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/>', 24, 2),
+  activity: icon('<path d="M3 12h4l3-8 4 16 3-8h4"/>', 22, 2),
   sun: icon('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>', 22, 2),
 };
 
 /** Ikon baris kontak berdasarkan kunci (whatsapp, instagram, ewallet, bank, lainnya = app). */
 export const contactIcon = (key) => PROFILE_ICON[key] || PROFILE_ICON.app;
 
-/** Foto bawaan (siluet) bila admin belum mengunggah foto. */
+/** Foto bawaan (siluet potret 3:4) bila admin belum mengunggah foto. */
 export const DEFAULT_AVATAR_SVG =
-  '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="currentColor" opacity=".16"/>' +
-  '<circle cx="32" cy="25" r="11" fill="currentColor" opacity=".55"/>' +
-  '<path d="M10 56c2-12 11-18 22-18s20 6 22 18z" fill="currentColor" opacity=".55"/></svg>';
+  '<svg viewBox="0 0 48 64" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="48" height="64" fill="currentColor" opacity=".14"/>' +
+  '<circle cx="24" cy="25" r="9" fill="currentColor" opacity=".55"/>' +
+  '<path d="M6 64c1.5-13 8-19 18-19s16.5 6 18 19z" fill="currentColor" opacity=".55"/></svg>';

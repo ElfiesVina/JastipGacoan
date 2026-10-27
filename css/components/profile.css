@@ -17,27 +17,31 @@
   container-type: inline-size;
 }
 
-/* --- bagian atas: foto + identitas --- */
+/* --- bagian atas: foto POTRET + identitas --- */
 .profile-main {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 14px;
 }
 
+/* foto potret 3:4: tingginya mengikuti blok teks di sebelahnya (minimal 128px).
+   Isi (foto / siluet) diletakkan absolut supaya selalu memenuhi kotak tanpa mengubah tingginya. */
 .profile-avatar {
+  position: relative;
   flex: none;
-  display: grid;
-  place-items: center;
-  width: 76px;
-  height: 76px;
+  align-self: stretch;
+  width: 96px;
+  min-height: 128px;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: 18px;
   background-color: var(--tint);
   color: var(--te);
 }
 
 .profile-avatar img,
 .profile-avatar svg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -46,6 +50,7 @@
 
 .profile-identity {
   flex: 1;
+  align-self: center;
   min-width: 0;
 }
 
@@ -280,15 +285,26 @@
   box-shadow: inset 0 0 0 1.5px var(--ln);
 }
 
-/* --- form ubah profil --- */
+/* --- form ubah profil: lima kotak (foto, data diri, kontak, sosmed, tampil) + tombol menempel --- */
+.profile-form {
+  padding-bottom: 0;
+}
+
 .form-title {
-  margin: 0 0 12px;
+  margin: 0 0 4px;
+}
+
+.form-block {
+  margin: 14px 0 0;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--ln);
+  border-radius: 18px;
 }
 
 .form-section {
-  margin: 20px 0 4px;
-  font: 800 16px var(--f-head);
-  letter-spacing: 0.04em;
+  margin: 0;
+  font: 800 15px var(--f-head);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--te);
 }
@@ -303,7 +319,7 @@
 
 .form-input {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   margin: 0;
 }
 
@@ -316,6 +332,23 @@ textarea.form-input {
   color: var(--tx);
   font: inherit;
   font-size: 16px;
+}
+
+/* panah pilihan buatan sendiri: tampil sama di semua HP dan tidak menekan teks pilihan */
+select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a96aa' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-size: 16px;
+  text-overflow: ellipsis;
+}
+
+/* pilihan kosong (belum dipilih) tampil redup seperti placeholder */
+select.form-input:has(option[value=""]:checked) {
+  color: var(--mu);
 }
 
 select.form-input:focus,
@@ -354,21 +387,68 @@ textarea.form-input {
   margin: 0;
 }
 
+/* --- media sosial: judul kolom + tiga baris (aplikasi, cara tampil, akun) --- */
+.social-head,
 .social-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
-  margin-bottom: 8px;
+}
+
+.social-head {
+  margin: 12px 0 6px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--mu);
+}
+
+.social-head-user {
+  display: none;
+}
+
+.social-row {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--ln);
+}
+
+.social-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .social-row input {
   grid-column: 1 / -1;
 }
 
+/* pilihan di baris sosmed lebih rapat supaya "Instagram" dan "Nama akun" tidak terpotong di HP kecil */
+.social-row select.form-input {
+  padding: 0 28px 0 12px;
+  background-position: right 9px center;
+  background-size: 14px;
+}
+
+/* --- foto profil di form --- */
 .photo-picker {
   display: flex;
   align-items: center;
   gap: 14px;
+  margin-top: 12px;
+}
+
+.photo-picker .profile-avatar {
+  align-self: auto;
+  width: 96px;
+  height: 128px;
+  min-height: 0;
+}
+
+.photo-side {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-width: 0;
 }
 
 .photo-button {
@@ -394,10 +474,22 @@ textarea.form-input {
   white-space: nowrap;
 }
 
+/* tombol Simpan/Batal menempel di atas bottom nav selama form masih terlihat */
+.form-actions {
+  position: sticky;
+  bottom: calc(var(--bnav-h, 0px) + var(--safe-b));
+  z-index: 3;
+  margin: 16px -16px 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--ln);
+  border-radius: 0 0 22px 22px;
+  background-color: var(--sf);
+}
+
 @media (min-width: 600px) {
-  .profile-avatar {
-    width: 92px;
-    height: 92px;
+  .profile-main .profile-avatar {
+    width: 112px;
+    min-height: 148px;
   }
 }
 
@@ -405,8 +497,13 @@ textarea.form-input {
    KARTUNYA cukup lebar untuk itu — supaya tidak terjepit saat kartu berada di kolom sempit
    (mis. kolom profil di dashboard dua-kolom pada tablet/laptop), walau jendelanya sendiri lebar. */
 @container (min-width: 460px) {
+  .social-head,
   .social-row {
     grid-template-columns: 1fr 1fr 1.2fr;
+  }
+
+  .social-head-user {
+    display: inline;
   }
 
   .social-row input {
@@ -414,7 +511,7 @@ textarea.form-input {
   }
 }
 
-/* --- panel developer: Kelola Co Jastip --- */
+/* --- tab Admin: List admin jastip (khusus developer) --- */
 .cojastip-list {
   display: grid;
   gap: 10px;

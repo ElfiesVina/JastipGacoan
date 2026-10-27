@@ -17,6 +17,8 @@ import { renderChangelogBadge } from '../services/changelog.js';
 import { markOnline, markOffline } from '../services/presence.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
+import { showTab } from './admin-tabs.js';
+import { renderBottomNav, tabFromHash } from '../components/bottom-nav.js';
 
 /** true setelah password baru berhasil disimpan (supaya layar "password baru" tidak muncul lagi). */
 let recoveryHandled = false;
@@ -285,7 +287,11 @@ export async function showAdmin() {
   document.body.classList.remove('auth-mode');
   renderHeader();
   renderChangelogBadge();
-  m ? showSessionDetail(m[1], my) : showDashboard(my);
+  const tab = tabFromHash(location.hash);
+  renderBottomNav(tab); // detail sesi (#/a/..) dan beranda sama-sama menyalakan tab Beranda
+  if (m) showSessionDetail(m[1], my);
+  else if (tab === 'home') showDashboard(my);
+  else showTab(tab, my);
 }
 
 /** Terjemahkan pesan galat Supabase yang umum ke bahasa Indonesia. */
