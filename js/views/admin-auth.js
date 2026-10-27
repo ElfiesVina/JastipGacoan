@@ -121,8 +121,7 @@ export function setAuthPage(n) {
 }
 
 /**
- * Pindah antara halaman Jastip dan Jastiper. Halaman lama mengecil dan memudar,
- * halaman baru membesar masuk (animasinya di CSS, lewat atribut data-pane).
+ * Pindah antara halaman Jastip dan Jastiper (langsung, tanpa animasi scale pada tombol switch).
  * @param {'jastip'|'jastiper'} nama
  */
 export function setAuthPane(nama) {
@@ -131,12 +130,6 @@ export function setAuthPane(nama) {
   pane = nama;
   try { sessionStorage.setItem('pane', nama); } catch (_) {}
   tandaiAktif();
-  $$('.sw-' + nama).forEach((t) => { // ikon yang baru dipilih membal
-    t.classList.remove('pop');
-    void t.offsetWidth;
-    t.classList.add('pop');
-    t.addEventListener('animationend', () => t.classList.remove('pop'), { once: true });
-  });
 }
 
 /**
