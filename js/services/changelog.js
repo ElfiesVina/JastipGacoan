@@ -47,10 +47,7 @@ export function renderChangelogBadge() {
     dot.hidden = !u.length;
     dot.textContent = u.length > 9 ? '9+' : u.length;
   });
-  $('#cl').innerHTML = u.length
-    ? '<button type="button" class="tz" data-act="cl"><span class="tzd"></span><span class="tzt"><b>' +
-      u.length + ' pembaruan baru</b><span>' + esc(u[0].judul) + '</span></span><span class="tzg">Lihat</span></button>'
-    : '';
+  $('#cl').innerHTML = ''; // pembaruan hanya ditandai badge di lonceng, tanpa banner/popup
 }
 
 /** HTML satu entri. @param {object} c entri @param {boolean} baru tandai "Baru" */

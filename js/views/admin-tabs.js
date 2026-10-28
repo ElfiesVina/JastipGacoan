@@ -2,7 +2,7 @@
  * js/views/admin-tabs.js
  * Halaman tab bottom nav selain Beranda:
  *   #/admins    List admin jastip (daftar akun + title Co Jastip, khusus developer)
- *   #/approval  Persetujuan pengajuan admin jastip (khusus developer)
+ *   #/approval  Persetujuan pendaftaran (developer dan Co Jastip)
  *   #/settings  Setelan: bahasa dan tema
  */
 import { app, esc } from '../core/dom.js';
@@ -25,6 +25,8 @@ const messageCard = (title, text) =>
   '<section class="profile-card tab-card"><h2 class="form-title">' + title + '</h2><p class="form-note">' + text + '</p></section>';
 
 const isDeveloper = () => isDeveloperEmail(state.user?.email);
+/** Developer atau Co Jastip: boleh menyetujui pendaftaran (server mengecek lagi, lihat is_approver()). */
+const isApprover = () => isDeveloper() || Boolean(state.profil?.cojastip);
 
 /* ---------------------------------------------------------------- List admin */
 
@@ -63,7 +65,7 @@ function requestHTML(r) {
   const date = new Date(r.dibuat).toLocaleDateString(getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
   return (
     '<li class="request-row"><div class="request-who"><b>' + esc(r.nama) + '</b><small>' + esc(r.email) + '</small>' +
-    (r.pesan ? '<p class="request-msg">' + esc(r.pesan) + '</p>' : '') + '<small class="request-date">' + esc(date) + '</small></div>' +
+    (r.alasan ? '<p class="request-msg"><b>' + t('ap.reason') + ':</b> ' + esc(r.alasan) + '</p>' : '') + '<small class="request-date">' + esc(date) + '</small></div>' +
     '<div class="request-actions">' +
     '<button type="button" class="profile-button-primary cojastip-btn" data-act="req-approve" data-id="' + esc(r.id) + '" data-email="' + esc(r.email) + '">' + t('ap.approve') + '</button>' +
     '<button type="button" class="profile-button-ghost cojastip-btn" data-act="req-reject" data-id="' + esc(r.id) + '">' + t('ap.reject') + '</button></div></li>'
@@ -84,7 +86,7 @@ async function refreshApprovals(my) {
 
 /** Tab Persetujuan. */
 async function showApproval(my) {
-  if (!isDeveloper()) { app.innerHTML = page(messageCard(t('ap.title'), t('ap.devOnly'))); return; }
+  if (!isApprover()) { app.innerHTML = page(messageCard(t('ap.title'), t('ap.devOnly'))); return; }
   await refreshApprovals(my);
 }
 

@@ -30,6 +30,9 @@ const ICON = {
   moon: svg('<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>', 22, 2),
   sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>', 22, 2),
   copy: svg('<rect x="9" y="9" width="11" height="11" rx="3"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>', 20, 2),
+  clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', 18, 2.2),
+  cross: svg('<path d="M6 6l12 12M18 6L6 18"/>', 18, 2.4),
+  note: svg('<path d="M6 3.5h9l3 3V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20z"/><path d="M9 11h6M9 15h6"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 20, 2.6),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
@@ -60,9 +63,35 @@ const signupBody = () =>
   field('user', 'id="nm" autocomplete="name" autocapitalize="words" maxlength="60" placeholder="Your name"') +
   field('mail', 'id="em" type="email" autocomplete="email" inputmode="email" placeholder="Email address"') +
   field('lock', 'id="pw" type="password" autocomplete="new-password" minlength="6" placeholder="New password"', true) +
+  '<div class="auth-field auth-field-area"><span class="ico">' + ICON.note + '</span>' +
+  '<textarea id="al" rows="3" maxlength="300" autocomplete="off" placeholder="' + esc(t('su.reason')) + '"></textarea></div>' +
   '<button class="auth-btn" type="submit">Daftar</button>' +
-  '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div>' +
-  '<div class="auth-links end">' + t('rq.hint') + '<button type="button" data-act="req-open">' + t('rq.open') + '</button></div></form>';
+  '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div></form>';
+
+/**
+ * Isi layar STATUS PENDAFTARAN: Pending -> Verified (atau Ditolak). Dipakai juga saat polling (ganti #pend).
+ * @param {{email?:string, status?:string, hasSession?:boolean}} ctx hasSession = pendaftar sedang login
+ */
+export const pendingHTML = (ctx) => {
+  const status = ctx.status || 'menunggu';
+  const kind = status === 'disetujui' ? 'ok' : status === 'ditolak' ? 'no' : 'wait';
+  const label = { ok: t('pd.verified'), no: t('pd.rejected'), wait: t('pd.pending') }[kind];
+  const icon = { ok: ICON.check, no: ICON.cross, wait: ICON.clock }[kind];
+  const title = { ok: t('pd.okTitle'), no: t('pd.rejTitle'), wait: t('pd.pendingTitle') }[kind];
+  const text = { ok: 'pd.okText', no: 'pd.rejText', wait: 'pd.pendingText' }[kind];
+  const email = '<b>' + esc(ctx.email || '') + '</b>';
+  return (
+    '<div class="pending" id="pend" data-status="' + esc(status) + '" aria-live="polite">' +
+    '<span class="pending-pill is-' + kind + '">' + icon + label + '</span>' +
+    '<h2 class="auth-title">' + title + '</h2>' +
+    '<p class="auth-hint">' + t(text, { email }) + '</p>' +
+    (kind === 'wait' && !ctx.hasSession ? '<p class="auth-hint">' + t('pd.checkMail') + '</p>' : '') +
+    (kind === 'wait'
+      ? (ctx.hasSession ? '<div class="auth-links end"><button type="button" data-act="pending-back">' + t('pd.logout') + '</button></div>' : '')
+      : '<button class="auth-btn" type="button" data-act="pending-back">' + t('pd.back') + '</button>') +
+    '</div>'
+  );
+};
 
 /** Isi form LUPA PASSWORD: email -> kirim link reset. */
 const forgotBody = () =>
@@ -112,7 +141,7 @@ const joinBody = (ctx) =>
 
 /** Pilih isi form sesuai mode. @param {string} mode */
 const bodyFor = (mode, ctx) =>
-  ({ signup: signupBody, forgot: forgotBody, otp: otpBody, newpass: newPasswordBody }[mode] || loginBody)(ctx);
+  ({ signup: signupBody, forgot: forgotBody, otp: otpBody, newpass: newPasswordBody, pending: pendingHTML }[mode] || loginBody)(ctx);
 
 /** Langkah singkat untuk JASTIP (admin): [judul, penjelasan]. */
 const STEPS_JASTIP = [

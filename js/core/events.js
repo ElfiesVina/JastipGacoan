@@ -14,12 +14,11 @@ import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast } from '../views/customer.js';
-import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane } from '../views/admin-auth.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane, backToLogin } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
 import { createSession } from '../views/admin-dashboard.js';
 import { toggleCojastip, approveRequest, rejectRequest, chooseLanguage } from '../views/admin-tabs.js';
-import { openRequestForm, submitRequest } from '../views/admin-request.js';
 import { openProfileForm, closeProfileForm, saveProfileForm, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -32,7 +31,7 @@ const ACT = {
   'cojastip-toggle': toggleCojastip,
   'req-approve': approveRequest,
   'req-reject': rejectRequest,
-  'req-open': openRequestForm,
+  'pending-back': backToLogin,
   'set-lang': chooseLanguage,
   'copy-recent': copyRecent,
   x: () => dlg.close(),
@@ -67,7 +66,6 @@ const FORM = {
   newpass: saveNewPassword,
   prof: saveProfileForm,
   news: createSession,
-  request: submitRequest,
   settle: publishRecap,
 };
 
