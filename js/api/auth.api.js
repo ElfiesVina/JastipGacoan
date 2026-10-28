@@ -14,11 +14,12 @@ export async function getSession() {
 export const signIn = (email, password) => sb.auth.signInWithPassword({ email, password });
 
 /**
- * Daftar akun baru. Nama disimpan sebagai metadata akun (user_metadata.nama).
+ * Daftar akun baru. Nama dan alasan mendaftar disimpan sebagai metadata akun (user_metadata.nama / .alasan);
+ * trigger di database mencatatnya sebagai pendaftaran berstatus 'menunggu'.
  * @returns {Promise<{data,error}>}
  */
-export const signUp = (email, password, nama) =>
-  sb.auth.signUp({ email, password, options: { data: { nama } } });
+export const signUp = (email, password, nama, alasan) =>
+  sb.auth.signUp({ email, password, options: { data: { nama, alasan } } });
 
 /** Keluar dari akun. */
 export const signOut = () => sb.auth.signOut();

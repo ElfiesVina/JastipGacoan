@@ -8,6 +8,7 @@ import { state } from '../core/state.js';
 import { store } from '../core/storage.js';
 import { getRecent } from '../core/recent.js';
 import { toast, lock, skeleton, setBusy, ready } from '../core/ui.js';
+import { POLL_MS } from '../core/constants.js';
 import { getSession, signIn, signUp, signOut, sendResetEmail, updatePassword, verifyResetCode } from '../api/auth.api.js';
 import { OPENED_FROM_RECOVERY_LINK, RESET_LINK_EXPIRED } from '../api/client.js';
 import { getProfile, saveProfile } from '../api/profile.api.js';
@@ -18,6 +19,9 @@ import { markOnline, markOffline } from '../services/presence.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
 import { showTab } from './admin-tabs.js';
+import { statusPendaftaran } from '../api/persetujuan.api.js';
+import { pendingHTML } from '../components/auth-forms.js';
+import { t } from '../core/i18n.js';
 import { showSessionsPage } from './admin-sessions.js';
 import { renderBottomNav, tabFromHash } from '../components/bottom-nav.js';
 
@@ -262,6 +266,15 @@ export async function showAdmin() {
     return;
   }
 
+  // Belum disetujui developer/Co Jastip: tampilkan halaman Pending/Verified, bukan beranda.
+  // (Bila fungsi status belum ada di database, lanjut saja; pembatasan sebenarnya ada di database.)
+  if (state.approvedFor !== state.user.id) {
+    const ap = await statusPendaftaran(state.user.email);
+    if (my !== state.rid) return;
+    if (!ap.error && ap.data && ap.data !== 'disetujui') { pane = 'jastip'; await showPending(state.user.email, true, ap.data); return; }
+    state.approvedFor = state.user.id;
+  }
+
   // Masih di auth-mode saat muat profil → form login tetap tampil, tidak flash header
   state.profil = (await getProfile(state.user.id)).data;
   if (my !== state.rid) return;
@@ -290,10 +303,41 @@ export async function showAdmin() {
   else showTab(tab, my);
 }
 
+/** Jeda cek status di layar Pending (ms): lebih rapat dari POLL_MS supaya terasa langsung berubah. */
+const PENDING_POLL_MS = 5000;
+
+/**
+ * Layar status pendaftaran: Pending sampai developer/Co Jastip menyetujui, lalu Verified + tombol kembali ke masuk.
+ * Status dicek ulang berkala (tanpa perlu muat ulang halaman).
+ * @param {string} email @param {boolean} hasSession pendaftar sedang login @param {string} [status] status awal (kalau sudah diketahui)
+ */
+async function showPending(email, hasSession, status) {
+  const first = status || (await statusPendaftaran(email)).data || 'menunggu';
+  showAuth('pending', { email, status: first, hasSession });
+  clearInterval(state.timer);
+  state.timer = setInterval(() => refreshPending(email, hasSession), PENDING_POLL_MS);
+}
+
+/** Cek status; bila berubah, ganti isi layar Pending. Berhenti sendiri kalau layarnya sudah hilang. */
+async function refreshPending(email, hasSession) {
+  const box = $('#pend');
+  if (!box) { clearInterval(state.timer); return; }
+  const { data } = await statusPendaftaran(email);
+  if (data && data !== box.dataset.status && $('#pend')) $('#pend').outerHTML = pendingHTML({ email, status: data, hasSession });
+}
+
+/** Tombol "Kembali ke masuk" (dan "Keluar" saat Pending): keluar dari akun lalu buka layar masuk. */
+export async function backToLogin() {
+  clearInterval(state.timer);
+  try { await signOut(); } catch (_) { /* tidak ada sesi: langsung ke layar masuk */ }
+  state.approvedFor = null;
+  showAdmin();
+}
+
 /** Terjemahkan pesan galat Supabase yang umum ke bahasa Indonesia. */
 function authError(err, isSignUp) {
   const m = err?.message || '';
-  if (isSignUp && /database error/i.test(m)) return 'Email ini belum diizinkan jadi jastip. Ketuk “Ajukan persetujuan” di bawah.';
+  if (isSignUp && /database error/i.test(m)) return 'Pendaftaran gagal diproses server. Coba lagi, atau hubungi developer.';
   if (/invalid login credentials/i.test(m)) return 'Email atau password salah.';
   if (/email not confirmed/i.test(m)) return 'Email belum dikonfirmasi. Cek kotak masuk (dan Spam), ketuk link konfirmasinya.';
   if (/already registered|already been registered/i.test(m)) return 'Email ini sudah terdaftar. Silakan masuk.';
@@ -314,13 +358,15 @@ export function authenticate(isSignUp) {
     const nama = isSignUp ? $('#nm').value.trim() : '';
     const e = $('#em').value.trim();
     const p = $('#pw').value;
+    const alasan = isSignUp ? $('#al').value.trim() : '';
     if (isSignUp && !nama) { toast('Isi nama dulu', 1); $('#nm').focus(); return; }
+    if (isSignUp && alasan.length < 5) { toast(t('su.reasonNeeded'), 1); $('#al').focus(); return; }
     if (!e || p.length < 6) { toast('Isi email dan password (min 6 karakter)', 1); return; }
 
     setBusy('.auth-btn', isSignUp ? 'Mendaftar…' : 'Masuk…'); // beri tanda sedang diproses
     let r;
     try {
-      r = isSignUp ? await signUp(e, p, nama) : await signIn(e, p);
+      r = isSignUp ? await signUp(e, p, nama, alasan) : await signIn(e, p);
     } catch (err) {
       r = { error: err }; // jaringan putus: tampilkan pesan, jangan diam
     }
@@ -329,7 +375,7 @@ export function authenticate(isSignUp) {
       toast(authError(r.error, isSignUp), 1);
       return;
     }
-    if (isSignUp && !r.data.session) { toast('Cek email untuk konfirmasi, lalu masuk'); showAuth('login'); return; }
+    if (isSignUp) { pane = 'jastip'; await showPending(e, Boolean(r.data.session)); return; } // daftar -> halaman Pending
     showAdmin();
   });
 }

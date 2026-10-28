@@ -533,3 +533,29 @@ html[data-theme="dark"] .auth[data-pane="jastiper"] .sw-jastiper{background:#e9f
     margin-top: 10px;
   }
 }
+
+/* --- kolom alasan mendaftar (textarea) + layar status pendaftaran --- */
+.auth-field textarea{
+  display:block;width:100%;min-height:84px;margin:0;padding:12px 16px 12px 48px;
+  border:1.5px solid #dfe9ef;border-radius:16px;background:#f8f9fb;
+  font:inherit;font-size:16px;line-height:1.4;resize:none;
+}
+.auth-field textarea:focus{outline:0;border-color:var(--au);background:#fff;box-shadow:0 0 0 4px #1db3d524}
+.auth-field-area .ico{top:16px;transform:none}
+html[data-theme="dark"] .auth-field textarea{background:#172433;border-color:#2a3d52;color:#e9f0f7}
+html[data-theme="dark"] .auth-field textarea:focus{background:#1b2b3d;border-color:var(--au)}
+html[data-short] .auth-field textarea{min-height:68px}
+
+.pending{text-align:center}
+.pending .auth-title{margin-top:4px}
+.pending-pill{
+  display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;padding:7px 16px;
+  border-radius:999px;font-weight:800;font-size:14px;letter-spacing:.02em;
+}
+.pending-pill.is-wait{background:#fff1cf;color:#8a5a00}
+.pending-pill.is-ok{background:#dff5ea;color:#0a7a4d}
+.pending-pill.is-no{background:#fde2ea;color:#b3123f}
+html[data-theme="dark"] .pending-pill.is-wait{background:#3a2e10;color:#f1c768}
+html[data-theme="dark"] .pending-pill.is-ok{background:#12302a;color:#35c58d}
+html[data-theme="dark"] .pending-pill.is-no{background:#3a1626;color:#ff8fb0}
+[dir="rtl"] .auth-field textarea{padding:12px 48px 12px 16px}

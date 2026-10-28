@@ -12,6 +12,12 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 18, tgl: '2026-10-27', v: '2.3', jenis: 'Fitur', untuk: 'semua',
+    judul: 'Daftar jastip kini lewat persetujuan',
+    poin: [
+      'Form daftar punya kolom alasan mendaftar.',
+      'Setelah daftar, kamu masuk ke halaman Pending. Status berubah jadi Verified saat developer atau Co Jastip menyetujui.',
+      'Pembaruan hanya ditandai badge di lonceng, tanpa banner.'] },
   { id: 17, tgl: '2026-10-27', v: '2.2', jenis: 'Fitur', untuk: 'admin',
     judul: 'Persetujuan admin, setelan, dan pilihan bahasa',
     poin: [
