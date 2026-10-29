@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="teal_primary">#07758F</color>
+    <color name="teal_secondary">#0A8FB0</color>
+    <color name="teal_light">#E4F3F7</color>
+    <color name="pink_accent">#E6007E</color>
+    <color name="pink_light">#FFF0F8</color>
+    <color name="text_dark">#10192B</color>
+    <color name="text_muted">#5D6A80</color>
+    <color name="background">#F2F6F9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="border_line">#DFE6EE</color>
+    <color name="success_green">#0A8A58</color>
+    <color name="auth_cyan">#1DB3D5</color>
+    <color name="auth_blue">#0C7A94</color>
+</resources>

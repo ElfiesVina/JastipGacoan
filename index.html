@@ -5,6 +5,7 @@
 <!-- viewport-fit=cover: konten boleh sampai tepi layar; jarak aman notch diatur di CSS lewat env(safe-area-inset-*) -->
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-visual">
 <meta name="theme-color" content="#07758f">
+<meta name="description" content="Aplikasi titip pesanan Mie Gacoan, rekap hitungan harga otomatis dengan rincian biaya transfer.">
 <title>Titip Gacoan</title>
 
 <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
@@ -34,13 +35,20 @@ addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.or
 </script>
 <noscript><style>body.boot header,body.boot main{visibility:visible!important}body.boot::after{display:none!important}</style></noscript>
 
-<!-- Ikon: favicon tab browser (logo polos), ikon aplikasi/layar utama (logo bertulisan), dan manifest untuk pasang/APK -->
+<!-- Dukungan Layar Utama / PWA untuk iPhone (iOS Safari) & Android -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Titip Gacoan">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Ikon: favicon browser, apple-touch-icon untuk iOS, dan manifest untuk PWA -->
 <link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png">
+<link rel="apple-touch-icon" href="icons/app-icon.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="apple-mobile-web-app-title" content="Titip Gacoan">
+<link rel="manifest" href="manifest.json">
 
 <!-- Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,6 +114,19 @@ addEventListener('orientationchange',function(){setTimeout(u,150)});if(screen.or
   <div class="shh"><h3 id="dlt">Yang baru</h3><button type="button" data-act="x">Tutup</button></div>
   <div class="shb" id="dl"></div>
 </dialog>
+
+<!-- Registrasi Service Worker PWA Ringan -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        console.log('[PWA] Service Worker terdaftar dengan scope:', reg.scope);
+      }).catch((err) => {
+        console.warn('[PWA] Registrasi Service Worker gagal:', err);
+      });
+    });
+  }
+</script>
 
 <!-- Library Supabase (versi dikunci). Harus dimuat SEBELUM main.js -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
