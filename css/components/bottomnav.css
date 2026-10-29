@@ -246,3 +246,56 @@ a.nav-button {
 [dir="rtl"] .nav-button {
   text-align: right;
 }
+
+/* --- Persetujuan: ringkasan jumlah + badge status pendaftar --- */
+.request-sum {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+
+.sum-chip {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--tint);
+  text-align: center;
+}
+
+.sum-chip b {
+  font: 800 24px/1 var(--f-head);
+  color: var(--te);
+}
+
+.sum-chip span {
+  font: 700 12px var(--f-body);
+  color: var(--mu);
+}
+
+.sum-chip.is-check { background: #fff1cf; }
+.sum-chip.is-check b { color: #8a5a00; }
+.sum-chip.is-ok { background: #dff5ea; }
+.sum-chip.is-ok b { color: #0a7a4d; }
+html[data-theme="dark"] .sum-chip.is-check { background: #3a2e10; }
+html[data-theme="dark"] .sum-chip.is-check b { color: #f1c768; }
+html[data-theme="dark"] .sum-chip.is-ok { background: #12302a; }
+html[data-theme="dark"] .sum-chip.is-ok b { color: #35c58d; }
+
+.request-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.request-badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font: 800 11.5px var(--f-body);
+}
+
+.request-badge.is-wait { background: var(--tint); color: var(--te); }
+.request-badge.is-check { background: #ffe9b8; color: #7a4a00; }
+html[data-theme="dark"] .request-badge.is-check { background: #4a3708; color: #ffc857; }

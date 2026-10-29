@@ -11,7 +11,8 @@ import { toast, lock } from '../core/ui.js';
 import { POLL_MS } from '../core/constants.js';
 import { t, LANGS, getLang, setLang } from '../core/i18n.js';
 import { listJastipProfiles, setCojastip } from '../api/profile.api.js';
-import { listPermintaan, putuskanPermintaan } from '../api/persetujuan.api.js';
+import { listPermintaan, putuskanPermintaan, mulaiPeriksa, hitungPermintaan } from '../api/persetujuan.api.js';
+import { CFG } from '../config.js';
 import { renderHeader } from '../components/header.js';
 import { cojastipPanelHTML } from '../components/cojastip-panel.js';
 import { PROFILE_ICON } from '../components/profile-icons.js';
@@ -60,34 +61,73 @@ export function toggleCojastip(button) {
 
 /* ---------------------------------------------------------------- Persetujuan */
 
-/** Satu kartu pengajuan: nama, email, pesan, tanggal, tombol Setujui/Tolak. */
+/** Badge status pendaftar: menunggu (abu-abu kuning) atau diperiksa (amber tegas). @param {string} status */
+const statusBadge = (status) =>
+  '<span class="request-badge is-' + (status === 'diperiksa' ? 'check' : 'wait') + '">' +
+  (status === 'diperiksa' ? t('ap.statusCheck') : t('ap.statusWait')) + '</span>';
+
+/**
+ * Satu kartu pengajuan: nama, badge status, email, alasan, tanggal, dan aksi sesuai status.
+ *   menunggu  -> [Mulai periksa] [Tolak]
+ *   diperiksa -> [Setujui (& kirim kode)] [Tolak]
+ */
 function requestHTML(r) {
   const date = new Date(r.dibuat).toLocaleDateString(getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  const checking = r.status === 'diperiksa';
+  const main = checking
+    ? '<button type="button" class="profile-button-primary cojastip-btn" data-act="req-approve" data-id="' + esc(r.id) + '" data-email="' + esc(r.email) + '">' + (CFG.OTP_PENDAFTARAN ? t('ap.approveSend') : t('ap.approve')) + '</button>'
+    : '<button type="button" class="profile-button-primary cojastip-btn" data-act="req-start" data-id="' + esc(r.id) + '">' + t('ap.start') + '</button>';
   return (
-    '<li class="request-row"><div class="request-who"><b>' + esc(r.nama) + '</b><small>' + esc(r.email) + '</small>' +
+    '<li class="request-row"><div class="request-who"><div class="request-top"><b>' + esc(r.nama) + '</b>' + statusBadge(r.status) + '</div><small>' + esc(r.email) + '</small>' +
     (r.alasan ? '<p class="request-msg"><b>' + t('ap.reason') + ':</b> ' + esc(r.alasan) + '</p>' : '') + '<small class="request-date">' + esc(date) + '</small></div>' +
-    '<div class="request-actions">' +
-    '<button type="button" class="profile-button-primary cojastip-btn" data-act="req-approve" data-id="' + esc(r.id) + '" data-email="' + esc(r.email) + '">' + t('ap.approve') + '</button>' +
+    '<div class="request-actions">' + main +
     '<button type="button" class="profile-button-ghost cojastip-btn" data-act="req-reject" data-id="' + esc(r.id) + '">' + t('ap.reject') + '</button></div></li>'
   );
 }
 
-/** Muat dan gambar daftar pengajuan yang menunggu. */
-async function refreshApprovals(my) {
-  const { data, error } = await listPermintaan();
+/** Ringkasan di atas daftar: jumlah Menunggu, Diperiksa, Disetujui. Disetujui disembunyikan bila fungsi hitung belum ada di database. */
+function summaryHTML(rows, counts) {
+  const n = (st) => rows.filter((r) => r.status === st).length;
+  const chip = (cls, label, v) => '<div class="sum-chip is-' + cls + '"><b>' + v + '</b><span>' + label + '</span></div>';
+  return '<div class="request-sum">' + chip('wait', t('ap.sumWait'), n('menunggu')) + chip('check', t('ap.sumCheck'), n('diperiksa')) +
+    (counts && typeof counts.disetujui === 'number' ? chip('ok', t('ap.sumOk'), counts.disetujui) : '') + '</div>';
+}
+
+/** Isi terakhir yang digambar (JSON), supaya polling tidak menggambar ulang kalau tidak ada perubahan. */
+let lastApprovals = '';
+
+/** Muat dan gambar daftar pengajuan (menunggu + diperiksa). @param {number} my nomor navigasi @param {boolean} [force] gambar walau isi sama */
+async function refreshApprovals(my, force) {
+  const [{ data, error }, cnt] = await Promise.all([listPermintaan(), hitungPermintaan()]);
   if (my !== state.rid) return;
   const rows = Array.isArray(data) ? data : [];
+  const counts = cnt && !cnt.error && cnt.data && typeof cnt.data === 'object' ? cnt.data : null;
+  const sig = JSON.stringify([rows, counts, Boolean(error), getLang()]);
+  if (!force && sig === lastApprovals) return;
+  lastApprovals = sig;
   app.innerHTML = page(
     '<section class="profile-card tab-card"><h2 class="form-title">' + t('ap.title') + '</h2><p class="form-note">' + t('ap.lead') + '</p>' +
     (error ? '<p class="form-note">' + t('ap.loadFail') + '</p>'
-      : rows.length ? '<ul class="cojastip-list">' + rows.map(requestHTML).join('') + '</ul>' : '<p class="form-note">' + t('ap.empty') + '</p>') +
+      : summaryHTML(rows, counts) + (rows.length ? '<ul class="cojastip-list">' + rows.map(requestHTML).join('') + '</ul>' : '<p class="form-note">' + t('ap.empty') + '</p>')) +
     '</section>');
 }
 
-/** Tab Persetujuan. */
+/** Tab Persetujuan. Daftar dimuat ulang berkala supaya pendaftar baru dan perubahan status muncul tanpa reload. */
 async function showApproval(my) {
   if (!isApprover()) { app.innerHTML = page(messageCard(t('ap.title'), t('ap.devOnly'))); return; }
-  await refreshApprovals(my);
+  await refreshApprovals(my, true);
+  if (my !== state.rid) return;
+  state.timer = setInterval(() => refreshApprovals(my), POLL_MS);
+}
+
+/** Mulai memeriksa satu pendaftar (menunggu -> diperiksa). @param {HTMLElement} button */
+export function startReview(button) {
+  return lock(async () => {
+    const { error } = await mulaiPeriksa(button.dataset.id);
+    if (error) { toast(error.message || t('ap.fail'), 1); return; }
+    toast(t('ap.started'));
+    await refreshApprovals(state.rid, true);
+  });
 }
 
 /** Setujui / tolak pengajuan (tombol di kartu). @param {HTMLElement} button @param {boolean} approve */
@@ -95,8 +135,8 @@ function decide(button, approve) {
   return lock(async () => {
     const { error } = await putuskanPermintaan(button.dataset.id, approve);
     if (error) { toast(error.message || t('ap.fail'), 1); return; }
-    toast(approve ? t('ap.approved', { email: button.dataset.email }) : t('ap.rejected'));
-    await refreshApprovals(state.rid);
+    toast(approve ? t(CFG.OTP_PENDAFTARAN ? 'ap.approvedOtp' : 'ap.approved', { email: button.dataset.email }) : t('ap.rejected'));
+    await refreshApprovals(state.rid, true);
   });
 }
 export const approveRequest = (button) => decide(button, true);

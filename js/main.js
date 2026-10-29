@@ -18,9 +18,11 @@ import { route } from './core/router.js';
 import { armOfflineOnClose } from './services/presence.js';
 
 import { ready } from './core/ui.js';
+import { initPullRefresh } from './services/pull-refresh.js';
 
 initLang(); // bahasa dipasang sebelum halaman pertama digambar
 bindEvents();
 armOfflineOnClose(); // usaha terbaik: tandai offline saat tab/jendela ditutup
+initPullRefresh(); // tarik untuk refresh (header tetap, indikator Gacoan di bawahnya)
 route();
 setTimeout(ready, 6000); // pengaman: jangan biarkan layar tunggu tertahan bila ada galat

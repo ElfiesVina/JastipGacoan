@@ -14,11 +14,11 @@ import { openChangelog } from '../services/changelog.js';
 import { saveRecapImage } from '../services/recap-image.js';
 import { syncChoice } from '../components/customer-forms.js';
 import { submitOrder, submitPayment, refreshWhenVisible, joinSession, openLast } from '../views/customer.js';
-import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane, backToLogin } from '../views/admin-auth.js';
+import { authenticate, logout, showAuth, togglePassword, forgotPassword, sendReset, verifyCode, resendCode, saveNewPassword, setAuthPage, setAuthPane, backToLogin, verifyPendingOtp, resendPendingOtp } from '../views/admin-auth.js';
 import { toggleTheme } from './theme.js';
 import { copyRecent } from './recent.js';
 import { createSession } from '../views/admin-dashboard.js';
-import { toggleCojastip, approveRequest, rejectRequest, chooseLanguage } from '../views/admin-tabs.js';
+import { toggleCojastip, approveRequest, rejectRequest, startReview, chooseLanguage } from '../views/admin-tabs.js';
 import { openProfileForm, closeProfileForm, saveProfileForm, previewPhoto } from '../views/admin-profile.js';
 import { reloadSession, setStatus, publishRecap, deleteOrder, togglePaid, copyLink } from '../views/admin-session.js';
 
@@ -31,6 +31,8 @@ const ACT = {
   'cojastip-toggle': toggleCojastip,
   'req-approve': approveRequest,
   'req-reject': rejectRequest,
+  'req-start': startReview,
+  'otp-resend': resendPendingOtp,
   'pending-back': backToLogin,
   'set-lang': chooseLanguage,
   'copy-recent': copyRecent,
@@ -62,6 +64,7 @@ const FORM = {
   signup: () => authenticate(true),
   reset: sendReset,
   otp: verifyCode,
+  'pd-otp': verifyPendingOtp,
   join: joinSession,
   newpass: saveNewPassword,
   prof: saveProfileForm,

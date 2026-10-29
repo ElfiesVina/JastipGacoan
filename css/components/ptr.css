@@ -1,0 +1,86 @@
+/* =====================================================================
+   components/ptr.css
+   Tarik untuk refresh bergaya Gacoan (js/services/pull-refresh.js dan layar masuk).
+
+   - #ptr: ruang di bawah header yang tingginya mengikuti jari (--pull). Header tidak bergerak;
+     konten di bawahnya ikut turun karena #ptr mengisi ruang itu.
+   - .gl: ikon muat pink saja. Animasi huruf ada di logo header (.lg-c / .lg-pill), digerakkan --ptr (0..1) di <html>.
+   ===================================================================== */
+
+/* matikan tarik-bawaan browser (yang membuat header ikut tertarik) di semua halaman biasa */
+html,body{overscroll-behavior-y:none}
+
+#ptr{
+  position:relative;height:var(--pull,0px);overflow:hidden;pointer-events:none;
+}
+/* main memakai margin atas -16px; selagi ditarik, imbangi supaya tinggi ruang = jarak tarik */
+#ptr.on{margin-bottom:16px}
+#ptr:not(.pulling){transition:height .3s cubic-bezier(.2,.8,.2,1)}
+.ptr-in{
+  position:absolute;left:0;right:0;top:0;bottom:0;
+  display:grid;place-items:center;
+  opacity:var(--ptr,0);
+  transform:translateY(calc((1 - var(--ptr,0)) * -14px));
+}
+body.boot #ptr,body.auth-mode #ptr{display:none}
+
+/* ---------------- ikon muat (di bawah header) ---------------- */
+.gl{display:inline-flex;color:var(--pk)}
+.gl-ico{flex:none;transform:rotate(calc(var(--ptr,0) * 320deg))}
+.refreshing .gl-ico{animation:gl-spin .8s linear infinite}
+@keyframes gl-spin{to{transform:rotate(360deg)}}
+
+/* ---------------- logo header: TITIP GACOAN ikut beranimasi ----------------
+   Variabel --ptr (0..1) dipasang di <html>. Urutan 12 bagian (nomor --k):
+     0-5 huruf GACOAN, 6 pil pink, 7-11 huruf TITIP.
+   Separuh pertama tarikan (0..0.5): bagian hilang berurutan 0 -> 11.
+   Separuh kedua (0.5..1): terisi kembali berurutan dengan urutan yang sama.
+   Penuh = logo utuh lagi. Saat memuat, siklus hilang -> terisi berulang terus.
+   Semua ini hanya aktif selama <html class="ptr-on">; di luar itu logo biasa. */
+@property --ptr{syntax:'<number>';inherits:true;initial-value:0}
+html.ptr-on:not(.ptr-pulling){transition:--ptr .32s cubic-bezier(.2,.8,.2,1)} /* lepas sebelum penuh: logo kembali mulus */
+
+.lg-c{display:inline-block}
+.lg-pill{position:relative;isolation:isolate}
+
+html.ptr-on .lg-c,
+html.ptr-on .lg-pill{
+  --vp:clamp(0, calc(var(--ptr,0) * 2), 1);        /* kemajuan fase hilang */
+  --rp:clamp(0, calc(var(--ptr,0) * 2 - 1), 1);    /* kemajuan fase terisi kembali */
+  --v:calc(1 - clamp(0, calc(var(--vp) * 12 - var(--k,0)), 1) + clamp(0, calc(var(--rp) * 12 - var(--k,0)), 1)); /* 1 = tampak penuh */
+}
+html.ptr-on .lg-c{clip-path:inset(calc((1 - var(--v)) * 100%) 0 0 0)}
+
+/* latar pink dipindah ke lapisan sendiri supaya bisa hilang/terisi terpisah dari huruf di dalamnya */
+html.ptr-on .lg-pill{background:none}
+html.ptr-on .lg-pill::before{
+  content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--pk);
+  clip-path:inset(calc((1 - var(--v)) * 100%) 0 0 0);
+}
+
+/* sedang memuat: ulang terus hilang -> terisi, tiap bagian bergeser sedikit waktunya */
+html.ptr-loading .lg-c,
+html.ptr-loading .lg-pill::before{
+  animation:lg-loop 2.4s ease-in-out infinite;
+  animation-delay:calc(var(--k,0) * .07s);
+}
+@keyframes lg-loop{
+  0%,8%{clip-path:inset(0 0 0 0)}
+  30%,50%{clip-path:inset(100% 0 0 0)}
+  72%,100%{clip-path:inset(0 0 0 0)}
+}
+
+/* ---------------- layar masuk/daftar (HP) ---------------- */
+/* Pita atas tidak bergerak. Indikator melayang tepat di bawah pita, form turun sedikit memberi ruang. */
+.auth{--hh:64px}
+@media (min-width:600px) and (max-width:899px){ html[data-orient="port"] .auth{--hh:84px} }
+.auth-ptr{
+  position:absolute;left:0;right:0;z-index:4;pointer-events:none;
+  top:calc(var(--hh) + var(--safe-t) + 14px);
+  display:grid;place-items:center;
+  opacity:var(--ptr,0);
+  transform:translateY(calc((1 - var(--ptr,0)) * -12px));
+}
+.auth:not(.pulling) .auth-ptr{transition:opacity .25s,transform .25s}
+.auth-main{transform:translateY(calc(var(--pull,0px) * .9))}
+.auth:not(.pulling) .auth-main{transition:transform .35s cubic-bezier(.2,.8,.2,1)}

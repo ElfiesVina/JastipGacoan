@@ -19,7 +19,10 @@ import { markOnline, markOffline } from '../services/presence.js';
 import { showDashboard } from './admin-dashboard.js';
 import { showSessionDetail } from './admin-session.js';
 import { showTab } from './admin-tabs.js';
-import { statusPendaftaran } from '../api/persetujuan.api.js';
+import { statusPendaftaran, kirimKodePendaftaran, verifikasiKodePendaftaran } from '../api/persetujuan.api.js';
+import { CFG } from '../config.js';
+import { initOtpBoxes, readOtp, clearOtp, setOtpError, disableOtp } from '../components/otp-boxes.js';
+import { startClock, stopClock, newEnd, savedEnd, mmss } from '../services/otp-clock.js';
 import { pendingHTML } from '../components/auth-forms.js';
 import { t } from '../core/i18n.js';
 import { showSessionsPage } from './admin-sessions.js';
@@ -177,7 +180,8 @@ function initAuthScroll() {
 
 /**
  * Tarik layar masuk ke bawah (saat sudah di paling atas) untuk memuat ulang halaman.
- * Biru header "memanjang" mengikuti jari, muncul indikator putar; lepas setelah cukup jauh = refresh.
+ * Pita atas tetap diam; di bawahnya muncul indikator Gacoan (ikon + huruf terisi satu per satu) dan form turun sedikit.
+ * Lepas setelah cukup jauh = refresh.
  * Hanya jalan di layar sentuh, hanya untuk gerakan TEGAK (geser mendatar antar halaman tidak terganggu),
  * dan dilewati saat keyboard terbuka supaya isian tidak hilang tidak sengaja.
  */
@@ -232,6 +236,7 @@ function initPullRefresh() {
         loading = true;
         a.classList.add('refreshing');
         set(HOLD);
+        a.style.setProperty('--ptr', '1'); // indikator Gacoan penuh lalu mengisi bergantian
         setTimeout(() => location.reload(), 650);
       } else {
         set(0);
@@ -314,6 +319,7 @@ const PENDING_POLL_MS = 5000;
 async function showPending(email, hasSession, status) {
   const first = status || (await statusPendaftaran(email)).data || 'menunggu';
   showAuth('pending', { email, status: first, hasSession });
+  setupPendingOtp();
   clearInterval(state.timer);
   state.timer = setInterval(() => refreshPending(email, hasSession), PENDING_POLL_MS);
 }
@@ -323,7 +329,99 @@ async function refreshPending(email, hasSession) {
   const box = $('#pend');
   if (!box) { clearInterval(state.timer); return; }
   const { data } = await statusPendaftaran(email);
-  if (data && data !== box.dataset.status && $('#pend')) $('#pend').outerHTML = pendingHTML({ email, status: data, hasSession });
+  if (data && data !== box.dataset.status && $('#pend')) {
+    $('#pend').outerHTML = pendingHTML({ email, status: data, hasSession });
+    setupPendingOtp();
+  }
+}
+
+/* ------------------------------------------------- Kode verifikasi pendaftaran (6 kotak) */
+
+/** Waktu (ms epoch) kirim ulang boleh lagi. Diisi saat kode pertama tampil dan tiap kali kirim ulang. */
+let otpCooldownEnd = 0;
+let otpEnd = 0;
+
+/** Pesan galat dari Edge Function -> teks inline. @param {any} err */
+function otpErrorText(err) {
+  const status = err?.context?.status;
+  if (status === 429) return t('pd.otpRate');
+  if (status === 404 || /FunctionsFetchError|FunctionsRelayError/.test(err?.name || '')) return t('pd.otpOff');
+  return t('pd.otpWrong');
+}
+
+/** Perbarui angka timer dan tombol kirim ulang tiap detik. @param {number} left sisa kode (dtk) @param {number} cool sisa jeda (dtk) */
+function paintOtpClock(left, cool) {
+  const tm = $('#otp-timer');
+  const rs = $('#otp-resend');
+  if (!tm) { stopClock(); return; } // layar sudah diganti
+  tm.textContent = mmss(left);
+  tm.classList.toggle('is-low', left > 0 && left <= 30);
+  if (rs) {
+    rs.disabled = cool > 0;
+    rs.textContent = cool > 0 ? t('pd.otpResendIn', { s: cool }) : t('pd.otpResend');
+  }
+  const f = $('.pd-otp');
+  if (f && left === 0 && !f.dataset.expired) { f.dataset.expired = '1'; disableOtp(f, true); setOtpError(f, t('pd.otpExpired')); }
+}
+
+/** Pasang perilaku kotak + jam bila layar yang tampil adalah Verified dengan kode. Aman dipanggil kapan saja. */
+function setupPendingOtp() {
+  const f = $('.pd-otp');
+  stopClock();
+  if (!f) return;
+  const email = $('#pend')?.dataset.email || '';
+  initOtpBoxes(f, { onComplete: () => verifyPendingOtp() });
+  const saved = savedEnd(email);
+  otpEnd = saved || newEnd(email);
+  if (!otpCooldownEnd || otpCooldownEnd < Date.now() - 3600000) otpCooldownEnd = Date.now() + CFG.OTP_JEDA_DETIK * 1000;
+  startClock({ end: otpEnd, cooldownEnd: otpCooldownEnd, onTick: paintOtpClock });
+  $('.otp-box')?.focus();
+}
+
+/** Kirim kode 6 digit ke server. Benar -> masuk (atau ke layar masuk bila belum ada sesi). */
+export function verifyPendingOtp() {
+  return lock(async () => {
+    const f = $('.pd-otp');
+    const box = $('#pend');
+    if (!f || !box) return;
+    const kode = readOtp(f);
+    if (f.dataset.expired) { setOtpError(f, t('pd.otpExpired')); return; }
+    if (kode.length < 6) { setOtpError(f, t('pd.otpIncomplete')); return; }
+    setOtpError(f);
+    setBusy('.pd-otp .auth-btn', t('pd.otpChecking'));
+    let r;
+    try { r = await verifikasiKodePendaftaran(box.dataset.email, kode); } catch (err) { r = { error: err }; }
+    if (r.error || r.data?.ok === false) {
+      setBusy('.pd-otp .auth-btn');
+      setOtpError(f, r.error ? otpErrorText(r.error) : t('pd.otpWrong'));
+      clearOtp(f);
+      return;
+    }
+    stopClock();
+    if (box.dataset.session) { toast(t('pd.otpDone')); state.approvedFor = null; showAdmin(); return; }
+    toast(t('pd.otpDoneLogin'));
+    await backToLogin();
+  });
+}
+
+/** Kirim ulang kode (aktif setelah jeda). */
+export function resendPendingOtp() {
+  return lock(async () => {
+    const f = $('.pd-otp');
+    const box = $('#pend');
+    if (!f || !box || Date.now() < otpCooldownEnd) return;
+    let r;
+    try { r = await kirimKodePendaftaran(box.dataset.email); } catch (err) { r = { error: err }; }
+    if (r.error) { setOtpError(f, otpErrorText(r.error)); return; }
+    delete f.dataset.expired;
+    disableOtp(f, false);
+    clearOtp(f);
+    setOtpError(f);
+    otpEnd = newEnd(box.dataset.email);
+    otpCooldownEnd = Date.now() + CFG.OTP_JEDA_DETIK * 1000;
+    startClock({ end: otpEnd, cooldownEnd: otpCooldownEnd, onTick: paintOtpClock });
+    toast(t('pd.otpSent'));
+  });
 }
 
 /** Tombol "Kembali ke masuk" (dan "Keluar" saat Pending): keluar dari akun lalu buka layar masuk. */

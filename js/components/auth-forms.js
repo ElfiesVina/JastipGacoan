@@ -8,6 +8,10 @@
 import { t } from '../core/i18n.js';
 import { esc } from '../core/dom.js';
 import { CHANGELOG } from '../data/changelog-data.js';
+import { CFG } from '../config.js';
+import { gacoanLoaderHTML } from './gacoan-loader.js';
+import { otpBoxesHTML } from './otp-boxes.js';
+import { mmss } from '../services/otp-clock.js';
 
 /** Nomor versi terbaru dari catatan perubahan (untuk footer). */
 const VERSI = (CHANGELOG.slice().sort((a, b) => b.id - a.id)[0] || {}).v || '';
@@ -34,6 +38,7 @@ const ICON = {
   cross: svg('<path d="M6 6l12 12M18 6L6 18"/>', 18, 2.4),
   note: svg('<path d="M6 3.5h9l3 3V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20z"/><path d="M9 11h6M9 15h6"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 20, 2.6),
+  search: svg('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>', 18, 2.2),
   bell: svg('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/>', 24),
 };
 
@@ -69,27 +74,43 @@ const signupBody = () =>
   '<div class="auth-links end">I have an account<button type="button" data-act="to-login">Masuk</button></div></form>';
 
 /**
- * Isi layar STATUS PENDAFTARAN: Pending -> Verified (atau Ditolak). Dipakai juga saat polling (ganti #pend).
+ * Isi layar STATUS PENDAFTARAN (progress 3 langkah):
+ *   menunggu (1/3) -> diperiksa (2/3) -> disetujui (3/3, + kode verifikasi bila CFG.OTP_PENDAFTARAN) | ditolak.
+ * Dipakai juga saat polling (ganti #pend).
  * @param {{email?:string, status?:string, hasSession?:boolean}} ctx hasSession = pendaftar sedang login
  */
 export const pendingHTML = (ctx) => {
-  const status = ctx.status || 'menunggu';
-  const kind = status === 'disetujui' ? 'ok' : status === 'ditolak' ? 'no' : 'wait';
-  const label = { ok: t('pd.verified'), no: t('pd.rejected'), wait: t('pd.pending') }[kind];
-  const icon = { ok: ICON.check, no: ICON.cross, wait: ICON.clock }[kind];
-  const title = { ok: t('pd.okTitle'), no: t('pd.rejTitle'), wait: t('pd.pendingTitle') }[kind];
-  const text = { ok: 'pd.okText', no: 'pd.rejText', wait: 'pd.pendingText' }[kind];
+  const status = ['menunggu', 'diperiksa', 'disetujui', 'ditolak'].includes(ctx.status) ? ctx.status : 'menunggu';
+  const kind = { menunggu: 'wait', diperiksa: 'check', disetujui: 'ok', ditolak: 'no' }[status];
+  const otp = kind === 'ok' && CFG.OTP_PENDAFTARAN;
+  const step = { wait: 1, check: 2, ok: 3, no: 0 }[kind];
+  const label = { ok: t('pd.verified'), no: t('pd.rejected'), wait: t('pd.pending'), check: t('pd.checking') }[kind];
+  const icon = { ok: ICON.check, no: ICON.cross, wait: ICON.clock, check: ICON.search }[kind];
+  const title = { ok: t('pd.okTitle'), no: t('pd.rejTitle'), wait: t('pd.pendingTitle'), check: t('pd.checkTitle') }[kind];
+  const text = { ok: otp ? 'pd.okTextOtp' : 'pd.okText', no: 'pd.rejText', wait: 'pd.pendingText', check: 'pd.checkText' }[kind];
   const email = '<b>' + esc(ctx.email || '') + '</b>';
+  const dots = step
+    ? '<div class="pd-steps" role="img" aria-label="' + esc(t('pd.step', { n: step })) + '">' +
+      [1, 2, 3].map((n) => '<i class="' + (n < step ? 'done' : n === step ? 'now' : '') + '"></i>').join('') +
+      '<span class="pd-n">' + step + '/3</span></div>'
+    : '';
+  const body = otp
+    ? '<form class="auth-form pd-otp" data-form="pd-otp" novalidate>' + otpBoxesHTML() +
+      '<p class="otp-meta">' + t('pd.otpExpires') + ' <b id="otp-timer" dir="ltr">' + mmss(CFG.OTP_MENIT * 60) + '</b></p>' +
+      '<p class="otp-err" role="alert" hidden></p>' +
+      '<button class="auth-btn" type="submit">' + t('pd.otpSubmit') + '</button>' +
+      '<div class="auth-links">' + t('pd.otpNoCode') + '<button type="button" id="otp-resend" data-act="otp-resend" disabled>' + t('pd.otpResend') + '</button></div>' +
+      '<div class="auth-links end"><button type="button" data-act="pending-back">' + t('pd.back') + '</button></div></form>'
+    : kind === 'wait' || kind === 'check'
+      ? (ctx.hasSession ? '<div class="auth-links end"><button type="button" data-act="pending-back">' + t('pd.logout') + '</button></div>' : '')
+      : '<button class="auth-btn" type="button" data-act="pending-back">' + t('pd.back') + '</button>';
   return (
-    '<div class="pending" id="pend" data-status="' + esc(status) + '" aria-live="polite">' +
-    '<span class="pending-pill is-' + kind + '">' + icon + label + '</span>' +
+    '<div class="pending" id="pend" data-status="' + esc(status) + '" data-email="' + esc(ctx.email || '') + '" data-session="' + (ctx.hasSession ? '1' : '') + '" aria-live="polite">' +
+    '<span class="pending-pill is-' + kind + '">' + icon + label + '</span>' + dots +
     '<h2 class="auth-title">' + title + '</h2>' +
     '<p class="auth-hint">' + t(text, { email }) + '</p>' +
-    (kind === 'wait' && !ctx.hasSession ? '<p class="auth-hint">' + t('pd.checkMail') + '</p>' : '') +
-    (kind === 'wait'
-      ? (ctx.hasSession ? '<div class="auth-links end"><button type="button" data-act="pending-back">' + t('pd.logout') + '</button></div>' : '')
-      : '<button class="auth-btn" type="button" data-act="pending-back">' + t('pd.back') + '</button>') +
-    '</div>'
+    (kind === 'wait' && !ctx.hasSession && !CFG.OTP_PENDAFTARAN ? '<p class="auth-hint">' + t('pd.checkMail') + '</p>' : '') +
+    body + '</div>'
   );
 };
 
@@ -235,7 +256,7 @@ export const authScreenHTML = (mode, ctx = {}) => {
     '</div></div>';
   return (
     '<section class="auth" data-pane="' + aktif + '" data-page="1">' +
-    '<div class="auth-ptr" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
+    '<div class="auth-ptr" aria-hidden="true">' + gacoanLoaderHTML() + '</div>' +
     '<div class="auth-right"><div class="auth-deck">' +
     pane('jastip', bodyFor(mode, ctx), infoHTML('jastip'), 'jastiper') +
     pane('jastiper', joinBody(ctx), infoHTML('jastiper'), 'jastip') +
