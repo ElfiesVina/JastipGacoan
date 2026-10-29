@@ -409,6 +409,7 @@ fun OrderListSection(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PersonOrderRow(
     group: PersonGroup,
@@ -478,7 +479,7 @@ fun PersonOrderRow(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = if (group.paid) "✓ Lunas" else "Belum",
+                        text = if (group.paid) "âœ“ Lunas" else "Belum",
                         style = MaterialTheme.typography.labelLarge.copy(
                             color = if (group.paid) SuccessGreen else PinkAccent,
                             fontSize = 11.sp
