@@ -11,6 +11,33 @@
      >=1024px laptop / desktop
    ===================================================================== */
 
+/* --- Optimalisasi Mobile & Safari iPhone --- */
+@supports (-webkit-touch-callout: none) {
+  /* Safari iOS specific enhancements */
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+  .auth-scroll, dialog, .shb {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Cegah ketukan abu-abu standar iOS */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Jarak aman notch & gesture bar untuk layar HP (iPhone X dan seterusnya) */
+body {
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+}
+
+/* Pastikan target sentuh minimal 44px untuk kenyamanan jempol */
+button, .btn, .sw, .bell, .opt, .lv {
+  min-height: 44px;
+}
+
 /* --- HP sangat kecil (mis. 320px) --- */
 @media (max-width:359px){
   header{padding-left:calc(14px + var(--safe-l));padding-right:calc(14px + var(--safe-r))}
@@ -25,6 +52,9 @@
 @media (max-height:480px) and (orientation:landscape){
   header{padding-top:calc(12px + var(--safe-t));padding-bottom:30px}
   dialog{max-height:94vh;max-height:94dvh}
+  .cust #go, .cust #pay {
+    position: static;
+  }
 }
 
 /* --- >=480px --- */
