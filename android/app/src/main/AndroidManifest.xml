@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".GacoanApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,14 +14,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TitipGacoan">
 
+        <!-- singleTask: membuka link sesi saat aplikasi sudah jalan tidak membuat jendela kedua.
+             configChanges: memutar layar atau mengubah ukuran tidak memuat ulang halaman. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|uiMode"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.TitipGacoan">
+            android:theme="@style/Theme.TitipGacoan.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Link sesi https://titipgacoan.vercel.app/#/s/KODE -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="titipgacoan.vercel.app" />
             </intent-filter>
         </activity>
 

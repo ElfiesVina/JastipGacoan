@@ -32,6 +32,12 @@ Modul ES butuh server HTTP (tidak jalan lewat `file://`). Di Vercel langsung jal
 1. Supabase > SQL Editor, jalankan `supabase/schema.sql`
 2. Lalu `supabase/migrasi-2026-10-15.sql`
 
+## Aplikasi Android (APK)
+Folder `android/` hanyalah cangkang WebView untuk web ini (`MainActivity.kt`), jadi tampilan dan fitur SELALU sama dengan web.
+Mengubah web (di Vercel) tidak perlu membangun ulang APK. APK hanya perlu dibangun ulang bila mengubah kode di `android/`
+atau icon. Alamat web diatur di `BASE_URL` pada `MainActivity.kt`. Build: GitHub Actions (`.github/workflows/build-apk.yml`).
+Icon: gambar sumber di `icons/app-icon-source.jpg`; ukuran Android ada di `android/app/src/main/res/mipmap-*`.
+
 ## Menambah catatan perubahan
 Buka `js/data/changelog-data.js`, taruh entri baru di paling atas dengan `id` satu angka di atas yang terakhir.
 

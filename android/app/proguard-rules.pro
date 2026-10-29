@@ -1,15 +1,5 @@
 # Proguard rules for com.jastip.gacoan
--keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
-
-# Keep data models for kotlinx.serialization
--keepclassmembers class * {
-    @kotlinx.serialization.Serializable <fields>;
-    companion object *;
+# Metode yang dipanggil dari JavaScript (lihat MainActivity.Bridge) harus tetap ada.
+-keepclassmembers class com.jastip.gacoan.MainActivity$Bridge {
+    @android.webkit.JavascriptInterface <methods>;
 }
--keepclasseswithmembers class * {
-    kotlinx.serialization.KSerializer serializer(...);
-}
-
-# Keep OkHttp
--dontwarn okhttp3.**
--dontwarn okio.**
