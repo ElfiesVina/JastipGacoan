@@ -7,7 +7,7 @@
 
 ### v2.5 — Tarik untuk refresh (Gacoan)
 - Header **tetap diam** saat layar ditarik, di HP maupun laptop/PC.
-- Di bawah header muncul ikon muat pink dan tulisan **GACOAN** yang terisi satu huruf demi satu huruf mengikuti tarikan. Lepas setelah penuh = halaman dimuat ulang.
+- Di bawah header muncul **ikon muat pink**. Tulisan **TITIP GACOAN di header** hilang berurutan (huruf GACOAN, latar pink, huruf TITIP) lalu terisi kembali dengan urutan sama mengikuti tarikan. Lepas setelah penuh = halaman dimuat ulang; saat memuat, animasi hilang-terisi berulang.
 - HP/tablet: tarik dengan jari dari posisi paling atas. Laptop/PC: gulir ke atas (roda mouse/trackpad) saat sudah di paling atas.
 - Layar masuk/daftar memakai indikator yang sama (pita atas tetap diam).
 - Berkas: `js/services/pull-refresh.js`, `js/components/gacoan-loader.js`, `css/components/ptr.css`.

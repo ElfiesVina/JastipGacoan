@@ -16,8 +16,9 @@ export const CHANGELOG = [
     judul: 'Tarik untuk refresh yang baru',
     poin: [
       'Header kini tetap diam saat layar ditarik, di HP maupun laptop.',
-      'Di bawah header muncul ikon muat berwarna pink dan tulisan GACOAN yang terisi satu huruf demi satu huruf.',
-      'Lepas setelah semua huruf penuh untuk memuat ulang halaman.'] },
+      'Di bawah header muncul ikon muat berwarna pink.',
+      'Tulisan TITIP GACOAN di header hilang berurutan (GACOAN, latar pink, TITIP) lalu terisi kembali satu huruf demi satu huruf.',
+      'Lepas setelah logo terisi penuh untuk memuat ulang halaman.'] },
   { id: 19, tgl: '2026-10-29', v: '2.4', jenis: 'Fitur', untuk: 'semua',
     judul: 'Status pendaftaran lebih jelas: Sedang diperiksa',
     poin: [
