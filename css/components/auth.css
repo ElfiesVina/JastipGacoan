@@ -8,7 +8,7 @@
      Tiap halaman (.auth-pane) punya dua layar yang digulir tegak dengan snap:
        .auth-p1 = pita + logo + form  (bawahnya kosong, hanya panah V)
        .auth-p2 = sambutan + cara kerja + footer (panah ^ di atas)
-     Variabel: --p (0..1 gulir tegak per halaman, efek scale), --pull (tarik untuk refresh).
+     Variabel: --p (0..1 gulir tegak per halaman, efek scale), --pull / --ptr (tarik untuk refresh, lihat ptr.css).
    Laptop / PC (>=900px): panel kiri (sambutan + cara kerja), kanan = halaman aktif; tanpa ikon switch.
    ===================================================================== */
 
@@ -38,16 +38,7 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 220' preserveAspectRatio='none'%3E%3Cpath d='M0 220C120 208 210 172 270 112C320 62 365 32 400 24V220Z' fill='%23ebf8f9'/%3E%3C/svg%3E") no-repeat right bottom/100% 100%;
 }
 
-/* indikator "tarik untuk refresh": biru memanjang di atas konten yang bergeser turun */
-.auth-ptr{
-  position:absolute;top:0;left:0;right:0;z-index:0;height:var(--pull,0px);
-  background:var(--au);color:#fff;pointer-events:none;overflow:hidden;
-  display:grid;place-items:end center;
-}
-.auth-ptr svg{margin-bottom:16px;opacity:var(--ptr,0);transform:rotate(calc(var(--ptr,0) * 300deg))}
-.auth.refreshing .auth-ptr svg{opacity:1;animation:auth-spin .8s linear infinite}
-@keyframes auth-spin{to{transform:rotate(360deg)}}
-.auth:not(.pulling) .auth-ptr{transition:height .35s cubic-bezier(.2,.8,.2,1)}
+/* indikator "tarik untuk refresh" (Gacoan): lihat css/components/ptr.css */
 
 /* HP: pembungkus "dilebur" supaya deck memenuhi layar; panel kiri & footer laptop disembunyikan */
 .auth-right{display:contents}
@@ -58,9 +49,7 @@ body.auth-mode main{max-width:none;margin:0;padding:0}
    jadi warna di tepi atas layar tetap dan tidak berkedip putih saat pindah halaman. */
 .auth-deck{
   position:absolute;inset:0;z-index:1;
-  transform:translateY(var(--pull,0px));
 }
-.auth:not(.pulling) .auth-deck{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .auth-pane{position:absolute;inset:0}
 /* pindah halaman Jastip <-> Jastiper: langsung, tanpa animasi */
 .auth[data-pane="jastip"] .pane-jastiper,
@@ -559,3 +548,47 @@ html[data-theme="dark"] .pending-pill.is-wait{background:#3a2e10;color:#f1c768}
 html[data-theme="dark"] .pending-pill.is-ok{background:#12302a;color:#35c58d}
 html[data-theme="dark"] .pending-pill.is-no{background:#3a1626;color:#ff8fb0}
 [dir="rtl"] .auth-field textarea{padding:12px 48px 12px 16px}
+
+/* --- layar status pendaftaran: pil "Sedang diperiksa", progress 3 langkah, kode verifikasi --- */
+.pending-pill.is-check{background:#ffe9b8;color:#7a4a00}
+html[data-theme="dark"] .pending-pill.is-check{background:#4a3708;color:#ffc857}
+
+/* progress: tiga batang + angka 1/3 */
+.pd-steps{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto 14px;max-width:240px}
+.pd-steps i{flex:1;height:6px;border-radius:999px;background:#dfe9ef}
+.pd-steps i.done{background:var(--ab)}
+.pd-steps i.now{background:linear-gradient(90deg,var(--au),var(--ab))}
+.pending-pill.is-check ~ .pd-steps i.now{background:#f0a500}
+.pending-pill.is-ok ~ .pd-steps i.now{background:#0a7a4d}
+.pd-n{flex:none;margin-left:6px;font:800 12px var(--f-body);color:#6b7a90}
+html[data-theme="dark"] .pd-steps i{background:#2a3d52}
+html[data-theme="dark"] .pd-n{color:#9fb0c4}
+[dir="rtl"] .pd-n{margin:0 6px 0 0}
+
+/* enam kotak kode */
+.pd-otp{margin-top:6px}
+.otp-boxes{display:flex;justify-content:center;gap:clamp(6px,2.4vw,10px)}
+.otp-box{
+  width:clamp(40px,12.5vw,52px);height:clamp(50px,15vw,60px);min-height:0;margin:0;padding:0;
+  border:1.5px solid #dfe9ef;border-radius:14px;background:#f8f9fb;color:#10192b;
+  font:800 24px var(--f-body);text-align:center;caret-color:var(--au);
+}
+.otp-box:focus{outline:0;border-color:var(--au);background:#fff;box-shadow:0 0 0 4px #1db3d524}
+.otp-box:disabled{opacity:.55}
+.otp-boxes.is-bad .otp-box{border-color:#e5466f;background:#fff5f8}
+html[data-theme="dark"] .otp-box{background:#172433;border-color:#2a3d52;color:#e9f0f7}
+html[data-theme="dark"] .otp-box:focus{background:#1b2b3d;border-color:var(--au)}
+html[data-theme="dark"] .otp-boxes.is-bad .otp-box{background:#3a1626;border-color:#ff8fb0}
+.otp-boxes.shake{animation:otp-shake .38s}
+@keyframes otp-shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+
+/* timer kedaluwarsa + pesan galat inline */
+.otp-meta{margin:14px 0 0;font-size:13px;color:#6b7a90;text-align:center}
+.otp-meta b{font:800 15px var(--f-body);color:var(--ab);font-variant-numeric:tabular-nums}
+.otp-meta b.is-low{color:#d9534f}
+html[data-theme="dark"] .otp-meta{color:#9fb0c4}
+.otp-err{margin:10px 0 0;font-size:13px;font-weight:700;color:#c2294d;text-align:center}
+html[data-theme="dark"] .otp-err{color:#ff8fb0}
+.pd-otp .auth-links{justify-content:center}
+.pd-otp .auth-links button:disabled{opacity:.5}
+.pd-otp .auth-links.end{justify-content:center;margin-top:4px}

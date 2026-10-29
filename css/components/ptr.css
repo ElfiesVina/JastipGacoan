@@ -1,0 +1,70 @@
+/* =====================================================================
+   components/ptr.css
+   Tarik untuk refresh bergaya Gacoan (js/services/pull-refresh.js dan layar masuk).
+
+   - #ptr: ruang di bawah header yang tingginya mengikuti jari (--pull). Header tidak bergerak;
+     konten di bawahnya ikut turun karena #ptr mengisi ruang itu.
+   - .gl: indikator = ikon putar pink + tulisan GACOAN yang terisi per huruf.
+     Variabel --ptr (0..1) diisi JS; tiap huruf (--i = 0..5) terisi bergantian dari bawah ke atas.
+   ===================================================================== */
+
+/* matikan tarik-bawaan browser (yang membuat header ikut tertarik) di semua halaman biasa */
+html,body{overscroll-behavior-y:none}
+
+#ptr{
+  position:relative;height:var(--pull,0px);overflow:hidden;pointer-events:none;
+}
+/* main memakai margin atas -16px; selagi ditarik, imbangi supaya tinggi ruang = jarak tarik */
+#ptr.on{margin-bottom:16px}
+#ptr:not(.pulling){transition:height .3s cubic-bezier(.2,.8,.2,1)}
+.ptr-in{
+  position:absolute;left:0;right:0;top:0;bottom:0;
+  display:grid;place-items:center;
+  opacity:var(--ptr,0);
+  transform:translateY(calc((1 - var(--ptr,0)) * -14px));
+}
+body.boot #ptr,body.auth-mode #ptr{display:none}
+
+/* ---------------- indikator Gacoan ---------------- */
+.gl{display:inline-flex;align-items:center;gap:9px;color:var(--pk)}
+.gl-ico{flex:none;transform:rotate(calc(var(--ptr,0) * 320deg))}
+.gl-t{display:inline-flex;font:800 25px/1 var(--f-head);letter-spacing:.07em;text-transform:uppercase}
+.gl-c{
+  position:relative;display:inline-block;
+  /* huruf ke-i mulai terisi saat tarikan melewati i/7, penuh 1/7 kemudian */
+  --k:clamp(0, calc(var(--ptr,0) * 7 - var(--i,0)), 1);
+}
+.gl-b{color:var(--ln)}                              /* huruf kosong (abu-abu pucat) */
+.gl-f{                                              /* huruf terisi pink; dipotong dari atas, jadi terisi dari bawah naik */
+  position:absolute;left:0;top:0;color:var(--pk);
+  clip-path:inset(calc((1 - var(--k)) * 100%) 0 0 0);
+}
+html[data-theme="dark"] .gl-b{color:#38506a}
+
+/* ---------------- sedang memuat ---------------- */
+.refreshing .gl-ico{animation:gl-spin .8s linear infinite}
+.refreshing .gl-f{
+  clip-path:inset(0);                                /* cadangan bila animasi dimatikan */
+  animation:gl-fill 1.3s ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * .12s);
+}
+@keyframes gl-spin{to{transform:rotate(360deg)}}
+@keyframes gl-fill{
+  0%,100%{clip-path:inset(100% 0 0 0)}
+  40%,70%{clip-path:inset(0 0 0 0)}
+}
+
+/* ---------------- layar masuk/daftar (HP) ---------------- */
+/* Pita atas tidak bergerak. Indikator melayang tepat di bawah pita, form turun sedikit memberi ruang. */
+.auth{--hh:64px}
+@media (min-width:600px) and (max-width:899px){ html[data-orient="port"] .auth{--hh:84px} }
+.auth-ptr{
+  position:absolute;left:0;right:0;z-index:4;pointer-events:none;
+  top:calc(var(--hh) + var(--safe-t) + 14px);
+  display:grid;place-items:center;
+  opacity:var(--ptr,0);
+  transform:translateY(calc((1 - var(--ptr,0)) * -12px));
+}
+.auth:not(.pulling) .auth-ptr{transition:opacity .25s,transform .25s}
+.auth-main{transform:translateY(calc(var(--pull,0px) * .9))}
+.auth:not(.pulling) .auth-main{transition:transform .35s cubic-bezier(.2,.8,.2,1)}

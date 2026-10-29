@@ -22,4 +22,15 @@ export const CFG = {
    * ke akun lain. Dicek juga di database (fungsi is_developer()) supaya tidak bisa dilewati dari luar.
    */
   DEV_EMAIL: 'vifie14@gmail.com',
+
+  /**
+   * Verifikasi email dengan kode 6 digit setelah pendaftaran disetujui.
+   * false = layar "Verified" lama (tombol kembali ke masuk). Ubah ke true HANYA setelah Edge Function
+   * `kode-pendaftaran` terpasang (lihat docs/DESAIN-ALUR-PENDAFTARAN.md), kalau tidak pendaftar tidak bisa verifikasi.
+   */
+  OTP_PENDAFTARAN: false,
+
+  /** Umur kode verifikasi (menit) dan jeda minimal kirim ulang (detik). Samakan dengan Edge Function. */
+  OTP_MENIT: 5,
+  OTP_JEDA_DETIK: 60,
 };

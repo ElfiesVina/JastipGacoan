@@ -12,6 +12,19 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 20, tgl: '2026-10-29', v: '2.5', jenis: 'Tampilan', untuk: 'semua',
+    judul: 'Tarik untuk refresh yang baru',
+    poin: [
+      'Header kini tetap diam saat layar ditarik, di HP maupun laptop.',
+      'Di bawah header muncul ikon muat berwarna pink dan tulisan GACOAN yang terisi satu huruf demi satu huruf.',
+      'Lepas setelah semua huruf penuh untuk memuat ulang halaman.'] },
+  { id: 19, tgl: '2026-10-29', v: '2.4', jenis: 'Fitur', untuk: 'semua',
+    judul: 'Status pendaftaran lebih jelas: Sedang diperiksa',
+    poin: [
+      'Halaman status pendaftar kini punya progress 3 langkah: Menunggu, Sedang diperiksa, lalu Verified.',
+      'Developer dan Co Jastip bisa menekan Mulai periksa sebelum menyetujui atau menolak.',
+      'Panel Persetujuan menampilkan jumlah pendaftar per status dan menyegarkan dirinya sendiri.',
+      'Siap untuk kode verifikasi 6 digit lewat email (aktif setelah layanan emailnya dipasang).'] },
   { id: 18, tgl: '2026-10-27', v: '2.3', jenis: 'Fitur', untuk: 'semua',
     judul: 'Daftar jastip kini lewat persetujuan',
     poin: [
