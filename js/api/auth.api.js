@@ -4,6 +4,8 @@
  */
 import { sb } from './client.js';
 
+import { CFG } from '../config.js';
+
 /** Ambil sesi login saat ini. @returns {Promise<object|null>} session atau null */
 export async function getSession() {
   const { data: { session } } = await sb.auth.getSession();
@@ -42,10 +44,6 @@ export const verifyResetCode = (email, token) => sb.auth.verifyOtp({ email, toke
 /** Ganti password akun yang sedang login (dipakai setelah membuka link reset). */
 export const updatePassword = (password) => sb.auth.updateUser({ password });
 
-// Tambahkan ke js/api/auth.api.js
-
-import { sb } from './client.js';
-import { CFG } from '../config.js';
 
 const EDGE_URL = `${CFG.URL}/functions/v1/kode-pendaftaran`;
 
