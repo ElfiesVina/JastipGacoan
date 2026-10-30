@@ -12,6 +12,23 @@
  *   poin  : daftar kalimat pendek, bahasa orang awam
  */
 export const CHANGELOG = [
+  { id: 22, tgl: '2026-10-29', v: '2.7', jenis: 'Perbaikan', untuk: 'semua',
+    judul: 'Aplikasi Android kini seperti aplikasi sungguhan',
+    poin: [
+      'Aplikasi berjalan sendiri, tanpa bilah alamat Chrome. Isi otomatis sandi dari Google tetap bisa dipakai.',
+      'Pilih foto bukti transfer kini berfungsi di aplikasi.',
+      'Tombol Back menutup jendela yang terbuka, mundur satu halaman, lalu keluar dari aplikasi.',
+      'Link WhatsApp terbuka langsung di aplikasi WhatsApp.',
+      '"Simpan rekap sebagai gambar" menyimpan gambar ke galeri HP.',
+      'Ada layar pembuka dengan logo baru dan layar "Tidak ada koneksi" dengan tombol Coba lagi.',
+      'Tampilan terbaru kini lebih cepat terpasang karena penyimpanan offline aplikasi diperbarui.',
+      'Membuka link sesi dari WhatsApp bisa langsung masuk ke aplikasi (aktifkan "Buka link yang didukung" di info aplikasi).'] },
+  { id: 21, tgl: '2026-10-29', v: '2.6', jenis: 'Tampilan', untuk: 'semua',
+    judul: 'Icon aplikasi Android yang baru',
+    poin: [
+      'Icon APK diganti: logo mangkuk dan sumpit dengan tulisan Jastip GacoanApp berwarna biru.',
+      'Latar icon kini putih dan logonya pas di dalam bentuk bulat maupun kotak bulat bawaan HP.',
+      'Ukuran icon disesuaikan untuk semua kerapatan layar, jadi lebih tajam dan file lebih kecil.'] },
   { id: 20, tgl: '2026-10-29', v: '2.5', jenis: 'Tampilan', untuk: 'semua',
     judul: 'Tarik untuk refresh yang baru',
     poin: [

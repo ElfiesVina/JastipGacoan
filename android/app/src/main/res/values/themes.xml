@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Tema aplikasi setelah splash screen selesai. -->
     <style name="Theme.TitipGacoan" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/teal_primary</item>
         <item name="android:navigationBarColor">@color/surface</item>
         <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+
+    <!-- Tema saat aplikasi dibuka: splash screen putih dengan logo. -->
+    <style name="Theme.TitipGacoan.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/surface</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.TitipGacoan</item>
     </style>
 </resources>
