@@ -1,2 +1,23 @@
+# Sistem
+.DS_Store
+Thumbs.db
+
+# Rahasia / lokal
+.env
+.env.*
+*.pem
 update.sh
-update.sh
+
+# Vercel / Node
+.vercel/
+node_modules/
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.apk
+*.aab
+*.iml

@@ -1,3 +1,5 @@
+> **Catatan (29 Okt 2026):** dokumen ini bersifat historis (audit 15 Okt). Semua "migrasi" yang disebut di bawah sudah digabung ke `supabase/schema.sql`, jadi tidak ada file migrasi terpisah. Pembatasan siapa yang boleh jadi jastip kini lewat tabel `allowed_jastip` dan alur persetujuan (lihat README bagian Peran).
+
 # Audit kode, 15 Okt 2026
 
 Cakupan: `index.html`, `schema.sql`, `config.js`. Status: **Diperbaiki** = sudah ada di versi ini,

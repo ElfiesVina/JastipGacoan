@@ -5,7 +5,7 @@
 
 ## Ringkasan hasil audit
 - Aplikasi sudah memiliki halaman Pending, RPC daftar persetujuan, dan tab `#/approval` untuk Developer/Co Jastip.
-- Status saat ini hanya `menunggu`, `disetujui`, `ditolak`; belum ada status `diperiksa`.
+- (Kondisi saat desain ditulis) status hanya `menunggu`, `disetujui`, `ditolak`. Status `diperiksa` dan RPC `mulai_periksa_permintaan_jastip` kini sudah ada di `supabase/schema.sql`.
 - OTP yang ada di `admin-auth.js` adalah OTP **reset password**, bukan verifikasi pendaftaran.
 - `signUp()` saat ini memanggil Supabase Auth langsung. Pengiriman email dan penerbitan OTP setelah persetujuan perlu diatur di backend, bukan hanya di tampilan.
 

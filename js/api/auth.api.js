@@ -4,8 +4,6 @@
  */
 import { sb } from './client.js';
 
-import { CFG } from '../config.js';
-
 /** Ambil sesi login saat ini. @returns {Promise<object|null>} session atau null */
 export async function getSession() {
   const { data: { session } } = await sb.auth.getSession();
@@ -43,35 +41,3 @@ export const verifyResetCode = (email, token) => sb.auth.verifyOtp({ email, toke
 
 /** Ganti password akun yang sedang login (dipakai setelah membuka link reset). */
 export const updatePassword = (password) => sb.auth.updateUser({ password });
-
-
-const EDGE_URL = `${CFG.URL}/functions/v1/kode-pendaftaran`;
-
-/** Minta Edge Function mengirim kode 6 digit ke email (dipanggil saat klik "Masuk" di halaman pending). */
-export async function kirimKodePendaftaran(email) {
-  const res = await fetch(EDGE_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: CFG.KEY },
-    body: JSON.stringify({ action: 'kirim', email }),
-  });
-  return res.json(); // { ok: true } atau { error: '...' }
-}
-
-/** Verifikasi kode 6 digit. Kalau benar, pasang session-nya supaya user benar-benar login. */
-export async function verifikasiKodePendaftaran(email, token) {
-  const res = await fetch(EDGE_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: CFG.KEY },
-    body: JSON.stringify({ action: 'verifikasi', email, token }),
-  });
-  const result = await res.json();
-
-  if (result.ok && result.session) {
-    // Pasang session dari Edge Function supaya browser benar-benar dianggap login
-    await sb.auth.setSession({
-      access_token: result.session.access_token,
-      refresh_token: result.session.refresh_token,
-    });
-  }
-  return result; // { ok: true, session } atau { error: '...' }
-}
